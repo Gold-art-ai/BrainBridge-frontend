@@ -70,7 +70,7 @@ export default function DashboardPage() {
     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-[#08075C]">Welcome, John</h2>
+          <h2 className="text-2xl font-bold text-[#08075C]">Welcome, Gold</h2>
           <p className="text-gray-400 text-xs font-medium uppercase tracking-widest mt-0.5">Project Overview • Feb 2026</p>
         </div>
 

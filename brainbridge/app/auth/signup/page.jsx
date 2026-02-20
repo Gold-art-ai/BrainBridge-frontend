@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function SignUpPage() {
   const [errors, setErrors] = useState({});
@@ -139,10 +140,16 @@ export default function SignUpPage() {
           
           {/* LEFT SIDE: FORM */}
           <div className="w-full lg:w-1/2 p-8 sm:p-12 md:p-16">
-            <h1 className="text-3xl font-bold mb-6 bg-clip-text text-transparent w-fit"
-              style={{ fontFamily: "'Playpen Sans', cursive", backgroundImage: "linear-gradient(90deg, #08075C, #3A38DE)" }}>
-              BrainBridge
-            </h1>
+            <Link href="/" className="inline-block mb-6">
+              <Image 
+                src="/logo_main.png" 
+                alt="BrainBridge" 
+                width={180} 
+                height={60}
+                className="object-contain"
+                priority
+              />
+            </Link>
 
             <h2 className="text-3xl font-bold mb-1 text-[#08075C]">Create an account</h2>
             <p className="text-sm text-gray-400 mb-8 font-medium">
@@ -204,8 +211,14 @@ export default function SignUpPage() {
           {/* RIGHT SIDE: BRAND SHOWCASE */}
           <div className="hidden lg:flex w-1/2 bg-[#F8F9FF] relative items-center justify-center p-16">
             <div className="relative z-20 text-center">
-               <div className="w-32 h-32 bg-white rounded-[2.5rem] flex items-center justify-center shadow-xl mb-10 mx-auto border border-blue-50">
-                  <i className="fa-solid fa-code-branch text-5xl text-[#3A38DE] opacity-40"></i>
+               <div className="w-40 h-40 bg-white rounded-[2.5rem] flex items-center justify-center shadow-xl mb-10 mx-auto border border-blue-50 p-6">
+                  <Image 
+                    src="/logo_main.png" 
+                    alt="BrainBridge Logo" 
+                    width={140} 
+                    height={140}
+                    className="object-contain"
+                  />
                </div>
                <h3 className="text-3xl font-bold text-[#08075C] mb-4 leading-tight">
                  Build. Showcase.<br/>Connect.
