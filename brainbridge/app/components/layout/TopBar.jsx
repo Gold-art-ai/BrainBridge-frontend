@@ -68,13 +68,13 @@ export default function TopBar({ onMenuClick }) {
         {/* User Profile Summary */}
         <div className="flex items-center gap-2 sm:gap-3 cursor-pointer group p-1 rounded-xl hover:bg-gray-50 transition-all">
           <div className="text-right hidden md:block">
-            <p className="text-sm font-bold text-[#08075C]">Gold Developer</p>
+            <p className="text-sm font-bold text-[#08075C]">Gold</p>
             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Admin Node</p>
           </div>
           
           {/* Avatar with Brand Gradient */}
           <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-[#08075C] to-[#3A38DE] rounded-xl flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-500/10 transition-transform group-hover:scale-105">
-            JD
+            G
           </div>
           
           <ChevronDown 
