@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   FolderCode, 
@@ -11,9 +11,14 @@ import {
   Bell, 
   ChevronDown 
 } from 'lucide-react';
+import { redirect } from 'next/navigation';
 
 export default function NavigationShell({ children }) {
   const [activeTab, setActiveTab] = useState('dashboard');
+
+  useEffect(() => {
+    redirect('/dashboard');
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-[#F5F6FA] font-sans">
