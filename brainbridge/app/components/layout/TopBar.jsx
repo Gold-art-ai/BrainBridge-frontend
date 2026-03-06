@@ -1,5 +1,4 @@
-"use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Search, 
   Bell, 
@@ -8,6 +7,22 @@ import {
 } from 'lucide-react';
 
 export default function TopBar() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        setUser(JSON.parse(userStr));
+      } catch (e) {
+        console.error("Error parsing user from localStorage", e);
+      }
+    }
+  }, []);
+
+  const fullName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username : "Guest User";
+  const initials = user ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || user.username?.[0] || 'U'}`.toUpperCase() : "GU";
+
   return (
     <header className="h-20 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-8 sticky top-0 z-40 ml-64">
       {/* Search Input - Optimized Visibility */}
@@ -42,13 +57,13 @@ export default function TopBar() {
         {/* User Profile Summary */}
         <div className="flex items-center gap-3 cursor-pointer group p-1 rounded-xl hover:bg-gray-50 transition-all">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-bold text-[#08075C]">John Developer</p>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Admin Node</p>
+            <p className="text-sm font-bold text-[#08075C]">{fullName}</p>
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{user ? 'Developer' : 'Guest'}</p>
           </div>
           
           {/* Avatar with Brand Gradient */}
           <div className="w-10 h-10 bg-gradient-to-br from-[#08075C] to-[#3A38DE] rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-md shadow-blue-500/10 transition-transform group-hover:scale-105">
-            JD
+            {initials}
           </div>
           
           <ChevronDown 

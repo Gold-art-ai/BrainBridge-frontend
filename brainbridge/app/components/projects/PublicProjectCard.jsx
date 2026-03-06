@@ -1,32 +1,30 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { Bookmark, ArrowUpRight, Clock, Eye } from "lucide-react";
+import { useGetMyFavoritesQuery, useAddFavoriteMutation, useRemoveFavoriteMutation } from "../../redux/api/FavoritesApiSlice";
 
 export default function PublicProjectCard({ project }) {
-  const [isSaved, setIsSaved] = useState(false);
+  const { data: favoriteIds = [] } = useGetMyFavoritesQuery(undefined, {
+    skip: typeof window !== 'undefined' && !localStorage.getItem('token') // Skip if not logged in
+  });
+  const [addFavorite] = useAddFavoriteMutation();
+  const [removeFavorite] = useRemoveFavoriteMutation();
+  
+  const isSaved = favoriteIds.includes(project.id);
 
-  // Sync state with localStorage on mount
-  useEffect(() => {
-    const favs = JSON.parse(localStorage.getItem("favorited_ids") || "[]");
-    setIsSaved(favs.includes(project.id));
-  }, [project.id]);
-
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault(); // Stop navigation
     e.stopPropagation(); // Stop parent bubble
 
-    const favs = JSON.parse(localStorage.getItem("favorited_ids") || "[]");
-    let updatedFavs;
-
-    if (favs.includes(project.id)) {
-      updatedFavs = favs.filter(id => id !== project.id);
-      setIsSaved(false);
-    } else {
-      updatedFavs = [...favs, project.id];
-      setIsSaved(true);
+    try {
+      if (isSaved) {
+        await removeFavorite(project.id).unwrap();
+      } else {
+        await addFavorite(project.id).unwrap();
+      }
+    } catch (err) {
+      console.error("Failed to toggle favorite", err);
     }
-
-    localStorage.setItem("favorited_ids", JSON.stringify(updatedFavs));
   };
 
   return (
@@ -34,9 +32,9 @@ export default function PublicProjectCard({ project }) {
       {/* Image with Bookmark Icon */}
       <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-gray-100 mb-5">
         <img 
-          src={project.image} 
+          src={project.coverImageUrl} 
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
-          alt={project.name}
+          alt={project.title}
         />
         <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors" />
         
@@ -64,7 +62,7 @@ export default function PublicProjectCard({ project }) {
 
         <div className="flex items-start justify-between">
           <h4 className="text-2xl font-bold text-[#101828] group-hover:text-[#6941C6] transition-colors leading-tight">
-            {project.name}
+            {project.title}
           </h4>
           <ArrowUpRight className="text-gray-300 group-hover:text-[#6941C6] transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" size={24} />
         </div>

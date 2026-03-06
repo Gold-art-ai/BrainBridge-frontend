@@ -4,12 +4,12 @@ import React, { useState } from 'react';
 export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
   // --- Form State ---
   const [preview, setPreview] = useState(null);
-  const [name, setName] = useState('');
+  const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState('Idea');
+  const [status, setStatus] = useState('DRAFT');
   const [category, setCategory] = useState('Web App'); // New State
-  const [github, setGithub] = useState('');
-  const [projectType, setProjectType] = useState('Personal');
+  const [repoUrl, setRepoUrl] = useState('');
+  const [projectVisibility, setProjectVisibility] = useState('PUBLIC');
 
   // --- Dynamic Lists State ---
   const [skills, setSkills] = useState(['React', 'Tailwind']);
@@ -46,25 +46,25 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
   };
 
   const handleClose = () => {
-    setPreview(null); setName(''); setDescription('');
-    setStatus('Idea'); setGithub(''); setProjectType('Personal');
+    setPreview(null); setTitle(''); setDescription('');
+    setStatus('DRAFT'); setRepoUrl(''); setProjectVisibility('PUBLIC');
     setCategory('Web App'); setSkills(['React', 'Tailwind']); setMembers([]);
     onClose();
   };
 
   const handleSubmit = () => {
-    if (!name.trim() || !description.trim()) {
-      alert("Please provide a project name and value proposition.");
+    if (!title.trim() || !description.trim()) {
+      alert("Please provide a project title and value proposition.");
       return;
     }
-    if (status !== 'Idea' && !github.trim()) {
-      alert("Please provide a GitHub repository link for this phase.");
+    if (status !== 'DRAFT' && !repoUrl.trim()) {
+      alert("Please provide a repository link for this phase.");
       return;
     }
 
     onAddProject({
-      name, description, status, category, github, projectType,
-      tech: skills, members, image: preview,
+      title, description, projectStatus: status, category, repoUrl, projectVisibility,
+      tech: skills, members, coverImageUrl: preview,
       createdAt: new Date().toISOString()
     });
     handleClose();
@@ -120,9 +120,9 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
           {/* 2. Basic Info */}
           <div className="space-y-4">
             <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1.5 ml-1">Project Name</label>
+              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1.5 ml-1">Project Title</label>
               <input 
-                type="text" value={name} onChange={(e) => setName(e.target.value)}
+                type="text" value={title} onChange={(e) => setTitle(e.target.value)}
                 className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2.5 px-4 text-xs font-semibold outline-none focus:border-[#3A38DE] text-[#08075C] transition-all" 
                 placeholder="Project Title"
               />
@@ -162,38 +162,38 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1.5 ml-1">Phase</label>
-              <select 
-                value={status} onChange={(e) => setStatus(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2.5 px-3 text-[11px] font-bold text-[#08075C] outline-none cursor-pointer"
-              >
-                <option value="Idea">Idea Phase</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Completed">Completed</option>
-                <option value="Stopped">Stopped</option>
-              </select>
+                <select 
+                  value={status} onChange={(e) => setStatus(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2.5 px-3 text-[11px] font-bold text-[#08075C] outline-none cursor-pointer"
+                >
+                  <option value="DRAFT">Draft</option>
+                  <option value="ONGOING">Ongoing</option>
+                  <option value="COMPLETED">Completed</option>
+                  <option value="FAILED">Failed</option>
+                </select>
             </div>
             <div>
               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1.5 ml-1">Type</label>
               <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
                 <button 
-                  onClick={() => setProjectType('Personal')}
-                  className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all ${projectType === 'Personal' ? 'bg-white shadow-sm text-[#3A38DE]' : 'text-gray-400'}`}
+                  onClick={() => setProjectVisibility('PRIVATE')}
+                  className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all ${projectVisibility === 'PRIVATE' ? 'bg-white shadow-sm text-[#3A38DE]' : 'text-gray-400'}`}
                 >Personal</button>
                 <button 
-                  onClick={() => setProjectType('Team')}
-                  className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all ${projectType === 'Team' ? 'bg-white shadow-sm text-[#3A38DE]' : 'text-gray-400'}`}
+                  onClick={() => setProjectVisibility('PUBLIC')}
+                  className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all ${projectVisibility === 'PUBLIC' ? 'bg-white shadow-sm text-[#3A38DE]' : 'text-gray-400'}`}
                 >Team</button>
               </div>
             </div>
           </div>
 
-          {status !== 'Idea' && (
+          {status !== 'DRAFT' && (
             <div className="animate-in slide-in-from-top-2 duration-300">
               <label className="block text-[10px] font-black text-[#3A38DE] uppercase tracking-wider mb-1.5 ml-1">Source Repository</label>
               <div className="relative">
                 <i className="fa-brands fa-github absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
                 <input 
-                  type="url" value={github} onChange={(e) => setGithub(e.target.value)}
+                  type="url" value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)}
                   className="w-full bg-blue-50/30 border border-blue-100 rounded-xl py-2.5 pl-11 pr-4 text-xs outline-none focus:border-[#3A38DE] text-[#08075C] font-medium" 
                   placeholder="https://github.com/user/repo"
                 />
@@ -224,7 +224,7 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
           </div>
 
           {/* 6. Team Tagging */}
-          {projectType === 'Team' && (
+          {projectVisibility === 'PUBLIC' && (
             <div className="animate-in slide-in-from-top-2 duration-300 space-y-2">
               <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider ml-1">Collaborators</label>
               <div className="flex flex-wrap gap-2 p-2 bg-gray-50/50 rounded-lg min-h-[30px]">

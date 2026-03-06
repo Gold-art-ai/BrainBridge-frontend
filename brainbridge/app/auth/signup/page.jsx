@@ -3,8 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+import { useRouter } from 'next/navigation';
+import { useRegisterMutation } from '../../redux/api/UserApiSlice';
+import toast from 'toastify';
+
 export default function SignUpPage() {
+  const router = useRouter();
   const [errors, setErrors] = useState({});
+  const [registerUser] = useRegisterMutation();
   const [formData, setFormData] = useState({
     username: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: ''
   });
@@ -23,7 +29,7 @@ export default function SignUpPage() {
     });
   }, [formData.password]);
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     let newErrors = {};
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email) newErrors.email = "Email is required";
@@ -38,7 +44,18 @@ export default function SignUpPage() {
     }
 
     setErrors(newErrors);
-    if (Object.keys(newErrors).length === 0) alert("Account Ready!");
+    if (Object.keys(newErrors).length === 0) {
+      try {
+        await registerUser(formData).unwrap();
+        toast.success("Account Ready! We encourage you to login.");
+        router.push('/auth/login');
+      } catch (error) {
+        toast.error(error.data?.message || "Registration failed. Try again.");
+        if (error.data?.fieldErrors) {
+           setErrors(error.data.fieldErrors);
+        }
+      }
+    }
   };
 
   const handleChange = (e, field) => {

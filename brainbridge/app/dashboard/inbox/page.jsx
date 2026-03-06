@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Send, Hash, Paperclip, Search } from 'lucide-react';
 
-export default function InboxPage() {
+function InboxContent() {
   const searchParams = useSearchParams();
   const [chats, setChats] = useState([
     { id: 'global', name: "Global Chat", project: null, lastMsg: "System online." }
@@ -112,5 +112,13 @@ export default function InboxPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function InboxPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]"><p className="text-[10px] font-black uppercase tracking-widest text-[#08075C] animate-pulse">Loading Inbox...</p></div>}>
+      <InboxContent />
+    </Suspense>
   );
 }

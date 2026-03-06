@@ -2,18 +2,40 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import toast from 'toastify';
+import { useLoginMutation } from '../../redux/api/UserApiSlice';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ emailOrUsername: '', password: '' });
   const [errors, setErrors] = useState({});
 
-  const handleLogin = () => {
+  const router = useRouter();
+  const [login] = useLoginMutation();
+
+  const handleLogin = async () => {
     let newErrors = {};
-    if (!formData.email) newErrors.email = "Email is required";
+    if (!formData.emailOrUsername) newErrors.emailOrUsername = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
     
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length === 0) alert("Welcome back!");
+    try {
+      const res = await login(formData).unwrap();
+      if (res.success && res.data && res.data.token) {
+        // Persist the token so Redux RTK queries can pick it up
+        localStorage.setItem('token', res.data.token);
+        // Optionally save the user structure locally
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+      }
+      console.log(res);
+      setErrors(newErrors);
+      router.push('/dashboard')
+    } catch (error) {
+      toast.error(error.data?.message || "Login failed. Please check your credentials.");
+      if (error.data?.fieldErrors) {
+        newErrors = { ...newErrors, ...error.data.fieldErrors };
+      }
+      setErrors(newErrors);
+    }
   };
 
   const handleChange = (e, field) => {
@@ -126,8 +148,8 @@ export default function LoginPage() {
             <div className="space-y-6">
               <div>
                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">E-mail Address</label>
-                <input type="email" value={formData.email} onChange={(e) => handleChange(e, 'email')}
-                  className={`input-field w-full rounded-2xl px-5 py-3.5 outline-none mt-1 ${errors.email ? 'error-ring animate-shake' : ''}`} 
+                <input type="email" value={formData.emailOrUsername} onChange={(e) => handleChange(e, 'emailOrUsername')}
+                  className={`input-field w-full rounded-2xl px-5 py-3.5 outline-none mt-1 ${errors.emailOrUsername ? 'error-ring animate-shake' : ''}`} 
                   placeholder="name@email.com" />
               </div>
 
@@ -145,9 +167,12 @@ export default function LoginPage() {
                 <label htmlFor="remember" className="text-xs text-gray-500 font-medium cursor-pointer">Keep me logged in</label>
               </div>
 
-              <Link href="/dashboard" className="btn-brand w-full text-white py-4 rounded-2xl font-bold text-lg shadow-xl mt-4 active:scale-95 transition-all inline-block text-center">
+              <button
+               onClick={handleLogin}
+              //  href="/dashboard"
+               className="btn-brand w-full text-white py-4 rounded-2xl font-bold text-lg shadow-xl mt-4 active:scale-95 transition-all inline-block text-center">
                 Sign In
-              </Link>
+              </button>
             </div>
           </div>
 

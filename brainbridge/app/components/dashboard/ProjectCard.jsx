@@ -17,10 +17,10 @@ export default function ProjectCard({ project }) {
       
       {/* 1. Visual Header */}
       <div className="relative h-40 w-full bg-[#F8F9FB] overflow-hidden">
-        {project.image ? (
+        {project.coverImageUrl ? (
           <img 
-            src={project.image} 
-            alt={project.name} 
+            src={project.coverImageUrl} 
+            alt={project.title} 
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           />
         ) : (
@@ -33,9 +33,9 @@ export default function ProjectCard({ project }) {
         <div className="absolute top-4 left-4">
           <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md border border-white shadow-sm text-[9px] font-black uppercase tracking-wider text-[#08075C]">
             <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${
-              project.status === 'Completed' ? 'bg-blue-400' : 'bg-[#3A38DE]'
+              project.projectStatus === 'COMPLETED' ? 'bg-blue-400' : 'bg-[#3A38DE]'
             }`}></span>
-            {project.status}
+            {project.projectStatus}
           </span>
         </div>
       </div>
@@ -46,7 +46,7 @@ export default function ProjectCard({ project }) {
           {/* We make the title a link too, very common UX pattern */}
           <Link href={viewPath}>
             <h4 className="text-[15px] font-bold text-[#08075C] leading-tight truncate group-hover:text-[#3A38DE] transition-colors cursor-pointer">
-              {project.name}
+              {project.title}
             </h4>
           </Link>
           <button className="text-gray-300 hover:text-[#08075C] transition-colors p-1 -mr-1">
@@ -59,7 +59,7 @@ export default function ProjectCard({ project }) {
         </p>
 
         <div className="flex flex-wrap gap-1.5 mb-6">
-          {project.tech.map((tag) => (
+          {project.tech?.map((tag) => (
             <span key={tag} className="text-[9px] font-black text-[#3A38DE] bg-[#3A38DE]/5 px-2 py-0.5 rounded border border-[#3A38DE]/10 uppercase tracking-tighter">
               {tag}
             </span>

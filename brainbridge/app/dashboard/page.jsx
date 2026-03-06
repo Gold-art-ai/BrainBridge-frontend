@@ -3,6 +3,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import StatsOverview from "../components/dashboard/StatsOverview";
 import ProjectCard from "../components/dashboard/ProjectCard";
 import NewProjectModal from "../components/projects/NewProjectModal";
+import { useGetMyProjectsQuery, useAddProjectMutation } from '../redux/api/ProjectsApiSlice'
 
 const DEFAULT_PROJECT_IMAGES = [
   "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=800&auto=format&fit=crop",
@@ -14,64 +15,75 @@ export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
-  const [projects, setProjects] = useState([]);
-
-  const categories = ["All", "Web App", "Mobile", "AI/ML", "Design", "Blockchain"];
+  const [userName, setUserName] = useState("Developer");
+  const { data: projects = [], isLoading } = useGetMyProjectsQuery();
 
   useEffect(() => {
-    const savedProjects = localStorage.getItem("my_projects");
-    if (savedProjects) {
-      setProjects(JSON.parse(savedProjects));
-    } else {
-      const defaultProjects = [
-        {
-          id: "1",
-          name: "BrainBridge UI",
-          description: "Design system and component library for the core platform.",
-          status: "Completed",
-          category: "Design",
-          tech: ["Next.js", "Tailwind"],
-          image: DEFAULT_PROJECT_IMAGES[0]
-        }
-      ];
-      setProjects(defaultProjects);
-      localStorage.setItem("my_projects", JSON.stringify(defaultProjects));
-    }
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const userObj = JSON.parse(userStr);
+        setUserName(userObj.firstName || userObj.username || "Developer");
+      }
+    } catch {}
   }, []);
+
+  const categories = ["All", "Web App", "Mobile", "AI/ML", "Design", "Blockchain"];
+  const [addProjectMutation] = useAddProjectMutation();
 
   const filteredProjects = useMemo(() => {
     return projects.filter((proj) => {
-      const matchesSearch = proj.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      const matchesSearch = (proj.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
         (proj.tech && proj.tech.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase())));
       const matchesCategory = activeCategory === "All" || proj.category === activeCategory;
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, activeCategory, projects]);
 
-  const addProject = (newProj) => {
-    const id = Date.now().toString();
-    
-    // Check if user uploaded an image. If not, use default.
-    const projectWithId = { 
-      ...newProj, 
-      id,
-      image: newProj.image || DEFAULT_PROJECT_IMAGES[projects.length % DEFAULT_PROJECT_IMAGES.length]
+  const addProject = async (newProj) => {
+    let ownerId = 201; // Default fallback
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const userObj = JSON.parse(userStr);
+        if (userObj.id) ownerId = userObj.id;
+      }
+    } catch (e) {
+      console.error("Failed to get user from localStorage", e);
+    }
+
+    // Explicitly pick fields the backend DTO expects
+    const payload = {
+      title: newProj.title,
+      description: newProj.description,
+      projectStatus: newProj.projectStatus,
+      projectVisibility: newProj.projectVisibility,
+      ownerId: ownerId,
+      teamId: 20, // Fallback for testing
+      sourceIdeaId: 2002, // Fallback for testing
+      coverImageUrl: newProj.coverImageUrl || "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=800&auto=format&fit=crop",
+      repoUrl: newProj.repoUrl || "",
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date().toISOString().split('T')[0]
     };
 
-    const updatedFleet = [projectWithId, ...projects];
-    setProjects(updatedFleet);
-    localStorage.setItem("my_projects", JSON.stringify(updatedFleet));
-    
-    setIsModalOpen(false); 
-    // Redirect removed: localhost:3000/projects/... will no longer happen
+    try {
+      await addProjectMutation(payload).unwrap();
+    } catch (e) {
+      console.error('Add project failed', e);
+      if (e.data && e.data.errors) {
+        console.table(e.data.errors);
+      }
+    }
+    setIsModalOpen(false);
   };
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 sm:px-6 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-[#08075C]">Welcome, John</h2>
-          <p className="text-gray-400 text-xs font-medium uppercase tracking-widest mt-0.5">Project Overview • Feb 2026</p>
+          <h2 className="text-2xl font-bold text-[#08075C]">Welcome, {userName}</h2>
+          <p className="text-gray-400 text-xs font-medium uppercase tracking-widest mt-0.5">Project Overview • {new Date().toLocaleString('default', { month: 'short', year: 'numeric' })}</p>
         </div>
 
         <button

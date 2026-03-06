@@ -51,7 +51,7 @@ export default function ProjectTable({ projects, onDelete }) {
                 }`}
               >
                 <td className="px-8 py-6">
-                  <p className="text-sm font-bold text-[#08075C]">{proj.name}</p>
+                  <p className="text-sm font-bold text-[#08075C]">{proj.title}</p>
                   <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tight mt-0.5">
                     {proj.category}
                   </p>
@@ -59,11 +59,11 @@ export default function ProjectTable({ projects, onDelete }) {
                 
                 <td className="px-6 py-6">
                   <span className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border ${
-                    proj.status === 'Completed' 
+                    proj.projectStatus === 'COMPLETED' 
                     ? 'bg-blue-50 text-[#3A38DE] border-blue-100' 
                     : 'bg-white text-gray-500 border-gray-200'
                   }`}>
-                    {proj.status}
+                    {proj.projectStatus}
                   </span>
                 </td>
 

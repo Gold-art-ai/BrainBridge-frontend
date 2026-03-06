@@ -12,12 +12,12 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
   // Sync state when modal opens with existing project data
   useEffect(() => {
     if (project && isOpen) {
-      setName(project.name || '');
+      setName(project.title || '');
       setDescription(project.description || '');
-      setStatus(project.status || 'Idea');
+      setStatus(project.projectStatus || 'DRAFT');
       setCategory(project.category || 'Web App');
-      setGithub(project.github || '');
-      setImage(project.image || ''); // Sync existing image
+      setGithub(project.repoUrl || '');
+      setImage(project.coverImageUrl || '');
     }
   }, [project, isOpen]);
 
@@ -37,12 +37,12 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
     e.preventDefault();
     onUpdateProject({
       ...project,
-      name,
+      title: name,
       description,
-      status,
+      projectStatus: status,
       category,
-      github,
-      image // Pass the updated image back
+      repoUrl: github,
+      coverImageUrl: image 
     });
     onClose();
   };
@@ -107,10 +107,10 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
                   value={status} onChange={(e) => setStatus(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold text-[#08075C] outline-none cursor-pointer"
                 >
-                  <option value="Idea">Idea</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Stopped">Stopped</option>
+                  <option value="DRAFT">Draft</option>
+                  <option value="ONGOING">Ongoing</option>
+                  <option value="COMPLETED">Completed</option>
+                  <option value="FAILED">Failed</option>
                 </select>
               </div>
               <div>

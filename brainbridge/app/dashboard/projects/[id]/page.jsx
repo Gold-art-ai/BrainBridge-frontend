@@ -2,41 +2,32 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import ProjectView from "../../../components/projects/ProjectView"; 
+import { useGetProjectByIdQuery, useUpdateProjectMutation, useRemoveProjectMutation } from '../../../redux/api/ProjectsApiSlice';
 
 export default function ProjectPage() {
   const { id } = useParams();
   const router = useRouter();
-  const [project, setProject] = useState(null);
 
-  // 1. Fetch Logic from LocalStorage
-  useEffect(() => {
-    const allProjects = JSON.parse(localStorage.getItem('my_projects') || '[]');
-    const found = allProjects.find(p => p.id.toString() === id.toString());
-    
-    if (found) {
-      setProject(found);
-    } else {
-      // Fallback for demo purposes
-      const fallbacks = [{ id: "1", name: "BrainBridge UI", status: "In Progress", category: "Design", tech: ["React"] }];
-      setProject(fallbacks.find(p => p.id === id));
+  const { data: project, isLoading } = useGetProjectByIdQuery(id, { skip: !id });
+  const [updateProject] = useUpdateProjectMutation();
+  const [removeProject] = useRemoveProjectMutation();
+
+  const handleUpdate = async (updatedProj) => {
+    try {
+      await updateProject(updatedProj).unwrap();
+    } catch (e) {
+      console.error("Failed to update project", e);
     }
-  }, [id]);
-
-  // 2. Update Logic
-  const handleUpdate = (updatedProj) => {
-    const allProjects = JSON.parse(localStorage.getItem('my_projects') || '[]');
-    const newProjects = allProjects.map(p => p.id.toString() === id.toString() ? updatedProj : p);
-    localStorage.setItem('my_projects', JSON.stringify(newProjects));
-    setProject(updatedProj);
   };
 
-  // 3. Delete Logic
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (window.confirm("DECOMMISSION PROJECT FROM BRAINBRIDGE?")) {
-      const allProjects = JSON.parse(localStorage.getItem('my_projects') || '[]');
-      const filtered = allProjects.filter(p => p.id.toString() !== id.toString());
-      localStorage.setItem('my_projects', JSON.stringify(filtered));
-      router.push('/dashboard/projects');
+      try {
+        await removeProject(project?.title).unwrap();
+        router.push('/dashboard/projects');
+      } catch (e) {
+        console.error("Failed to delete project", e);
+      }
     }
   };
 

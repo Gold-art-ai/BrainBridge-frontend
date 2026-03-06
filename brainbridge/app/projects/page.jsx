@@ -7,6 +7,7 @@ import PublicProjectCard from '../components/projects/PublicProjectCard';
 import TechTrends from '../components/projects/TechTrends';
 import NewProjectModal from "../components/projects/NewProjectModal";
 import { Search, Loader2, Plus } from "lucide-react";
+import { useGetAllProjectsQuery, useAddProjectMutation } from '../redux/api/ProjectsApiSlice'
 
 export default function PublicDiscoveryPage() {
   const [projects, setProjects] = useState([]);
@@ -16,54 +17,55 @@ export default function PublicDiscoveryPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const observerTarget = useRef(null);
 
-  // Load Initial Data + LocalStorage Projects
+  const { data: fetched, isLoading: projectsLoading } = useGetAllProjectsQuery();
+  const [addProjectMutation] = useAddProjectMutation();
+
   useEffect(() => {
-    const initialData = [
-      { id: "p1", name: "Quantum Ledger", description: "Decentralized protocol for high-frequency quantum trading.", creator: "Alex Rivers", category: "FinTech", date: "2 hours ago", tech: ["Rust", "Solidity"], views: "2.4k", likes: "156", image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=900&q=80" },
-      { id: "p2", name: "CryptoSec AI", description: "LLM-driven monitoring for global trading groups.", creator: "Sarah Chen", category: "AI / ML", date: "5 hours ago", tech: ["Python", "PyTorch"], views: "1.8k", likes: "312", image: "https://images.unsplash.com/photo-1640161704729-cbe966a08476?auto=format&fit=crop&w=800&q=80" },
-      { id: "p3", name: "EcoMesh IoT", description: "Smart city sensor network for carbon tracking.", creator: "Marcus Thorne", category: "IoT", date: "Yesterday", tech: ["C++", "MQTT"], views: "942", likes: "88", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80" },
-    ];
-
-    const saved = localStorage.getItem("my_projects");
-    const userProjects = saved ? JSON.parse(saved).map(p => ({
-      ...p,
-      category: p.category || 'Web Apps', 
-      creator: "You", // This helps the Inbox identify the user as the architect
-      date: "Just now",
-      views: "0",
-      likes: "0"
-    })) : [];
-
-    setProjects([...userProjects, ...initialData]);
-  }, []);
+    setProjects(fetched || []);
+  }, [fetched]);
 
   // Logic to add project and persist it for both Dashboard and Public Feed
-  const addProject = (newProj) => {
-    const id = Date.now().toString();
-    const projectWithClassification = { 
-      ...newProj, 
-      id, 
-      creator: "You", 
-      date: "Just now", 
-      views: "0", 
-      likes: "0",
-      category: newProj.category || 'Web Apps' 
+  const addProject = async (newProj) => {
+    let ownerId = 201; // Default fallback
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const userObj = JSON.parse(userStr);
+        if (userObj.id) ownerId = userObj.id;
+      }
+    } catch (e) {
+      console.error("Failed to get user from localStorage", e);
+    }
+
+    // Explicitly pick fields the backend DTO expects
+    const payload = {
+      title: newProj.title,
+      description: newProj.description,
+      projectStatus: newProj.projectStatus,
+      projectVisibility: newProj.projectVisibility,
+      ownerId: ownerId,
+      teamId: 20, // Fallback for testing
+      sourceIdeaId: 2002, // Fallback for testing
+      coverImageUrl: newProj.coverImageUrl || "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=800&auto=format&fit=crop",
+      repoUrl: newProj.repoUrl || "",
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date().toISOString().split('T')[0]
     };
 
-    setProjects(prev => [projectWithClassification, ...prev]);
+    // try to persist to backend
+    try {
+      await addProjectMutation(payload).unwrap();
+    } catch (e) {
+      console.error('Add project failed', e);
+    }
 
-    // Save to LocalStorage so it exists when navigating to the dynamic Project Page
-    const saved = localStorage.getItem("my_projects");
-    const currentList = saved ? JSON.parse(saved) : [];
-    localStorage.setItem("my_projects", JSON.stringify([projectWithClassification, ...currentList]));
-    
     setIsModalOpen(false);
   };
 
   const filteredProjects = useMemo(() => {
     return projects.filter(p => {
-      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            p.creator.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = (p.title || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            (p.creator || "").toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCat = activeCategory === 'All' || p.category === activeCategory;
       return matchesSearch && matchesCat;
     });
@@ -72,7 +74,7 @@ export default function PublicDiscoveryPage() {
   return (
     <div className="bg-white min-h-screen text-[#101828]">
       {/* Editorial Style Hero using the first/latest project */}
-      <PublicHero project={projects[0]} />
+      <PublicHero projects={projects.slice(0, 5)} />
 
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">

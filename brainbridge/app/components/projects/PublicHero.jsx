@@ -18,6 +18,7 @@ export default function PublicHero({ projects }) {
     const interval = setInterval(() => {
       setFade(false);
       setTimeout(() => {
+        
         setCurrentIndex((prev) => (prev + 1) % projects.length);
         setFade(true);
       }, 600);

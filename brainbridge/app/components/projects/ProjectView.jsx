@@ -23,15 +23,17 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
 
   const getStatusTheme = (status) => {
     const map = {
-      'Idea': { bg: 'bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-500', border: 'border-amber-100' },
-      'In Progress': { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500', border: 'border-blue-100' },
-      'Completed': { bg: 'bg-green-50', text: 'text-green-700', dot: 'bg-green-500', border: 'border-green-100' },
-      'Stopped': { bg: 'bg-red-50', text: 'text-red-700', dot: 'bg-red-500', border: 'border-red-100' }
+      'DRAFT': { bg: 'bg-amber-50', text: 'text-amber-600', dot: 'bg-amber-500', border: 'border-amber-100' },
+      'ACTIVE': { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500', border: 'border-blue-100' },
+      'ONGOING': { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500', border: 'border-blue-100' },
+      'COMPLETED': { bg: 'bg-green-50', text: 'text-green-700', dot: 'bg-green-500', border: 'border-green-100' },
+      'ARCHIVED': { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-400', border: 'border-gray-100' },
+      'DELETED': { bg: 'bg-red-50', text: 'text-red-700', dot: 'bg-red-500', border: 'border-red-100' }
     };
     return map[status] || { bg: 'bg-gray-50', text: 'text-gray-600', dot: 'bg-gray-400', border: 'border-gray-100' };
   };
 
-  const theme = getStatusTheme(project.status);
+  const theme = getStatusTheme(project.projectStatus);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -45,12 +47,12 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
           Back to System
         </button>
 
-        {project.image ? (
+        {project.coverImageUrl ? (
           <div className="absolute inset-0">
             <img 
-              src={project.image} 
+              src={project.coverImageUrl} 
               className="w-full h-full object-cover opacity-20 grayscale" 
-              alt={project.name}
+              alt={project.title}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-blue-900/70 via-blue-900/50 to-transparent" />
           </div>
@@ -71,7 +73,7 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
                   </span>
                 </div>
                 <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight leading-none">
-                  {project.name}
+                  {project.title}
                 </h1>
               </div>
 
@@ -83,9 +85,9 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
                   <PenSquare size={14} />
                   Modify
                 </button>
-                {project.github && (
+                {project.repoUrl && (
                   <a 
-                    href={project.github} 
+                    href={project.repoUrl} 
                     target="_blank" 
                     className="bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-3 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-white/20 transition-all"
                   >
@@ -124,7 +126,7 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
                 <h4 className="font-bold text-gray-900 uppercase tracking-wide text-sm">Architectural Overview</h4>
               </div>
               <p className="text-gray-600 text-sm leading-7">
-                The <span className="font-bold text-gray-900">"{project.name}"</span> infrastructure is currently in <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide ${theme.bg} ${theme.text}`}>{project.status}</span> stage. 
+                The <span className="font-bold text-gray-900">"{project.title}"</span> infrastructure is currently in <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide ${theme.bg} ${theme.text}`}>{project.projectStatus}</span> stage. 
                 Stack: <span className="text-blue-700 font-semibold">{project.tech?.[0] || 'Custom Frameworks'}</span>.
               </p>
             </section>
@@ -155,7 +157,7 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
             <div className={`${theme.bg} ${theme.border} p-6 rounded-2xl border flex items-center justify-between shadow-sm`}>
               <div>
                 <p className={`text-[9px] font-bold ${theme.text} uppercase tracking-wide mb-1`}>Node Status</p>
-                <p className={`text-lg font-bold ${theme.text} uppercase tracking-tight`}>{project.status}</p>
+                <p className={`text-lg font-bold ${theme.text} uppercase tracking-tight`}>{project.projectStatus}</p>
               </div>
               <div className="relative">
                 <div className={`w-3 h-3 rounded-full ${theme.dot} animate-ping absolute inset-0 opacity-20`} />

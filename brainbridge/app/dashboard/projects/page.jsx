@@ -2,35 +2,32 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import ProjectFilters from '../../components/projects/ProjectFilters';
 import ProjectTable from '../../components/projects/ProjectTable';
+import { useGetMyProjectsQuery, useRemoveProjectMutation } from '../../redux/api/ProjectsApiSlice';
 
 export default function ProjectsWorkspace() {
-  const [projects, setProjects] = useState([]);
+  const { data: projects = [], isLoading } = useGetMyProjectsQuery();
+  const [removeProject] = useRemoveProjectMutation();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeStatus, setActiveStatus] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
 
-  // Load projects from localStorage on mount
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem('my_projects') || '[]');
-    setProjects(saved);
-  }, []);
-
   // Function to handle delete
-  const handleDelete = (id) => {
-    const updated = projects.filter(p => p.id !== id);
-    setProjects(updated);
-    localStorage.setItem('my_projects', JSON.stringify(updated)); // keep localStorage in sync
+  const handleDelete = async (id) => {
+    const projectToDelete = projects.find(p => p.id === id);
+    if (projectToDelete) {
+      await removeProject(projectToDelete.title); // Backend expects title for deletion
+    }
   };
 
   const filteredAndSorted = useMemo(() => {
     let result = projects.filter(p => {
-      const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = activeStatus === 'All' || p.status === activeStatus;
+      const matchesSearch = (p.title || "").toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = activeStatus === 'All' || p.projectStatus === activeStatus;
       return matchesSearch && matchesStatus;
     });
 
     if (sortBy === 'alpha') {
-      result.sort((a, b) => a.name.localeCompare(b.name));
+      result.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
     } else {
       // Logic for "Last Updated" (or by ID)
       result.sort((a, b) => b.id - a.id);
