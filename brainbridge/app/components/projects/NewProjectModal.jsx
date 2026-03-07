@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
   // --- Form State ---
   const [preview, setPreview] = useState(null);
+  const [base64Image, setBase64Image] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('DRAFT');
@@ -20,7 +21,14 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
   // --- Handlers ---
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) setPreview(URL.createObjectURL(file));
+    if (file) {
+      setPreview(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBase64Image(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSkillKeyDown = (e) => {
@@ -46,7 +54,7 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
   };
 
   const handleClose = () => {
-    setPreview(null); setTitle(''); setDescription('');
+    setPreview(null); setBase64Image(null); setTitle(''); setDescription('');
     setStatus('DRAFT'); setRepoUrl(''); setProjectVisibility('PUBLIC');
     setCategory('Web App'); setSkills(['React', 'Tailwind']); setMembers([]);
     onClose();
@@ -64,7 +72,7 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
 
     onAddProject({
       title, description, projectStatus: status, category, repoUrl, projectVisibility,
-      tech: skills, members, coverImageUrl: preview,
+      tech: skills, members, coverImageUrl: base64Image || preview,
       createdAt: new Date().toISOString()
     });
     handleClose();

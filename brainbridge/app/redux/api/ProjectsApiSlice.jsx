@@ -7,9 +7,7 @@ export const projectsApi = apiSlice.injectEndpoints({
       invalidatesTags: ['Projects']
     }),
     getAllProjects: builder.query({
-      // We point "getAllProjects" (discovery feed) to Backend 1 (runs on 8081)
-      // to meet the requirement of integrating both backends simultaneously.
-      query: () => ({ url: 'http://localhost:8081/projects/api/all' }),
+      query: () => ({ url: '/projects/all' }),
       providesTags: ['Projects']
     }),
     getMyProjects: builder.query({
@@ -30,7 +28,7 @@ export const projectsApi = apiSlice.injectEndpoints({
       providesTags: ['Projects']
     }),
     removeProject: builder.mutation({
-      query: title => ({ url: `/projects/remove/${encodeURIComponent(title)}`, method: 'DELETE' }),
+      query: id => ({ url: `/projects/remove/${id}`, method: 'DELETE' }),
       invalidatesTags: ['Projects']
     }),
   }),

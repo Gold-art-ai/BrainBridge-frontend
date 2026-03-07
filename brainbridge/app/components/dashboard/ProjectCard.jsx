@@ -59,7 +59,7 @@ export default function ProjectCard({ project }) {
         </p>
 
         <div className="flex flex-wrap gap-1.5 mb-6">
-          {project.tech?.map((tag) => (
+          {project.category && [project.category].map((tag) => (
             <span key={tag} className="text-[9px] font-black text-[#3A38DE] bg-[#3A38DE]/5 px-2 py-0.5 rounded border border-[#3A38DE]/10 uppercase tracking-tighter">
               {tag}
             </span>
@@ -74,7 +74,7 @@ export default function ProjectCard({ project }) {
                 <Users size={10} />
               </div>
               <div className="w-6 h-6 rounded-lg bg-[#3A38DE] flex items-center justify-center text-[8px] text-white border-2 border-white font-black">
-                +{project.members?.length || 0}
+                +0
               </div>
             </div>
             <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">Collaborators</span>

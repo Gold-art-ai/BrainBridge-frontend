@@ -9,19 +9,24 @@ export default function StatsOverview({ projects = [] }) {
         growth="+11.01%"
       />
       <StatCard
-        title="Viewers"
-        value={(projects.length * 150).toString()}
-        growth="+11.01%"
+        title="Global Views"
+        value={projects.reduce((acc, p) => acc + (p.viewCount || 0), 0).toString()}
+        growth="Live"
+      />
+      <StatCard
+        title="Explore Hub"
+        value={projects.filter(p => p.projectVisibility === 'PUBLIC').length.toString()}
+        growth="Visible"
       />
       <StatCard
         title="Active Collaborators"
-        value={projects.length > 0 ? "5" : "0"}
-        growth="+11.01%"
+        value={projects.reduce((acc, p) => acc + (p.members?.length || 0), 0).toString()}
+        growth="Team"
       />
       <StatCard
         title="Enterprises"
-        value={projects.length > 0 ? "1" : "0"}
-        growth="+11.01%"
+        value={projects.reduce((acc, p) => acc + (p.enterpriseRequests || 0), 0).toString()}
+        growth="Requests"
       />
     </section>
   );

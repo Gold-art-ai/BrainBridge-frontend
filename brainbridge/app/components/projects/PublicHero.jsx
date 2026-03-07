@@ -9,9 +9,9 @@ export default function PublicHero({ projects }) {
     if (!projects || projects.length === 0) return;
 
     projects.forEach(p => {
-      if (p.image) {
+      if (p.coverImageUrl) {
         const img = new Image();
-        img.src = p.image;
+        img.src = p.coverImageUrl;
       }
     });
 
@@ -37,7 +37,7 @@ export default function PublicHero({ projects }) {
       <div className="absolute top-0 right-0 w-2/3 h-full">
         <div className={`relative w-full h-full transition-all duration-1000 ease-in-out ${fade ? 'translate-x-0 opacity-100' : 'translate-x-12 opacity-0'}`}>
           <img
-            src={active.image}
+            src={active.coverImageUrl || "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=800&auto=format&fit=crop"}
             alt=""
             className="w-full h-full object-cover"
           />
@@ -62,9 +62,9 @@ export default function PublicHero({ projects }) {
 
           {/* Typography: Using Mixed Weights for a 'Designed' feel */}
           <h1 className="text-7xl font-[900] text-white uppercase tracking-tighter leading-[0.85] mb-6 italic">
-            {active.name.split(' ')[0]} <br/>
+            {(active.title || "Innovation").split(' ')[0]} <br/>
             <span className="text-transparent stroke-text" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.4)' }}>
-              {active.name.split(' ').slice(1).join(' ')}
+              {(active.title || "Innovation").split(' ').slice(1).join(' ')}
             </span>
           </h1>
 
@@ -85,7 +85,7 @@ export default function PublicHero({ projects }) {
                <span className="text-[8px] text-gray-500 font-black uppercase tracking-widest">Architect</span>
                <div className="flex items-center gap-3">
                   <p className="text-xs text-white font-bold uppercase tracking-wider underline decoration-[#3A38DE] underline-offset-4">
-                    {active.creator}
+                    {active.creator || "Anonymous"}
                   </p>
                </div>
             </div>

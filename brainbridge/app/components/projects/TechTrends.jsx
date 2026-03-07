@@ -2,38 +2,32 @@
 import React from 'react';
 import { TrendingUp, Cpu, Code2, Terminal, Zap } from 'lucide-react';
 
-const trends = [
-  { 
-    name: 'React', 
-    count: '1.2k', 
-    icon: <Code2 size={16} />, 
-    intensity: 'text-[#3A38DE]', // Primary Brand Blue
-    bgIntensity: 'bg-[#3A38DE]/10' 
-  },
-  { 
-    name: 'Nest.js', 
-    count: '850', 
-    icon: <Zap size={16} />, 
-    intensity: 'text-[#08075C]', // Deep Navy Blue
-    bgIntensity: 'bg-[#08075C]/10' 
-  },
-  { 
-    name: 'Python', 
-    count: '2.4k', 
-    icon: <Terminal size={16} />, 
-    intensity: 'text-[#5351FB]', // Lighter Electric Blue
-    bgIntensity: 'bg-[#5351FB]/10' 
-  },
-  { 
-    name: 'Rust', 
-    count: '310', 
-    icon: <Cpu size={16} />, 
-    intensity: 'text-[#1A18A0]', // Mid-tone Royal Blue
-    bgIntensity: 'bg-[#1A18A0]/10' 
-  },
-];
+export default function TechTrends({ projects = [] }) {
+  const categoryCounts = projects.reduce((acc, p) => {
+    const cat = p.category || 'Web App';
+    acc[cat] = (acc[cat] || 0) + 1;
+    return acc;
+  }, {});
 
-export default function TechTrends() {
+  const topCategories = Object.entries(categoryCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4);
+
+  const iconsMap = {
+    'Web App': { icon: <Code2 size={16} />, intensity: 'text-[#3A38DE]', bgIntensity: 'bg-[#3A38DE]/10' },
+    'Mobile': { icon: <Zap size={16} />, intensity: 'text-[#08075C]', bgIntensity: 'bg-[#08075C]/10' },
+    'AI/ML': { icon: <Terminal size={16} />, intensity: 'text-[#5351FB]', bgIntensity: 'bg-[#5351FB]/10' },
+    'Design': { icon: <Code2 size={16} />, intensity: 'text-[#1A18A0]', bgIntensity: 'bg-[#1A18A0]/10' },
+    'Blockchain': { icon: <Cpu size={16} />, intensity: 'text-[#3A38DE]', bgIntensity: 'bg-[#3A38DE]/10' }
+  };
+  const defaultStyle = { icon: <Code2 size={16} />, intensity: 'text-[#1A18A0]', bgIntensity: 'bg-[#1A18A0]/10' };
+
+  const dynamicTrends = topCategories.map(([name, count]) => {
+    const style = iconsMap[name] || defaultStyle;
+    return { name, count: count.toString(), ...style };
+  });
+
+  if (dynamicTrends.length === 0) return null;
   return (
     <div className="flex flex-col gap-6 mb-12">
       {/* Small subtle header */}
@@ -46,7 +40,7 @@ export default function TechTrends() {
 
       {/* Grid of Nodes */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {trends.map((tech) => (
+        {dynamicTrends.map((tech) => (
           <div 
             key={tech.name} 
             className="group flex items-center justify-between p-4 rounded-xl border border-gray-100 bg-white hover:border-[#3A38DE]/30 hover:shadow-[0_4px_20px_-10px_rgba(58,56,222,0.1)] transition-all cursor-default"

@@ -1,0 +1,2 @@
+ALTER TABLE projects ADD COLUMN view_count INTEGER DEFAULT 0;
+ALTER TABLE projects ADD COLUMN enterprise_requests INTEGER DEFAULT 0;

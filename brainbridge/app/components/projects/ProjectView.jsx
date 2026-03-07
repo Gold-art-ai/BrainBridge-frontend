@@ -127,7 +127,7 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
               </div>
               <p className="text-gray-600 text-sm leading-7">
                 The <span className="font-bold text-gray-900">"{project.title}"</span> infrastructure is currently in <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide ${theme.bg} ${theme.text}`}>{project.projectStatus}</span> stage. 
-                Stack: <span className="text-blue-700 font-semibold">{project.tech?.[0] || 'Custom Frameworks'}</span>.
+                Stack: <span className="text-blue-700 font-semibold">{project.category || 'Custom Frameworks'}</span>.
               </p>
             </section>
 
@@ -171,7 +171,7 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
                   <Binary size={12} /> Tech Stack
               </h4>
               <div className="flex flex-wrap gap-2">
-                {project.tech?.map(skill => (
+                {project.category && [project.category].map(skill => (
                   <span key={skill} className="bg-white/40 text-gray-900 border border-gray-200 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-default">
                     {skill}
                   </span>

@@ -75,18 +75,18 @@ export default function PublicProjectCard({ project }) {
         <div className="flex items-center justify-between pt-4">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-600 border border-gray-200 uppercase">
-              {project.creator ? project.creator[0] : "U"}
+              {project.creator ? project.creator[0] : "A"}
             </div>
-            <span className="text-xs font-medium text-gray-600">{project.creator}</span>
+            <span className="text-xs font-medium text-gray-600">{project.creator || "Anonymous"}</span>
           </div>
           
           <div className="flex items-center gap-3">
              <div className="flex items-center gap-1 text-gray-400 text-xs font-medium">
                <Eye size={14} />
-               <span>{project.views || 0}</span>
+               <span>{project.viewCount || 0}</span>
              </div>
              <div className="flex gap-1">
-               {project.tech && project.tech.slice(0, 1).map(t => (
+               {project.category && [project.category].map(t => (
                  <span key={t} className="px-2 py-0.5 bg-[#F9F5FF] text-[#6941C6] rounded text-[10px] font-bold uppercase">{t}</span>
                ))}
              </div>

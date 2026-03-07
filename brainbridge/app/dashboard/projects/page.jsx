@@ -15,7 +15,7 @@ export default function ProjectsWorkspace() {
   const handleDelete = async (id) => {
     const projectToDelete = projects.find(p => p.id === id);
     if (projectToDelete) {
-      await removeProject(projectToDelete.title); // Backend expects title for deletion
+      await removeProject(projectToDelete.id); // Backend expects ID for deletion now
     }
   };
 

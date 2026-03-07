@@ -23,7 +23,7 @@ export default function ProjectPage() {
   const handleDelete = async () => {
     if (window.confirm("DECOMMISSION PROJECT FROM BRAINBRIDGE?")) {
       try {
-        await removeProject(project?.title).unwrap();
+        await removeProject(id).unwrap();
         router.push('/dashboard/projects');
       } catch (e) {
         console.error("Failed to delete project", e);
@@ -61,7 +61,7 @@ export default function ProjectPage() {
                 <p className="text-xs font-black text-[#08075C]">Corporate Node A</p>
                 <span className="bg-blue-100 text-blue-600 px-2 py-0.5 rounded text-[8px] font-bold uppercase">New</span>
               </div>
-              <p className="text-[11px] text-gray-500 italic mb-4">"Requesting integration documentation for {project.name}."</p>
+              <p className="text-[11px] text-gray-500 italic mb-4">"Requesting integration documentation for {project.title}."</p>
               <div className="flex gap-2">
                 <button className="flex-1 bg-[#08075C] text-white py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-[#3A38DE] transition-all">Accept</button>
                 <button className="flex-1 bg-white text-gray-400 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest border border-gray-100 hover:text-red-500 transition-all">Decline</button>
