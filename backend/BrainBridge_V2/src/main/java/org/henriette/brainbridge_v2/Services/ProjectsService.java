@@ -1,8 +1,6 @@
 package org.henriette.brainbridge_v2.Services;
 
 import org.henriette.brainbridge_v2.Entities.Projects;
-import org.henriette.brainbridge_v2.Enums.Status;
-import org.henriette.brainbridge_v2.Enums.Visibility;
 import org.henriette.brainbridge_v2.Repositories.ProjectsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
