@@ -31,6 +31,10 @@ export const projectsApi = apiSlice.injectEndpoints({
       query: id => ({ url: `/projects/remove/${id}`, method: 'DELETE' }),
       invalidatesTags: ['Projects']
     }),
+    incrementViewCount: builder.mutation({
+      query: id => ({ url: `/projects/view/${id}`, method: 'POST' }),
+      invalidatesTags: ['Projects']
+    }),
   }),
   overrideExisting: false,
 })
@@ -43,4 +47,5 @@ export const {
   useGetProjectByIdQuery,
   useGetTeamProjectsQuery,
   useRemoveProjectMutation,
+  useIncrementViewCountMutation,
 } = projectsApi

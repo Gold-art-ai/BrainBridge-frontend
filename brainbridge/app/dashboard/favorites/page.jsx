@@ -16,7 +16,7 @@ export default function FavoritesPage() {
   }, [allProjects, favoriteIds]);
 
   const displayedFavorites = favoriteProjects.filter(p => 
-    p.name.toLowerCase().includes(searchQuery.toLowerCase())
+    (p.name || p.title || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (

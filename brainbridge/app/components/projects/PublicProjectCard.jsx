@@ -1,20 +1,42 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Bookmark, ArrowUpRight, Clock, Eye } from "lucide-react";
 import { useGetMyFavoritesQuery, useAddFavoriteMutation, useRemoveFavoriteMutation } from "../../redux/api/FavoritesApiSlice";
 
+const formatDate = (dateString) => {
+  if (!dateString) return "Just now";
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - date) / 1000);
+
+  if (diffInSeconds < 60) return "Just now";
+  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
+  });
+};
+
 export default function PublicProjectCard({ project }) {
+  const isLoggedIn = typeof window !== 'undefined' && !!localStorage.getItem('token');
+
   const { data: favoriteIds = [] } = useGetMyFavoritesQuery(undefined, {
-    skip: typeof window !== 'undefined' && !localStorage.getItem('token') // Skip if not logged in
+    skip: !isLoggedIn
   });
   const [addFavorite] = useAddFavoriteMutation();
   const [removeFavorite] = useRemoveFavoriteMutation();
-  
+
   const isSaved = favoriteIds.includes(project.id);
 
   const handleSave = async (e) => {
-    e.preventDefault(); // Stop navigation
-    e.stopPropagation(); // Stop parent bubble
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isLoggedIn) return; // silently do nothing if not logged in
 
     try {
       if (isSaved) {
@@ -23,7 +45,10 @@ export default function PublicProjectCard({ project }) {
         await addFavorite(project.id).unwrap();
       }
     } catch (err) {
-      console.error("Failed to toggle favorite", err);
+      // Only log meaningful errors, not empty auth rejections
+      if (err?.status !== 401 && err?.status !== 403) {
+        console.error("Failed to toggle favorite", err);
+      }
     }
   };
 
@@ -31,21 +56,29 @@ export default function PublicProjectCard({ project }) {
     <div className="group cursor-pointer">
       {/* Image with Bookmark Icon */}
       <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-gray-100 mb-5">
-        <img 
-          src={project.coverImageUrl} 
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+        <img
+          src={
+            project.coverImageUrl
+              ? project.coverImageUrl.startsWith('http') ||
+                project.coverImageUrl.startsWith('/') ||
+                project.coverImageUrl.startsWith('data:')
+                ? project.coverImageUrl
+                : `/${project.coverImageUrl}`
+              : ''
+          }
+          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           alt={project.title}
         />
         <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors" />
-        
-        <button 
+
+        <button
           onClick={handleSave}
           className="absolute top-4 right-4 p-2.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm hover:bg-white transition-all transform active:scale-90 z-20"
         >
-          <Bookmark 
-            size={18} 
-            /* Changed from red-500 to blue-600 (#2563eb) for the saved state */
-            className={`transition-colors ${isSaved ? 'fill-blue-600 text-blue-600' : 'text-gray-600'}`} 
+          <Bookmark
+            size={18}
+            className={`transition-colors ${isSaved ? 'fill-blue-600 text-blue-600' : 'text-gray-600'}`}
           />
         </button>
       </div>
@@ -56,7 +89,7 @@ export default function PublicProjectCard({ project }) {
           <span>{project.category}</span>
           <div className="flex items-center gap-1.5 text-gray-400">
             <Clock size={12} />
-            <span>{project.date || "Just now"}</span>
+            <span>{formatDate(project.createdAt)}</span>
           </div>
         </div>
 
@@ -79,17 +112,17 @@ export default function PublicProjectCard({ project }) {
             </div>
             <span className="text-xs font-medium text-gray-600">{project.creator || "Anonymous"}</span>
           </div>
-          
+
           <div className="flex items-center gap-3">
-             <div className="flex items-center gap-1 text-gray-400 text-xs font-medium">
-               <Eye size={14} />
-               <span>{project.viewCount || 0}</span>
-             </div>
-             <div className="flex gap-1">
-               {project.category && [project.category].map(t => (
-                 <span key={t} className="px-2 py-0.5 bg-[#F9F5FF] text-[#6941C6] rounded text-[10px] font-bold uppercase">{t}</span>
-               ))}
-             </div>
+            <div className="flex items-center gap-1 text-gray-400 text-xs font-medium">
+              <Eye size={14} />
+              <span>{project.viewCount || 0}</span>
+            </div>
+            <div className="flex gap-1">
+              {project.category && [project.category].map(t => (
+                <span key={t} className="px-2 py-0.5 bg-[#F9F5FF] text-[#6941C6] rounded text-[10px] font-bold uppercase">{t}</span>
+              ))}
+            </div>
           </div>
         </div>
       </div>

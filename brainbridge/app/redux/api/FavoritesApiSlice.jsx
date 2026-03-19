@@ -8,10 +8,14 @@ export const favoritesApi = apiSlice.injectEndpoints({
     }),
     addFavorite: builder.mutation({
       query: projectId => ({ url: `/api/favorites/${projectId}`, method: 'POST' }),
+      transformResponse: (response, meta) => response, // backend returns plain text
+      async onQueryStarted(_, { queryFulfilled }) { try { await queryFulfilled } catch {} },
+      extraOptions: { responseHandler: 'text' },
       invalidatesTags: ['Favorites']
     }),
     removeFavorite: builder.mutation({
       query: projectId => ({ url: `/api/favorites/${projectId}`, method: 'DELETE' }),
+      extraOptions: { responseHandler: 'text' },
       invalidatesTags: ['Favorites']
     }),
     checkFavorite: builder.query({

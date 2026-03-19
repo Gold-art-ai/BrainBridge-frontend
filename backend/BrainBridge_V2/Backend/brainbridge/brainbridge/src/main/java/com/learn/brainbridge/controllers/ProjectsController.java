@@ -148,4 +148,10 @@ public class ProjectsController {
                 java.util.Collections.singletonMap("message", "Project " + project.get().getTitle() + " deleted"));
     }
 
+    @PostMapping("/view/{id}")
+    public ResponseEntity<?> incrementViewCount(@PathVariable("id") Integer id) {
+        service.incrementViewCount(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
 }

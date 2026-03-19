@@ -3,44 +3,80 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Send, Hash, Paperclip, Search } from 'lucide-react';
 
+import { useGetInboxQuery, useSendMessageMutation } from '../../redux/api/MessagesApiSlice';
+
 function InboxContent() {
   const searchParams = useSearchParams();
-  const [chats, setChats] = useState([
-    { id: 'global', name: "Global Chat", project: null, lastMsg: "System online." }
-  ]);
-  const [messages, setMessages] = useState([
-    { id: 1, sender: "System", text: "Secure channel initialized.", project: null }
-  ]);
+  const { data: fetchedMessages, isLoading } = useGetInboxQuery(undefined, {
+    pollingInterval: 5000,
+  });
+  const [sendMessage] = useSendMessageMutation();
+  
   const [inputText, setInputText] = useState("");
   const [activeChatId, setActiveChatId] = useState('global');
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try { setUser(JSON.parse(userStr)); } catch (e) {}
+    }
+  }, []);
+
+  // Process messages into chats
+  const chatGroups = (fetchedMessages || []).reduce((acc, msg) => {
+    const chatId = msg.projectId ? `proj-${msg.projectId}` : 'direct-messages';
+    if (!acc[chatId]) {
+      acc[chatId] = {
+        id: chatId,
+        name: msg.projectName || "Direct Messages",
+        project: msg.projectName,
+        projectId: msg.projectId,
+        lastMsg: msg.content,
+        messages: []
+      };
+    }
+    acc[chatId].messages.push(msg);
+    return acc;
+  }, {});
+
+  const chats = [
+    { id: 'global', name: "Global Chat", project: null, lastMsg: "System online.", messages: [] },
+    ...Object.values(chatGroups)
+  ];
 
   const activeChat = chats.find(c => c.id === activeChatId) || chats[0];
 
   useEffect(() => {
     const isNewChat = searchParams.get('newChat');
     const projectTag = searchParams.get('project');
-    const recipient = searchParams.get('to');
-    const draftMsg = searchParams.get('msg');
 
     if (isNewChat && projectTag) {
-      const newChatId = `chat-${projectTag}`;
-      setChats(prev => {
-        if (prev.find(c => c.id === newChatId)) return prev;
-        return [{ id: newChatId, name: recipient, project: projectTag, lastMsg: "Drafting..." }, ...prev];
-      });
-      setActiveChatId(newChatId);
-      if (draftMsg) setInputText(draftMsg);
+      const found = chats.find(c => c.project === projectTag);
+      if (found) setActiveChatId(found.id);
     }
-  }, [searchParams]);
+  }, [searchParams, chats]);
 
-  const sendMessage = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
-    const newMessage = { id: Date.now(), sender: "You", text: inputText, project: activeChat.project };
-    setMessages([...messages, newMessage]);
-    setChats(prev => prev.map(c => c.id === activeChatId ? { ...c, lastMsg: inputText } : c));
-    setInputText("");
+    if (!inputText.trim() || !user) return;
+
+    try {
+      const receiverId = activeChat.messages?.find(m => m.senderId !== user.id)?.senderId || 1; // Simplification
+
+      await sendMessage({
+        receiverId: receiverId,
+        projectId: activeChat.projectId,
+        content: inputText
+      }).unwrap();
+      
+      setInputText("");
+    } catch (err) {
+      console.error("Failed to send message", err);
+    }
   };
+
+  if (isLoading) return <div className="p-8 text-center text-[10px] font-black uppercase text-[#08075C] animate-pulse">Synchronizing Nodes...</div>;
 
   return (
     <div className="flex h-[calc(100vh-120px)] bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm">
@@ -53,7 +89,7 @@ function InboxContent() {
             <input 
               type="text" 
               placeholder="Search chats..." 
-              className="w-full bg-gray-100 border-none rounded-xl py-2 pl-9 pr-4 text-[11px] text-[#08075C] font-bold outline-none placeholder:text-gray-400" 
+              className="w-full bg-gray-100 border-none rounded-xl py-2.5 pl-9 pr-4 text-[11px] text-[#08075C] font-bold outline-none placeholder:text-gray-400" 
             />
           </div>
         </div>
@@ -82,18 +118,18 @@ function InboxContent() {
             </div>
           )}
         </div>
-        <div className="flex-1 overflow-y-auto p-8 space-y-6">
-          {messages.filter(m => !m.project || m.project === activeChat.project).map((msg) => (
-            <div key={msg.id} className={`flex flex-col ${msg.sender === "You" ? "items-end" : "items-start"}`}>
-              <div className={`max-w-[70%] p-4 rounded-2xl text-xs leading-relaxed shadow-sm ${msg.sender === "You" ? "bg-[#08075C] text-white rounded-tr-none" : "bg-white text-[#08075C] border border-gray-100 rounded-tl-none font-semibold"}`}>
-                {msg.text}
+        <div className="flex-1 overflow-y-auto p-8 space-y-6 flex flex-col-reverse">
+          {(activeChat.messages || []).map((msg) => (
+            <div key={msg.id} className={`flex flex-col ${msg.senderId === user?.id ? "items-end" : "items-start"}`}>
+              <div className={`max-w-[70%] p-4 rounded-2xl text-xs leading-relaxed shadow-sm ${msg.senderId === user?.id ? "bg-[#08075C] text-white rounded-tr-none" : "bg-white text-[#08075C] border border-gray-100 rounded-tl-none font-semibold"}`}>
+                {msg.content}
               </div>
-              <span className="text-[8px] font-black uppercase text-gray-300 mt-2 tracking-widest">{msg.sender}</span>
+              <span className="text-[8px] font-black uppercase text-gray-300 mt-2 tracking-widest">{msg.senderUsername}</span>
             </div>
           ))}
         </div>
         <div className="p-6 bg-white border-t border-gray-50">
-          <form onSubmit={sendMessage} className="relative">
+          <form onSubmit={handleSend} className="relative">
             <input 
               type="text"
               value={inputText}

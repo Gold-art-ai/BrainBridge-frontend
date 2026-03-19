@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useGetProjectByIdQuery } from '../../redux/api/ProjectsApiSlice';
+import { useSendMessageMutation } from '../../redux/api/MessagesApiSlice';
 import { ArrowLeft, MessageSquare, Share2, Terminal, Activity } from 'lucide-react';
 import Link from 'next/link';
 import ProjectView from "../../components/projects/ProjectView"; 
@@ -11,6 +12,15 @@ export default function ProjectPage() {
   const router = useRouter();
   const [project, setProject] = useState(null);
   const { data: fetchedProject } = useGetProjectByIdQuery(id, { skip: !id });
+  const [sendMessage] = useSendMessageMutation();
+
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try { setUser(JSON.parse(userStr)); } catch (e) {}
+    }
+  }, []);
 
   useEffect(() => {
     if (fetchedProject) {
@@ -28,15 +38,34 @@ export default function ProjectPage() {
     if (found) setProject(found);
   }, [id, fetchedProject]);
 
-  const handleCollaborate = () => {
-    const message = `Hi ${project.creator}, I'm interested in collaborating on the "${project.name}" node.`;
-    const params = new URLSearchParams({
-      newChat: "true",
-      project: project.name,
-      to: project.creator || "Architect",
-      msg: message
-    });
-    router.push(`/dashboard/inbox?${params.toString()}`);
+  const handleCollaborate = async () => {
+    if (!project || !user) return;
+    
+    const messageContent = `Hi ${project.creator || 'Architect'}, I'm interested in collaborating on the "${project.name || project.title}" node.`;
+    
+    // Ensure we only send requests for real (numeric ID) projects
+    const isMockProject = isNaN(Number(project.id));
+    if (isMockProject) {
+      console.warn("Cannot collaborate on a mock project node.");
+      return;
+    }
+
+    try {
+      await sendMessage({
+        receiverId: project.ownerId || 1, 
+        projectId: parseInt(project.id),
+        content: messageContent
+      }).unwrap();
+      
+      const params = new URLSearchParams({
+        newChat: "true",
+        project: project.title || project.name,
+        to: project.creator || "Architect",
+      });
+      router.push(`/dashboard/inbox?${params.toString()}`);
+    } catch (err) {
+      console.error("Failed to send collaboration message", err);
+    }
   };
 
   if (!project) return (

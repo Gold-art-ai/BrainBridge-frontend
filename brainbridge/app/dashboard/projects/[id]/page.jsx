@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import ProjectView from "../../../components/projects/ProjectView"; 
-import { useGetProjectByIdQuery, useUpdateProjectMutation, useRemoveProjectMutation } from '../../../redux/api/ProjectsApiSlice';
+import { useGetProjectByIdQuery, useUpdateProjectMutation, useRemoveProjectMutation, useIncrementViewCountMutation } from '../../../redux/api/ProjectsApiSlice';
+import { useGetProjectLogQuery } from '../../../redux/api/MessagesApiSlice';
 
 export default function ProjectPage() {
   const { id } = useParams();
@@ -11,6 +12,14 @@ export default function ProjectPage() {
   const { data: project, isLoading } = useGetProjectByIdQuery(id, { skip: !id });
   const [updateProject] = useUpdateProjectMutation();
   const [removeProject] = useRemoveProjectMutation();
+  const [incrementViewCount] = useIncrementViewCountMutation();
+  const { data: colabLog } = useGetProjectLogQuery(id, { skip: !id, pollingInterval: 10000 });
+
+  useEffect(() => {
+    if (id) {
+      incrementViewCount(id);
+    }
+  }, [id, incrementViewCount]);
 
   const handleUpdate = async (updatedProj) => {
     try {
@@ -77,15 +86,21 @@ export default function ProjectPage() {
             Collaboration Log
           </h3>
           <div className="flex-1 space-y-6 mb-6 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
-            <div className="flex gap-4">
-              <div className="w-8 h-8 rounded-xl bg-blue-50 flex-shrink-0 flex items-center justify-center text-[10px] font-black text-[#3A38DE] border border-blue-100">
-                L
+            {(colabLog || []).length > 0 ? colabLog.map((log) => (
+              <div key={log.id} className="flex gap-4">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 flex-shrink-0 flex items-center justify-center text-[10px] font-black text-[#3A38DE] border border-blue-100 uppercase">
+                  {log.senderUsername?.[0] || 'S'}
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-[#08075C]">{log.senderUsername} <span className="font-normal text-gray-400 ml-2">Logged: {new Date(log.createdAt).toLocaleTimeString()}</span></p>
+                  <p className="text-xs text-gray-500 mt-1">{log.content}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-[10px] font-black text-[#08075C]">Lead Architect <span className="font-normal text-gray-400 ml-2">Logged: System Boot</span></p>
-                <p className="text-xs text-gray-500 mt-1">Initial parameters set for {project.category} module.</p>
+            )) : (
+              <div className="flex flex-col items-center justify-center h-full text-gray-300">
+                <p className="text-[9px] font-black uppercase tracking-widest">No active logs yet</p>
               </div>
-            </div>
+            )}
           </div>
           
           <div className="relative mt-auto">

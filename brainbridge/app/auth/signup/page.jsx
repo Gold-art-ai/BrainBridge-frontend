@@ -12,7 +12,7 @@ export default function SignUpPage() {
   const [errors, setErrors] = useState({});
   const [registerUser] = useRegisterMutation();
   const [formData, setFormData] = useState({
-    username: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: ''
+    username: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '', isSubmitting: false
   });
 
   const [requirements, setRequirements] = useState({
@@ -43,8 +43,13 @@ export default function SignUpPage() {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
+    if (!requirements.length || !requirements.upper || !requirements.number || !requirements.special) {
+      newErrors.password = "Password does not meet all requirements";
+    }
+
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
+      setFormData(prev => ({ ...prev, isSubmitting: true }));
       try {
         await registerUser(formData).unwrap();
         toast.success("Account Ready! We encourage you to login.");
@@ -54,6 +59,8 @@ export default function SignUpPage() {
         if (error.data?.fieldErrors) {
            setErrors(error.data.fieldErrors);
         }
+      } finally {
+        setFormData(prev => ({ ...prev, isSubmitting: false }));
       }
     }
   };
@@ -212,9 +219,11 @@ export default function SignUpPage() {
                 {errors.confirmPassword && <span className="text-[10px] text-red-500 font-bold ml-1">{errors.confirmPassword}</span>}
               </div>
 
-              <Link href="/dashboard" className="btn-brand w-full text-white py-4 rounded-2xl font-bold text-lg shadow-xl active:scale-95 transition-all inline-block text-center">
-                Create Account
-              </Link>
+              <button 
+                onClick={handleSignUp}
+                className="btn-brand w-full text-white py-4 rounded-2xl font-bold text-lg shadow-xl active:scale-95 transition-all inline-block text-center">
+                {typeof window !== 'undefined' && formData.isSubmitting ? 'Creating...' : 'Create Account'}
+              </button>
             </div>
           </div>
 

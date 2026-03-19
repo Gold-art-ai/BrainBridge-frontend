@@ -66,4 +66,10 @@ public class ProjectsService {
     // {
     // return repo.findByStartDateBetweenAndEndDateBetween(start, start, end, end);
     // }
+    public void incrementViewCount(Integer id) {
+        repo.findById(id).ifPresent(project -> {
+            project.setViewCount(project.getViewCount() + 1);
+            repo.save(project);
+        });
+    }
 }
