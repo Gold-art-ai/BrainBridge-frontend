@@ -147,8 +147,8 @@ export default function LoginPage() {
 
             <div className="space-y-6">
               <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">E-mail Address</label>
-                <input type="email" value={formData.emailOrUsername} onChange={(e) => handleChange(e, 'emailOrUsername')}
+                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">E-mail Address Or Username</label>
+                <input type="text" value={formData.emailOrUsername} onChange={(e) => handleChange(e, 'emailOrUsername')}
                   className={`input-field w-full rounded-2xl px-5 py-3.5 outline-none mt-1 ${errors.emailOrUsername ? 'error-ring animate-shake' : ''}`} 
                   placeholder="name@email.com" />
               </div>
