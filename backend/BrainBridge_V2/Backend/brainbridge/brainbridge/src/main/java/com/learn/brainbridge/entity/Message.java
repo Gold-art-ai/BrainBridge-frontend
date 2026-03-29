@@ -8,7 +8,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "messages")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Message {
@@ -42,4 +43,5 @@ public class Message {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
 }
