@@ -11,7 +11,8 @@ import {
   Mail, 
   LogOut,
   X,
-  Menu
+  Menu,
+  Activity
 } from 'lucide-react';
 
 const workspaceLinks = [
@@ -21,6 +22,7 @@ const workspaceLinks = [
 ];
 
 const discoveryLinks = [
+  { name: 'Feed', icon: <Activity size={18} />, path: '/dashboard/feed' },
   { name: 'Explore Hub', icon: <Compass size={18} />, path: '/projects' },
   { name: 'Inbox', icon: <Mail size={18} />, path: '/dashboard/inbox' },
 ];

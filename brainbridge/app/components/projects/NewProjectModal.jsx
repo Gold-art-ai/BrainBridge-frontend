@@ -1,78 +1,112 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { FIELDS, MAIN_TAGS, SUB_TAGS, SDG_GOALS, NST2_GOALS } from '../../utils/taxonomy';
+import { X, Upload, Plus, Trash2, CheckCircle2 } from 'lucide-react';
 
 export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
   // --- Form State ---
-  const [preview, setPreview] = useState(null);
-  const [base64Image, setBase64Image] = useState(null);
+  const [coverPreview, setCoverPreview] = useState(null);
+  const [coverBase64, setCoverBase64] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('DRAFT');
-  const [category, setCategory] = useState('Web App'); // New State
   const [repoUrl, setRepoUrl] = useState('');
   const [projectVisibility, setProjectVisibility] = useState('PUBLIC');
 
-  // --- Dynamic Lists State ---
-  const [skills, setSkills] = useState(['React', 'Tailwind']);
-  const [skillInput, setSkillInput] = useState('');
-  const [members, setMembers] = useState([]);
-  const [memberInput, setMemberInput] = useState('');
+  // --- Taxonomy State ---
+  const [field, setField] = useState('');
+  const [selectedMainTags, setSelectedMainTags] = useState([]);
+  const [selectedSubTags, setSelectedSubTags] = useState([]);
+  const [selectedSdgGoals, setSelectedSdgGoals] = useState([]);
+  const [selectedNst2Goals, setSelectedNst2Goals] = useState([]);
+
+  // --- Additional Media State ---
+  const [additionalMediaPreviews, setAdditionalMediaPreviews] = useState([]);
+  const [additionalMediaBase64, setAdditionalMediaBase64] = useState([]);
 
   // --- Handlers ---
-  const handleImageChange = (e) => {
+  const handleCoverChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setPreview(URL.createObjectURL(file));
+      setCoverPreview(URL.createObjectURL(file));
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setBase64Image(reader.result);
-      };
+      reader.onloadend = () => setCoverBase64(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSkillKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      const val = skillInput.trim().replace(',', '');
-      if (val && !skills.includes(val)) {
-        setSkills([...skills, val]);
-        setSkillInput('');
-      }
-    } else if (e.key === 'Backspace' && !skillInput && skills.length > 0) {
-      setSkills(skills.slice(0, -1));
+  const handleAdditionalMediaChange = (e) => {
+    const files = Array.from(e.target.files);
+    files.forEach(file => {
+      const previewUrl = URL.createObjectURL(file);
+      setAdditionalMediaPreviews(prev => [...prev, previewUrl]);
+      
+      const reader = new FileReader();
+      reader.onloadend = () => setAdditionalMediaBase64(prev => [...prev, reader.result]);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeAdditionalMedia = (index) => {
+    setAdditionalMediaPreviews(prev => prev.filter((_, i) => i !== index));
+    setAdditionalMediaBase64(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Toggle helpers
+  const toggleItem = (item, list, setList) => {
+    if (list.includes(item)) setList(list.filter(i => i !== item));
+    else setList([...list, item]);
+  };
+
+  // When a main tag is removed, also remove any associated sub tags to keep state clean
+  const toggleMainTag = (tag) => {
+    if (selectedMainTags.includes(tag)) {
+      setSelectedMainTags(prev => prev.filter(t => t !== tag));
+      // Remove orphaned sub tags
+      const orphanedSubs = SUB_TAGS[tag] || [];
+      setSelectedSubTags(prev => prev.filter(sub => !orphanedSubs.includes(sub)));
+    } else {
+      setSelectedMainTags(prev => [...prev, tag]);
     }
   };
 
-  const handleAddMember = (e) => {
-    if (e) e.preventDefault();
-    const val = memberInput.trim();
-    if (val && !members.includes(val)) {
-      setMembers([...members, val]);
-      setMemberInput('');
-    }
-  };
+  // Available Sub Tags based on Selected Main Tags
+  const availableSubTags = useMemo(() => {
+    let subs = [];
+    selectedMainTags.forEach(main => {
+      if (SUB_TAGS[main]) subs = [...subs, ...SUB_TAGS[main]];
+    });
+    return subs;
+  }, [selectedMainTags]);
 
   const handleClose = () => {
-    setPreview(null); setBase64Image(null); setTitle(''); setDescription('');
-    setStatus('DRAFT'); setRepoUrl(''); setProjectVisibility('PUBLIC');
-    setCategory('Web App'); setSkills(['React', 'Tailwind']); setMembers([]);
+    // Reset Everything
+    setCoverPreview(null); setCoverBase64(null); setTitle(''); setDescription(''); setStatus('DRAFT');
+    setRepoUrl(''); setProjectVisibility('PUBLIC'); setField(''); setSelectedMainTags([]);
+    setSelectedSubTags([]); setSelectedSdgGoals([]); setSelectedNst2Goals([]);
+    setAdditionalMediaPreviews([]); setAdditionalMediaBase64([]);
     onClose();
   };
 
   const handleSubmit = () => {
-    if (!title.trim() || !description.trim()) {
-      alert("Please provide a project title and value proposition.");
-      return;
-    }
-    if (status !== 'DRAFT' && !repoUrl.trim()) {
-      alert("Please provide a repository link for this phase.");
+    if (!title.trim() || !description.trim() || !field) {
+      alert("Please provide a title, description, and select a main Field.");
       return;
     }
 
     onAddProject({
-      title, description, projectStatus: status, category, repoUrl, projectVisibility,
-      tech: skills, members, coverImageUrl: base64Image || preview,
+      title, 
+      description, 
+      projectStatus: status, 
+      projectVisibility, 
+      repoUrl,
+      coverImageUrl: coverBase64 || coverPreview,
+      field,
+      mainTags: selectedMainTags,
+      subTags: selectedSubTags,
+      sdgGoals: selectedSdgGoals,
+      nst2Goals: selectedNst2Goals,
+      additionalMediaUrls: additionalMediaBase64,
       createdAt: new Date().toISOString()
     });
     handleClose();
@@ -81,194 +115,249 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#08075C]/10 backdrop-blur-[2px]">
-      <div className="bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#08075C]/20 backdrop-blur-sm">
+      <div className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-50 flex justify-between items-center bg-white">
+        <div className="px-8 py-5 border-b border-gray-100 flex justify-between items-center bg-white z-10">
           <div>
-            <h3 className="text-sm font-black text-[#08075C] uppercase tracking-widest">Project Configuration</h3>
-            <p className="text-[10px] text-gray-400 font-medium italic">Define your innovation's core parameters</p>
+            <h3 className="text-lg font-black text-[#08075C]">Create Project</h3>
+            <p className="text-xs text-gray-500 font-medium">Define your innovation framework and taxonomy</p>
           </div>
-          <button onClick={handleClose} className="text-gray-400 hover:text-red-500 transition-colors">
-            <i className="fa-solid fa-xmark text-sm"></i>
+          <button onClick={handleClose} className="p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-red-500 transition-colors">
+            <X size={20} />
           </button>
         </div>
 
-        <div className="p-6 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        {/* Scrollable Form Body */}
+        <div className="p-8 overflow-y-auto custom-scrollbar flex-1 space-y-10">
           
-          {/* 1. Image Upload */}
-          <div className="flex items-center gap-4">
-            <div className="w-24 h-24 rounded-xl border-2 border-dashed border-gray-100 bg-gray-50 flex-shrink-0 overflow-hidden relative group">
-              {preview ? (
-                <>
-                  <img src={preview} alt="Preview" className="w-full h-full object-cover" />
-                  <button onClick={() => setPreview(null)} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity">
-                    <i className="fa-solid fa-trash-can text-sm"></i>
-                  </button>
-                </>
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
-                  <i className="fa-solid fa-cloud-arrow-up text-lg mb-1"></i>
-                  <span className="text-[8px] font-bold uppercase">Cover</span>
+          {/* Section 1: Basic Information */}
+          <section className="space-y-6">
+            <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest border-b pb-2">1. Core Details</h4>
+            
+            <div className="flex gap-6">
+              {/* Cover Image Upload */}
+              <div className="w-32 h-32 rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 flex-shrink-0 overflow-hidden relative group cursor-pointer hover:border-[#3A38DE] transition-colors">
+                <input type="file" className="absolute inset-0 opacity-0 cursor-pointer z-10" accept="image/*" onChange={handleCoverChange} />
+                {coverPreview ? (
+                  <>
+                    <img src={coverPreview} alt="Cover" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center pointer-events-none transition-opacity">
+                      <span className="text-white text-xs font-bold">Change</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                    <Upload size={24} className="mb-2 group-hover:text-[#3A38DE] transition-colors" />
+                    <span className="text-[9px] font-bold uppercase">Cover Image</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Title & Desc */}
+              <div className="flex-1 space-y-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-[#08075C] mb-1.5">Project Title <span className="text-red-500">*</span></label>
+                  <input 
+                    type="text" value={title} onChange={(e) => setTitle(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm font-semibold outline-none focus:border-[#3A38DE] focus:ring-2 focus:ring-[#3A38DE]/10 transition-all" 
+                    placeholder="e.g. AgriSmart IoT Sensor"
+                  />
                 </div>
-              )}
-            </div>
-            <div className="flex-1">
-              <label className="cursor-pointer bg-white border border-gray-200 px-4 py-2 rounded-lg text-[10px] font-bold text-[#08075C] hover:border-[#3A38DE] transition-all">
-                Select Graphic
-                <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
-              </label>
-              <p className="text-[9px] text-gray-400 mt-2 font-medium">PNG, JPG or WEBP. Max 2MB.</p>
-            </div>
-          </div>
-
-          <div className="h-px bg-gray-50 w-full"></div>
-
-          {/* 2. Basic Info */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1.5 ml-1">Project Title</label>
-              <input 
-                type="text" value={title} onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2.5 px-4 text-xs font-semibold outline-none focus:border-[#3A38DE] text-[#08075C] transition-all" 
-                placeholder="Project Title"
-              />
-            </div>
-            <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1.5 ml-1">Value Proposition</label>
-              <textarea 
-                rows="3" value={description} onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2.5 px-4 text-xs outline-none focus:border-[#3A38DE] text-[#08075C] transition-all resize-none leading-relaxed overflow-hidden" 
-                style={{ display: '-webkit-box', WebkitLineClamp: '3', WebkitBoxOrient: 'vertical' }}
-                placeholder="Describe the core innovation (3 lines max)..."
-              />
-            </div>
-          </div>
-
-          {/* 3. Category Selection */}
-          <div>
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-2 ml-1">Innovation Category</label>
-            <div className="flex flex-wrap gap-2">
-              {['Web App', 'Mobile', 'AI/ML', 'Design', 'Blockchain'].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setCategory(cat)}
-                  className={`px-3 py-1.5 rounded-lg text-[9px] font-bold border transition-all ${
-                    category === cat 
-                    ? 'bg-[#3A38DE] border-[#3A38DE] text-white shadow-md shadow-blue-100' 
-                    : 'bg-white border-gray-100 text-gray-400 hover:border-gray-300'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 4. Toggles & Repository */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1.5 ml-1">Phase</label>
-                <select 
-                  value={status} onChange={(e) => setStatus(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-xl py-2.5 px-3 text-[11px] font-bold text-[#08075C] outline-none cursor-pointer"
-                >
-                  <option value="DRAFT">Draft</option>
-                  <option value="ONGOING">Ongoing</option>
-                  <option value="COMPLETED">Completed</option>
-                  <option value="FAILED">Failed</option>
-                </select>
-            </div>
-            <div>
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1.5 ml-1">Type</label>
-              <div className="flex bg-gray-50 p-1 rounded-xl border border-gray-100">
-                <button 
-                  onClick={() => setProjectVisibility('PRIVATE')}
-                  className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all ${projectVisibility === 'PRIVATE' ? 'bg-white shadow-sm text-[#3A38DE]' : 'text-gray-400'}`}
-                >Personal</button>
-                <button 
-                  onClick={() => setProjectVisibility('PUBLIC')}
-                  className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all ${projectVisibility === 'PUBLIC' ? 'bg-white shadow-sm text-[#3A38DE]' : 'text-gray-400'}`}
-                >Team</button>
+                <div>
+                  <label className="block text-[11px] font-bold text-[#08075C] mb-1.5">Description <span className="text-red-500">*</span></label>
+                  <textarea 
+                    rows="3" value={description} onChange={(e) => setDescription(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#3A38DE] focus:ring-2 focus:ring-[#3A38DE]/10 transition-all resize-none"
+                    placeholder="Briefly describe the problem and your solution..."
+                  />
+                </div>
               </div>
             </div>
-          </div>
+            
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div>
+                <label className="block text-[11px] font-bold text-[#08075C] mb-2">Primary Field <span className="text-red-500">*</span></label>
+                <select 
+                  value={field} onChange={(e) => setField(e.target.value)}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm font-semibold outline-none focus:border-[#3A38DE]"
+                >
+                  <option value="" disabled>Select Sector...</option>
+                  {FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                 <div>
+                  <label className="block text-[11px] font-bold text-[#08075C] mb-2">Status</label>
+                  <select 
+                    value={status} onChange={(e) => setStatus(e.target.value)}
+                    className="w-full bg-white border border-gray-200 rounded-xl py-3 px-3 text-xs font-semibold outline-none"
+                  >
+                    <option value="DRAFT">Draft</option>
+                    <option value="ONGOING">Ongoing</option>
+                    <option value="COMPLETED">Completed</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-[#08075C] mb-2">Visibility</label>
+                  <select 
+                    value={projectVisibility} onChange={(e) => setProjectVisibility(e.target.value)}
+                    className="w-full bg-white border border-gray-200 rounded-xl py-3 px-3 text-xs font-semibold outline-none"
+                  >
+                    <option value="PUBLIC">Public</option>
+                    <option value="PRIVATE">Private</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </section>
 
-          {status !== 'DRAFT' && (
-            <div className="animate-in slide-in-from-top-2 duration-300">
-              <label className="block text-[10px] font-black text-[#3A38DE] uppercase tracking-wider mb-1.5 ml-1">Source Repository</label>
-              <div className="relative">
-                <i className="fa-brands fa-github absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+          {/* Section 2: Tech Stack */}
+          <section className="space-y-4">
+            <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest border-b pb-2">2. Technology Stack</h4>
+            
+            {/* Main Tags */}
+            <div>
+              <p className="text-[11px] font-bold text-[#08075C] mb-2">Main Domains</p>
+              <div className="flex flex-wrap gap-2">
+                {MAIN_TAGS.map(tag => {
+                  const isActive = selectedMainTags.includes(tag);
+                  return (
+                    <button
+                      key={tag}
+                      onClick={() => toggleMainTag(tag)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all flex items-center gap-1.5 ${
+                        isActive ? 'bg-[#3A38DE] border-[#3A38DE] text-white' : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-300'
+                      }`}
+                    >
+                      {isActive && <CheckCircle2 size={12} />} {tag}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Sub Tags (Only render if Main Tags are selected and have subs available) */}
+            {availableSubTags.length > 0 && (
+              <div className="p-4 bg-[#F8F9FB] rounded-2xl border border-gray-100 animate-in slide-in-from-top-2">
+                <p className="text-[11px] font-bold text-[#3A38DE] mb-3">Specific Technologies (Sub-tags)</p>
+                <div className="flex flex-wrap gap-2">
+                  {availableSubTags.map(sub => {
+                    const isActive = selectedSubTags.includes(sub);
+                    return (
+                      <button
+                        key={sub}
+                        onClick={() => toggleItem(sub, selectedSubTags, setSelectedSubTags)}
+                        className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all ${
+                          isActive ? 'bg-[#08075C] text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-500 hover:border-[#3A38DE]'
+                        }`}
+                      >
+                        {sub}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </section>
+
+          {/* Section 3: Goals & Impact */}
+          <section className="space-y-5">
+            <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest border-b pb-2">3. Impact & Alignment</h4>
+            
+            <div>
+               <p className="text-[11px] font-bold text-[#08075C] mb-2">SDG Goals</p>
+               <div className="flex flex-wrap gap-2">
+                {SDG_GOALS.map(goal => {
+                  const isActive = selectedSdgGoals.includes(goal);
+                  return (
+                    <button
+                      key={goal}
+                      onClick={() => toggleItem(goal, selectedSdgGoals, setSelectedSdgGoals)}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wide font-black border transition-all ${
+                        isActive ? 'bg-green-600 border-green-600 text-white' : 'bg-gray-50 border-gray-200 text-gray-500 hover:border-green-600 hover:text-green-700'
+                      }`}
+                    >
+                      {goal}
+                    </button>
+                  );
+                })}
+               </div>
+            </div>
+
+            <div>
+               <p className="text-[11px] font-bold text-[#08075C] mb-2">NST2 Goals</p>
+               <div className="flex flex-wrap gap-2">
+                {NST2_GOALS.map(goal => {
+                  const isActive = selectedNst2Goals.includes(goal);
+                  return (
+                    <button
+                      key={goal}
+                      onClick={() => toggleItem(goal, selectedNst2Goals, setSelectedNst2Goals)}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wide font-black border transition-all ${
+                        isActive ? 'bg-yellow-500 border-yellow-500 text-black' : 'bg-gray-50 border-gray-200 text-gray-500 hover:border-yellow-500 hover:text-yellow-700'
+                      }`}
+                    >
+                      {goal}
+                    </button>
+                  );
+                })}
+               </div>
+            </div>
+          </section>
+
+          {/* Section 4: Repository & Media */}
+          <section className="space-y-4">
+            <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest border-b pb-2">4. Repository & Media</h4>
+
+             <div>
+                <label className="block text-[11px] font-bold text-[#08075C] mb-1.5">Source Repository URL</label>
                 <input 
                   type="url" value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)}
-                  className="w-full bg-blue-50/30 border border-blue-100 rounded-xl py-2.5 pl-11 pr-4 text-xs outline-none focus:border-[#3A38DE] text-[#08075C] font-medium" 
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#3A38DE] transition-all" 
                   placeholder="https://github.com/user/repo"
                 />
-              </div>
-            </div>
-          )}
+             </div>
 
-          {/* 5. Modern Skills Tag Input */}
-          <div className="space-y-2">
-            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider mb-1.5 ml-1">Technologies & Skills</label>
-            <div className="flex flex-wrap gap-2 p-2.5 bg-gray-50 border border-gray-100 rounded-xl focus-within:border-[#3A38DE] focus-within:bg-white transition-all min-h-[46px]">
-              {skills.map(tag => (
-                <span key={tag} className="flex items-center gap-1.5 bg-[#3A38DE] text-white px-2 py-1 rounded-md text-[9px] font-bold shadow-sm">
-                  {tag} 
-                  <button type="button" onClick={() => setSkills(skills.filter(t => t !== tag))}>
-                    <i className="fa-solid fa-xmark text-[7px] hover:text-red-300 transition-colors"></i>
-                  </button>
-                </span>
-              ))}
-              <input 
-                value={skillInput} 
-                onChange={(e) => setSkillInput(e.target.value)}
-                onKeyDown={handleSkillKeyDown}
-                className="bg-transparent text-[11px] outline-none font-bold text-[#08075C] placeholder-gray-400 flex-grow min-w-[100px]" 
-                placeholder={skills.length === 0 ? "+ Add Skill..." : ""}
-              />
-            </div>
-          </div>
+             <div>
+                <label className="block text-[11px] font-bold text-[#08075C] mb-1.5">Additional Media Showcase</label>
+                <div className="flex flex-wrap gap-4 items-start pb-4">
+                  
+                  {/* Media Upload Button */}
+                  <div className="relative w-24 h-24 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-50 hover:border-[#3A38DE] transition-all group overflow-hidden">
+                    <input type="file" multiple className="absolute inset-0 opacity-0 cursor-pointer z-10" accept="image/*,video/*" onChange={handleAdditionalMediaChange} />
+                    <Plus size={24} className="text-gray-400 group-hover:text-[#3A38DE] transition-colors" />
+                  </div>
 
-          {/* 6. Team Tagging */}
-          {projectVisibility === 'PUBLIC' && (
-            <div className="animate-in slide-in-from-top-2 duration-300 space-y-2">
-              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-wider ml-1">Collaborators</label>
-              <div className="flex flex-wrap gap-2 p-2 bg-gray-50/50 rounded-lg min-h-[30px]">
-                {members.map(m => (
-                  <span key={m} className="bg-white text-[#08075C] px-2 py-1 rounded-md text-[9px] font-bold flex items-center gap-2 border border-gray-200">
-                    @{m} <i onClick={() => setMembers(members.filter(i => i !== m))} className="fa-solid fa-xmark text-[8px] cursor-pointer hover:text-red-500"></i>
-                  </span>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <input 
-                  value={memberInput} 
-                  onChange={(e) => setMemberInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddMember())}
-                  className="flex-1 bg-gray-50 border border-gray-100 rounded-xl py-2 px-4 text-xs outline-none focus:border-[#3A38DE] text-[#08075C]" 
-                  placeholder="Username..."
-                />
-                <button 
-                  onClick={handleAddMember}
-                  className="bg-[#08075C] text-white px-4 rounded-xl text-[10px] font-black hover:bg-[#3A38DE] transition-all"
-                >TAG</button>
-              </div>
-            </div>
-          )}
+                  {/* Media Previews */}
+                  {additionalMediaPreviews.map((src, i) => (
+                    <div key={i} className="relative w-24 h-24 rounded-xl border border-gray-200 overflow-hidden group">
+                      <img src={src} className="w-full h-full object-cover" alt="Preview" />
+                      <button 
+                         onClick={() => removeAdditionalMedia(i)}
+                         className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                         <Trash2 size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+             </div>
+          </section>
+
         </div>
 
-        {/* Footer */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end items-center gap-4">
-          <button onClick={handleClose} className="text-[10px] font-bold text-gray-400 hover:text-red-500 uppercase tracking-widest transition-colors">
-            Discard
+        {/* Footer Actions */}
+        <div className="px-8 py-5 bg-gray-50 border-t border-gray-100 flex justify-end items-center gap-4 z-10">
+          <button onClick={handleClose} className="px-5 py-2.5 text-xs font-bold text-gray-500 hover:bg-gray-200 rounded-xl transition-colors uppercase tracking-wider">
+            Cancel
           </button>
           <button 
             onClick={handleSubmit}
-            className="bg-[#3A38DE] text-white px-8 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-blue-100 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            className="flex items-center gap-2 bg-[#3A38DE] text-white px-8 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
-            Add Project
+            Create Project
           </button>
         </div>
       </div>

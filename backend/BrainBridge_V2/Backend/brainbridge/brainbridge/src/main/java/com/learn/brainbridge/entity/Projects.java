@@ -8,6 +8,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -66,6 +68,34 @@ public class Projects {
 
     @Column(nullable = false, name = "enterprise_requests", columnDefinition = "integer default 0")
     private Integer enterpriseRequests = 0;
+
+    @Column(name = "project_field")
+    private String field;
+
+    @ElementCollection
+    @CollectionTable(name = "project_main_tags", joinColumns = @JoinColumn(name = "project_id"))
+    @Column(name = "tag")
+    private List<String> mainTags = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "project_sub_tags", joinColumns = @JoinColumn(name = "project_id"))
+    @Column(name = "tag")
+    private List<String> subTags = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "project_sdg_goals", joinColumns = @JoinColumn(name = "project_id"))
+    @Column(name = "goal")
+    private List<String> sdgGoals = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "project_nst2_goals", joinColumns = @JoinColumn(name = "project_id"))
+    @Column(name = "goal")
+    private List<String> nst2Goals = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "project_additional_media", joinColumns = @JoinColumn(name = "project_id"))
+    @Column(name = "media_url", columnDefinition = "TEXT")
+    private List<String> additionalMediaUrls = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
@@ -225,4 +255,22 @@ public class Projects {
     public void setEnterpriseRequests(Integer enterpriseRequests) {
         this.enterpriseRequests = enterpriseRequests;
     }
+
+    public String getField() { return field; }
+    public void setField(String field) { this.field = field; }
+
+    public List<String> getMainTags() { return mainTags; }
+    public void setMainTags(List<String> mainTags) { this.mainTags = mainTags; }
+
+    public List<String> getSubTags() { return subTags; }
+    public void setSubTags(List<String> subTags) { this.subTags = subTags; }
+
+    public List<String> getSdgGoals() { return sdgGoals; }
+    public void setSdgGoals(List<String> sdgGoals) { this.sdgGoals = sdgGoals; }
+
+    public List<String> getNst2Goals() { return nst2Goals; }
+    public void setNst2Goals(List<String> nst2Goals) { this.nst2Goals = nst2Goals; }
+
+    public List<String> getAdditionalMediaUrls() { return additionalMediaUrls; }
+    public void setAdditionalMediaUrls(List<String> additionalMediaUrls) { this.additionalMediaUrls = additionalMediaUrls; }
 }
