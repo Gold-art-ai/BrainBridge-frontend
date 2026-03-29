@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Schema(description = "Authentication response containing JWT token and user information")
 public class AuthResponseDTO {
 
