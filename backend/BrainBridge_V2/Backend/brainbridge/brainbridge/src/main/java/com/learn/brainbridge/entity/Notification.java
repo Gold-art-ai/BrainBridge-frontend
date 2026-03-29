@@ -14,8 +14,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "notifications")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class Notification {
 

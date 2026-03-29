@@ -16,8 +16,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "organizations")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class Organization {
 
