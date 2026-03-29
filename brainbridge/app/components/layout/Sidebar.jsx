@@ -12,12 +12,13 @@ import {
   LogOut,
   X,
   Menu,
-  Activity
+  Activity,
+  Settings
 } from 'lucide-react';
 
 const workspaceLinks = [
   { name: 'Dashboard', icon: <LayoutDashboard size={18} />, path: '/dashboard' },
-  { name: 'My Projects', icon: <Layers size={18} />, path: '/dashboard/projects' },
+  { name: 'My Assets', icon: <Layers size={18} />, path: '/dashboard/projects' },
   { name: 'Favorites', icon: <Heart size={18} />, path: '/dashboard/favorites' },
 ];
 
@@ -132,8 +133,12 @@ export default function Sidebar({ isOpen, onClose }) {
           </div>
         </nav>
 
-        {/* Logout Footer */}
-        <div className="p-6 border-t border-gray-50">
+        {/* Bottom Actions */}
+        <div className="p-4 border-t border-gray-50 flex flex-col gap-1">
+          <Link href="/dashboard/profile" className="flex items-center gap-4 px-4 py-3 w-full text-[#667085] font-bold hover:text-[#08075C] hover:bg-gray-50 rounded-xl transition-all group">
+            <Settings size={18} className="group-hover:rotate-45 transition-transform duration-300" />
+            <span className="text-[13px] tracking-tight">Settings</span>
+          </Link>
           <Link href="/auth/login" className="flex items-center gap-4 px-4 py-3 w-full text-[#667085] font-bold hover:text-red-500 hover:bg-red-50 rounded-xl transition-all group">
             <LogOut size={18} className="group-hover:-translate-x-1 transition-transform" />
             <span className="text-[13px] tracking-tight">Logout</span>

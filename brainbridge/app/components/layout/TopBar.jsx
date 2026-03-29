@@ -75,8 +75,8 @@ export default function TopBar({ onMenuClick }) {
           </button>
         </div>
 
-        {/* User Profile Summary */}
-        <div className="flex items-center gap-3 cursor-pointer group pl-1 sm:pl-2 py-1 rounded-full hover:bg-[#F8F9FB] transition-all">
+        {/* User Profile Summary linking to settings */}
+        <Link href="/dashboard/profile" className="flex items-center gap-3 cursor-pointer group pl-1 sm:pl-2 py-1 rounded-full hover:bg-[#F8F9FB] transition-all">
           <div className="text-right hidden sm:block">
             <p className="text-[13px] font-black text-[#08075C] leading-none mb-1 group-hover:text-[#3A38DE] transition-colors">{fullName}</p>
             <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em]">{userType}</p>
@@ -97,7 +97,7 @@ export default function TopBar({ onMenuClick }) {
             className="text-gray-400 group-hover:text-[#08075C] transition-colors hidden sm:block mr-2" 
             strokeWidth={3}
           />
-        </div>
+        </Link>
       </div>
     </header>
   );
