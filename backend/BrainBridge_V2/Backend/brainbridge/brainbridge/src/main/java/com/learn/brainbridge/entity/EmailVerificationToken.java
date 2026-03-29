@@ -13,9 +13,9 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "email_verification_tokens")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class EmailVerificationToken {
 
     @Id
@@ -74,5 +74,24 @@ public class EmailVerificationToken {
 
     public void setUsed(Boolean used) {
         this.used = used;
+    }
+
+    @Override 
+    public String toString() {
+        return "EmailVerificationToken{id=" + id + ", token='" + token + '\'' + ", expiresAt=" + expiresAt + ", used=" + used + '}';
+    }
+
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id,token,expireAt,used);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        EmailVerificationToken that = (EmailVerificationToken) obj;
+        return Objects.equals(id, that.id) && Objects.equals(token, that.token) && Objects.equals(expiresAt, that.expiresAt) && Objects.equals(used, that.used);
     }
 }
