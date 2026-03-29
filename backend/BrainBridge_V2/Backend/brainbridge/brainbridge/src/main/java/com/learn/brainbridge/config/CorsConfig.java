@@ -16,7 +16,7 @@ import java.util.Arrays;
  * 2. @Configuration - Marks this as a Spring configuration class
  * 3. CorsFilter - Spring filter that handles CORS preflight requests
  * 
- * This allows your React frontend (typically on port 5173) to make requests
+ * This allows your NextJS frontend (typically on port 3000) to make requests
  * to your Spring Boot backend (on port 8080)
  */
 @Configuration
