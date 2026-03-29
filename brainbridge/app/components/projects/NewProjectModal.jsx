@@ -1,9 +1,14 @@
 "use client";
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { FIELDS, MAIN_TAGS, SUB_TAGS, SDG_GOALS, NST2_GOALS } from '../../utils/taxonomy';
 import { X, Upload, Plus, Trash2, CheckCircle2 } from 'lucide-react';
 
 export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
+  // SSR Mounting Check for Portal
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   // --- Form State ---
   const [coverPreview, setCoverPreview] = useState(null);
   const [coverBase64, setCoverBase64] = useState(null);
@@ -112,10 +117,10 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
     handleClose();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#08075C]/20 backdrop-blur-sm">
+  return createPortal(
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-[#08075C]/20 backdrop-blur-sm">
       <div className="bg-white w-full max-w-4xl rounded-3xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col max-h-[90vh]">
         
         {/* Header */}
@@ -161,15 +166,15 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
                   <label className="block text-[11px] font-bold text-[#08075C] mb-1.5">Project Title <span className="text-red-500">*</span></label>
                   <input 
                     type="text" value={title} onChange={(e) => setTitle(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm font-semibold outline-none focus:border-[#3A38DE] focus:ring-2 focus:ring-[#3A38DE]/10 transition-all" 
-                    placeholder="e.g. AgriSmart IoT Sensor"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm font-semibold outline-none focus:border-[#3A38DE] focus:ring-2 focus:ring-[#3A38DE]/10 transition-all text-blue-700" 
+                    placeholder="AgriSmart IoT Sensor"
                   />
                 </div>
                 <div>
                   <label className="block text-[11px] font-bold text-[#08075C] mb-1.5">Description <span className="text-red-500">*</span></label>
                   <textarea 
                     rows="3" value={description} onChange={(e) => setDescription(e.target.value)}
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#3A38DE] focus:ring-2 focus:ring-[#3A38DE]/10 transition-all resize-none"
+                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm text-blue-700 outline-none focus:border-[#3A38DE] focus:ring-2 focus:ring-[#3A38DE]/10 transition-all resize-none"
                     placeholder="Briefly describe the problem and your solution..."
                   />
                 </div>
@@ -181,7 +186,7 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
                 <label className="block text-[11px] font-bold text-[#08075C] mb-2">Primary Field <span className="text-red-500">*</span></label>
                 <select 
                   value={field} onChange={(e) => setField(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm font-semibold outline-none focus:border-[#3A38DE]"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-sm text-blue-700 font-semibold outline-none focus:border-[#3A38DE]"
                 >
                   <option value="" disabled>Select Sector...</option>
                   {FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
@@ -192,7 +197,7 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
                   <label className="block text-[11px] font-bold text-[#08075C] mb-2">Status</label>
                   <select 
                     value={status} onChange={(e) => setStatus(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-xl py-3 px-3 text-xs font-semibold outline-none"
+                    className="w-full bg-white border border-gray-200 rounded-xl py-3 px-3 text-xs text-blue-700 font-semibold outline-none"
                   >
                     <option value="DRAFT">Draft</option>
                     <option value="ONGOING">Ongoing</option>
@@ -203,7 +208,7 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
                   <label className="block text-[11px] font-bold text-[#08075C] mb-2">Visibility</label>
                   <select 
                     value={projectVisibility} onChange={(e) => setProjectVisibility(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-xl py-3 px-3 text-xs font-semibold outline-none"
+                    className="w-full bg-white border border-gray-200 rounded-xl py-3 px-3 text-xs text-blue-700 font-semibold outline-none"
                   >
                     <option value="PUBLIC">Public</option>
                     <option value="PRIVATE">Private</option>
@@ -361,6 +366,7 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
