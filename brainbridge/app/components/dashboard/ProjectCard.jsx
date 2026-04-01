@@ -1,92 +1,87 @@
 "use client";
 import React from 'react';
-import Link from 'next/link'; // Added Link
-import { 
-  MoreVertical, 
-  ArrowUpRight, 
-  Users, 
-  Image as ImageIcon 
-} from "lucide-react";
+import Link from 'next/link';
+import { MoreVertical, ArrowUpRight, Users, Image as ImageIcon } from "lucide-react";
+
+const FIELD_COLORS = {
+  'Agriculture': '#4CAF50', 'Healthcare': '#FF5C8D', 'Education': '#FFA726', 'AI': '#6C63FF',
+  'Mining': '#8D6E63', 'Tourism': '#29B6F6', 'Sustainability': '#66BB6A', 'Water': '#26C6DA',
+  'Cybersecurity': '#EF5350', 'Finance': '#AB47BC', 'Food & Nutrition': '#FF7043',
+  'Energy': '#FFD54F', 'Smart Cities': '#5C6BC0', 'Environment': '#81C784', 'Transport': '#42A5F5',
+};
 
 export default function ProjectCard({ project }) {
-  // Construct the dynamic path based on project ID
   const viewPath = `/dashboard/projects/${project.id}`;
+  const fieldColor = FIELD_COLORS[project.field] || 'var(--primary)';
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-[0_12px_30px_-10px_rgba(8,7,92,0.15)] hover:border-[#3A38DE]/20 transition-all duration-300 group flex flex-col overflow-hidden h-full">
+    <div className="bg-white rounded-2xl border border-[var(--border)] hover:shadow-lg hover:shadow-gray-100 hover:border-[var(--primary)]/15 transition-all group flex flex-col overflow-hidden h-full">
       
-      {/* 1. Visual Header */}
-      <div className="relative h-40 w-full bg-[#F8F9FB] overflow-hidden">
+      {/* Cover */}
+      <div className="relative h-40 w-full bg-[var(--bg)] overflow-hidden">
         {project.coverImageUrl ? (
-          <img 
-            src={project.coverImageUrl} 
-            alt={project.title} 
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-          />
+          <img src={project.coverImageUrl} alt={project.title} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out" />
         ) : (
-          <div className="w-full h-full flex flex-col items-center justify-center text-[#3A38DE]/20">
-            <ImageIcon size={32} strokeWidth={1.5} />
-            <span className="text-[10px] font-bold mt-2 uppercase tracking-widest">No Preview</span>
+          <div className="w-full h-full flex flex-col items-center justify-center text-[var(--primary)]/20">
+            <ImageIcon size={28} strokeWidth={1.5} />
+            <span className="text-[10px] font-semibold mt-2 text-[var(--text-muted)]">No Preview</span>
           </div>
         )}
 
-        <div className="absolute top-4 left-4">
-          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md border border-white shadow-sm text-[9px] font-black uppercase tracking-wider text-[#08075C]">
-            <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${
-              project.projectStatus === 'COMPLETED' ? 'bg-blue-400' : 'bg-[#3A38DE]'
+        <div className="absolute top-3 left-3 flex items-center gap-2">
+          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md border border-white/60 text-[10px] font-semibold text-[var(--text)]">
+            <span className={`w-1.5 h-1.5 rounded-full ${
+              project.projectStatus === 'COMPLETED' ? 'bg-[var(--secondary)]' : project.projectStatus === 'ONGOING' ? 'bg-[var(--primary)]' : 'bg-[var(--text-muted)]'
             }`}></span>
             {project.projectStatus}
           </span>
         </div>
+
+        {project.field && (
+          <div className="absolute top-3 right-3">
+            <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold" style={{ background: fieldColor + '18', color: fieldColor }}>
+              {project.field}
+            </span>
+          </div>
+        )}
       </div>
 
-      {/* 2. Content Section */}
+      {/* Content */}
       <div className="p-5 flex flex-col flex-1">
         <div className="flex justify-between items-start mb-2">
-          {/* We make the title a link too, very common UX pattern */}
           <Link href={viewPath}>
-            <h4 className="text-[15px] font-bold text-[#08075C] leading-tight truncate group-hover:text-[#3A38DE] transition-colors cursor-pointer">
+            <h4 className="text-sm font-bold text-[var(--text)] leading-tight truncate group-hover:text-[var(--primary)] transition-colors cursor-pointer" style={{ fontFamily: 'var(--font-heading)' }}>
               {project.title}
             </h4>
           </Link>
-          <button className="text-gray-300 hover:text-[#08075C] transition-colors p-1 -mr-1">
+          <button className="text-[var(--text-muted)] hover:text-[var(--text)] transition-colors p-1 -mr-1 opacity-0 group-hover:opacity-100">
             <MoreVertical size={16} />
           </button>
         </div>
         
-        <p className="text-[#475467] text-[12px] leading-relaxed line-clamp-2 mb-4 h-9">
+        <p className="text-[var(--text-muted)] text-xs leading-relaxed line-clamp-2 mb-4">
           {project.description}
         </p>
 
-        <div className="flex flex-wrap gap-1.5 mb-6">
-          {project.category && [project.category].map((tag) => (
-            <span key={tag} className="text-[9px] font-black text-[#3A38DE] bg-[#3A38DE]/5 px-2 py-0.5 rounded border border-[#3A38DE]/10 uppercase tracking-tighter">
+        {/* Tags */}
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {(project.mainTags || []).slice(0, 3).map(tag => (
+            <span key={tag} className="text-[10px] font-semibold text-[var(--primary)] bg-[var(--primary)]/6 px-2 py-0.5 rounded-md">
               {tag}
             </span>
           ))}
         </div>
 
-        {/* 3. Footer Section */}
-        <div className="mt-auto pt-4 border-t border-gray-50 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="flex -space-x-2">
-              <div className="w-6 h-6 rounded-lg bg-[#08075C] flex items-center justify-center text-white border-2 border-white shadow-sm">
-                <Users size={10} />
-              </div>
-              <div className="w-6 h-6 rounded-lg bg-[#3A38DE] flex items-center justify-center text-[8px] text-white border-2 border-white font-black">
-                +0
-              </div>
-            </div>
-            <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest">Collaborators</span>
+        {/* Footer */}
+        <div className="mt-auto pt-3 border-t border-[var(--border)] flex justify-between items-center">
+          <div className="flex items-center gap-1.5">
+            <Users size={12} className="text-[var(--text-muted)]" />
+            <span className="text-[10px] text-[var(--text-muted)] font-medium">Collaborators</span>
           </div>
           
-          {/* THE FIX: Changed from button to Link */}
-          <Link 
-            href={viewPath}
-            className="group/btn flex items-center gap-1.5 text-[10px] font-black tracking-widest text-[#3A38DE] bg-[#3A38DE]/5 hover:bg-[#3A38DE] hover:text-white px-3 py-2 rounded-xl transition-all uppercase"
-          >
-            MANAGE 
-            <ArrowUpRight size={14} className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+          <Link href={viewPath}
+            className="group/btn flex items-center gap-1 text-[10px] font-semibold text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white px-3 py-1.5 rounded-lg transition-all uppercase tracking-wide">
+            View <ArrowUpRight size={12} />
           </Link>
         </div>
       </div>

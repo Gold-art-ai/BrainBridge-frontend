@@ -1,24 +1,14 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { 
-  LayoutDashboard, 
-  Layers, 
-  Heart, 
-  Compass, 
-  Mail, 
-  LogOut,
-  X,
-  Menu,
-  Activity,
-  Settings
+  LayoutDashboard, Layers, Heart, Compass, Mail, LogOut, X, Menu, Activity, Settings
 } from 'lucide-react';
 
 const workspaceLinks = [
   { name: 'Dashboard', icon: <LayoutDashboard size={18} />, path: '/dashboard' },
-  { name: 'My Assets', icon: <Layers size={18} />, path: '/dashboard/projects' },
+  { name: 'My Projects', icon: <Layers size={18} />, path: '/dashboard/projects' },
   { name: 'Favorites', icon: <Heart size={18} />, path: '/dashboard/favorites' },
 ];
 
@@ -32,15 +22,10 @@ export default function Sidebar({ isOpen, onClose }) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
-  // Close sidebar when route changes on mobile
   useEffect(() => {
-    if (isOpen && window.innerWidth < 1024) {
-      onClose();
-    }
+    if (isOpen && window.innerWidth < 1024) onClose();
   }, [pathname]);
 
   const NavItem = ({ item }) => {
@@ -49,99 +34,69 @@ export default function Sidebar({ isOpen, onClose }) {
     return (
       <Link 
         href={item.path}
-        onClick={() => {
-          // Close sidebar on mobile when clicking a link
-          if (window.innerWidth < 1024) {
-            onClose();
-          }
-        }}
-        className={`group relative flex items-center gap-4 px-4 py-3 rounded-xl font-bold transition-all duration-300 ${
+        onClick={() => { if (window.innerWidth < 1024) onClose(); }}
+        className={`group relative flex items-center gap-3.5 px-4 py-2.5 rounded-xl font-medium text-[13px] transition-all ${
           isActive 
-          ? 'bg-[#3A38DE]/5 text-[#3A38DE]' 
-          : 'text-[#667085] hover:text-[#08075C] hover:bg-gray-50'
+          ? 'bg-[var(--primary)]/8 text-[var(--primary)]' 
+          : 'text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg)]'
         }`}
       >
-        {/* Active Indicator Pillar */}
         {isActive && (
-          <div className="absolute left-0 w-1 h-5 bg-[#3A38DE] rounded-r-full shadow-[0_0_8px_rgba(58,56,222,0.4)]" />
+          <div className="absolute left-0 w-[3px] h-5 bg-[var(--primary)] rounded-r-full" />
         )}
-
-        <div className={`transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>
+        <div className={`transition-colors ${isActive ? 'text-[var(--primary)]' : 'group-hover:text-[var(--text)]'}`}>
           {item.icon}
         </div>
-
-        <span className="text-[13px] tracking-tight">{item.name}</span>
+        <span>{item.name}</span>
       </Link>
     );
   };
 
   return (
     <>
-      {/* Mobile Overlay */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 bg-black/30 z-40 lg:hidden" onClick={onClose} />
       )}
 
-      {/* Sidebar */}
       <aside className={`
-        w-64 min-h-screen bg-white border-r border-gray-100 flex flex-col fixed left-0 top-0 z-50
+        w-64 min-h-screen bg-white border-r border-[var(--border)] flex flex-col fixed left-0 top-0 z-50
         transform transition-transform duration-300 ease-in-out
         lg:translate-x-0
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        {/* Brand Section with Logo */}
-        <div className="p-6 flex items-center justify-between border-b border-gray-100">
-          <Link href="/dashboard" className="flex items-center gap-3">
-           
-            <h1 className="text-xl font-bold bg-clip-text text-transparent hidden sm:block"
-              style={{ 
-                fontFamily: "'Playpen Sans', cursive", 
-                backgroundImage: "linear-gradient(90deg, #08075C, #3A38DE)" 
-              }}>
-              BrainBridge
-            </h1>
+        <div className="p-6 flex items-center justify-between border-b border-[var(--border)]">
+          <Link href="/dashboard" className="text-lg font-extrabold text-[var(--primary)]" style={{ fontFamily: 'var(--font-heading)' }}>
+            BrainBridge
           </Link>
-          
-          {/* Close button for mobile */}
-          <button
-            onClick={onClose}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600"
-            aria-label="Close menu"
-          >
-            <X size={20} />
+          <button onClick={onClose} className="lg:hidden p-2 rounded-lg hover:bg-[var(--bg)] text-[var(--text-muted)]">
+            <X size={18} />
           </button>
         </div>
 
-        <nav className="flex-1 px-4 space-y-8 overflow-y-auto py-6">
-          {/* Workspace Section */}
+        <nav className="flex-1 px-4 space-y-7 overflow-y-auto py-6">
           <div>
-            <p className="px-4 text-[10px] font-black text-gray-300 uppercase tracking-[0.2em] mb-4">Core Workspace</p>
+            <p className="px-4 text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.15em] mb-3">Workspace</p>
             <div className="space-y-1">
               {workspaceLinks.map(item => <NavItem key={item.path} item={item} />)}
             </div>
           </div>
 
-          {/* Discovery Section */}
           <div>
-            <p className="px-4 text-[10px] font-black text-gray-300 uppercase tracking-[0.2em] mb-4">Discovery</p>
+            <p className="px-4 text-[10px] font-semibold text-[var(--text-muted)] uppercase tracking-[0.15em] mb-3">Discovery</p>
             <div className="space-y-1">
-              {discoveryLinks.map(item => <NavItem key={item.path} item={item} />) || []}
+              {discoveryLinks.map(item => <NavItem key={item.path} item={item} />)}
             </div>
           </div>
         </nav>
 
-        {/* Bottom Actions */}
-        <div className="p-4 border-t border-gray-50 flex flex-col gap-1">
-          <Link href="/dashboard/profile" className="flex items-center gap-4 px-4 py-3 w-full text-[#667085] font-bold hover:text-[#08075C] hover:bg-gray-50 rounded-xl transition-all group">
-            <Settings size={18} className="group-hover:rotate-45 transition-transform duration-300" />
-            <span className="text-[13px] tracking-tight">Settings</span>
+        <div className="p-4 border-t border-[var(--border)] flex flex-col gap-0.5">
+          <Link href="/dashboard/profile" className="flex items-center gap-3.5 px-4 py-2.5 w-full text-[var(--text-muted)] font-medium text-[13px] hover:text-[var(--text)] hover:bg-[var(--bg)] rounded-xl transition-all group">
+            <Settings size={18} />
+            <span>Settings</span>
           </Link>
-          <Link href="/auth/login" className="flex items-center gap-4 px-4 py-3 w-full text-[#667085] font-bold hover:text-red-500 hover:bg-red-50 rounded-xl transition-all group">
-            <LogOut size={18} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="text-[13px] tracking-tight">Logout</span>
+          <Link href="/auth/login" className="flex items-center gap-3.5 px-4 py-2.5 w-full text-[var(--text-muted)] font-medium text-[13px] hover:text-[var(--accent)] hover:bg-red-50 rounded-xl transition-all group">
+            <LogOut size={18} />
+            <span>Logout</span>
           </Link>
         </div>
       </aside>

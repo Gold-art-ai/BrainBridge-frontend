@@ -1,129 +1,55 @@
 "use client";
 import React from 'react';
-import { Bookmark, ArrowUpRight, Clock, Eye } from "lucide-react";
-import { useGetMyFavoritesQuery, useAddFavoriteMutation, useRemoveFavoriteMutation } from "../../redux/api/FavoritesApiSlice";
+import Link from 'next/link';
+import { Eye, ArrowUpRight, Image as ImageIcon } from 'lucide-react';
 
-const formatDate = (dateString) => {
-  if (!dateString) return "Just now";
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffInSeconds = Math.floor((now - date) / 1000);
-
-  if (diffInSeconds < 60) return "Just now";
-  if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-  if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
-  });
+const FIELD_COLORS = {
+  'Agriculture': '#4CAF50', 'Healthcare': '#FF5C8D', 'Education': '#FFA726', 'AI': '#6C63FF',
+  'Mining': '#8D6E63', 'Tourism': '#29B6F6', 'Sustainability': '#66BB6A', 'Water': '#26C6DA',
+  'Cybersecurity': '#EF5350', 'Finance': '#AB47BC', 'Food & Nutrition': '#FF7043',
+  'Energy': '#FFD54F', 'Smart Cities': '#5C6BC0', 'Environment': '#81C784', 'Transport': '#42A5F5',
 };
 
 export default function PublicProjectCard({ project }) {
-  const isLoggedIn = typeof window !== 'undefined' && !!localStorage.getItem('token');
-
-  const { data: favoriteIds = [] } = useGetMyFavoritesQuery(undefined, {
-    skip: !isLoggedIn
-  });
-  const [addFavorite] = useAddFavoriteMutation();
-  const [removeFavorite] = useRemoveFavoriteMutation();
-
-  const isSaved = favoriteIds.includes(project.id);
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!isLoggedIn) return; // silently do nothing if not logged in
-
-    try {
-      if (isSaved) {
-        await removeFavorite(project.id).unwrap();
-      } else {
-        await addFavorite(project.id).unwrap();
-      }
-    } catch (err) {
-      // Only log meaningful errors, not empty auth rejections
-      if (err?.status !== 401 && err?.status !== 403) {
-        console.error("Failed to toggle favorite", err);
-      }
-    }
-  };
+  const fieldColor = FIELD_COLORS[project.field] || 'var(--primary)';
 
   return (
-    <div className="group cursor-pointer">
-      {/* Image with Bookmark Icon */}
-      <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-gray-100 mb-5">
-        <img
-          src={
-            project.coverImageUrl
-              ? project.coverImageUrl.startsWith('http') ||
-                project.coverImageUrl.startsWith('/') ||
-                project.coverImageUrl.startsWith('data:')
-                ? project.coverImageUrl
-                : `/${project.coverImageUrl}`
-              : ''
-          }
-          onError={(e) => { e.currentTarget.style.display = 'none'; }}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          alt={project.title}
-        />
-        <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors" />
-
-        <button
-          onClick={handleSave}
-          className="absolute top-4 right-4 p-2.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm hover:bg-white transition-all transform active:scale-90 z-20"
-        >
-          <Bookmark
-            size={18}
-            className={`transition-colors ${isSaved ? 'fill-blue-600 text-blue-600' : 'text-gray-600'}`}
-          />
-        </button>
+    <div className="bg-white rounded-2xl border border-[var(--border)] overflow-hidden hover:shadow-lg hover:shadow-gray-100 transition-all group">
+      <div className="relative h-48 bg-[var(--bg)] overflow-hidden">
+        {project.coverImageUrl ? (
+          <img src={project.coverImageUrl} alt={project.title} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-[var(--text-muted)]">
+            <ImageIcon size={32} strokeWidth={1.5} />
+          </div>
+        )}
+        {project.field && (
+          <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-semibold backdrop-blur-md bg-white/80" style={{ color: fieldColor }}>
+            <span className="w-1.5 h-1.5 rounded-full inline-block mr-1.5" style={{ background: fieldColor }}></span>
+            {project.field}
+          </span>
+        )}
       </div>
 
-      {/* Header Info */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-[#6941C6] font-semibold text-xs uppercase tracking-wider">
-          <span>{project.category}</span>
-          <div className="flex items-center gap-1.5 text-gray-400">
-            <Clock size={12} />
-            <span>{formatDate(project.createdAt)}</span>
-          </div>
+      <div className="p-5">
+        <h3 className="text-base font-bold text-[var(--text)] mb-1.5 group-hover:text-[var(--primary)] transition-colors line-clamp-1" style={{ fontFamily: 'var(--font-heading)' }}>
+          {project.title}
+        </h3>
+        <p className="text-xs text-[var(--text-muted)] leading-relaxed line-clamp-2 mb-4">{project.description}</p>
+
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {(project.mainTags || []).slice(0, 3).map(tag => (
+            <span key={tag} className="text-[10px] font-semibold text-[var(--primary)] bg-[var(--primary)]/6 px-2 py-0.5 rounded-md">{tag}</span>
+          ))}
         </div>
 
-        <div className="flex items-start justify-between">
-          <h4 className="text-2xl font-bold text-[#101828] group-hover:text-[#6941C6] transition-colors leading-tight">
-            {project.title}
-          </h4>
-          <ArrowUpRight className="text-gray-300 group-hover:text-[#6941C6] transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" size={24} />
-        </div>
-
-        <p className="text-[#475467] text-sm leading-relaxed line-clamp-2">
-          {project.description}
-        </p>
-
-        {/* Footer Info */}
-        <div className="flex items-center justify-between pt-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-600 border border-gray-200 uppercase">
-              {project.creator ? project.creator[0] : "A"}
-            </div>
-            <span className="text-xs font-medium text-gray-600">{project.creator || "Anonymous"}</span>
+        <div className="flex items-center justify-between pt-3 border-t border-[var(--border)]">
+          <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
+            <Eye size={14} /> {project.viewCount || 0} views
           </div>
-
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 text-gray-400 text-xs font-medium">
-              <Eye size={14} />
-              <span>{project.viewCount || 0}</span>
-            </div>
-            <div className="flex gap-1">
-              {project.category && [project.category].map(t => (
-                <span key={t} className="px-2 py-0.5 bg-[#F9F5FF] text-[#6941C6] rounded text-[10px] font-bold uppercase">{t}</span>
-              ))}
-            </div>
-          </div>
+          <span className="text-xs font-semibold text-[var(--primary)] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            View <ArrowUpRight size={14} />
+          </span>
         </div>
       </div>
     </div>

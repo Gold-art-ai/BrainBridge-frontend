@@ -2,35 +2,31 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import toast from 'toastify';
 import { useLoginMutation } from '../../redux/api/UserApiSlice';
 import { useRouter } from 'next/navigation';
+import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ emailOrUsername: '', password: '' });
   const [errors, setErrors] = useState({});
-
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const [login] = useLoginMutation();
 
   const handleLogin = async () => {
     let newErrors = {};
-    if (!formData.emailOrUsername) newErrors.emailOrUsername = "Email is required";
-    if (!formData.password) newErrors.password = "Password is required";
-    
+    if (!formData.emailOrUsername) newErrors.emailOrUsername = "Required";
+    if (!formData.password) newErrors.password = "Required";
+
     try {
       const res = await login(formData).unwrap();
       if (res.success && res.data && res.data.token) {
-        // Persist the token so Redux RTK queries can pick it up
         localStorage.setItem('token', res.data.token);
-        // Optionally save the user structure locally
         localStorage.setItem('user', JSON.stringify(res.data.user));
       }
-      console.log(res);
-      setErrors(newErrors);
-      router.push('/dashboard')
+      setErrors({});
+      router.push('/dashboard');
     } catch (error) {
-      toast.error(error.data?.message || "Login failed. Please check your credentials.");
       if (error.data?.fieldErrors) {
         newErrors = { ...newErrors, ...error.data.fieldErrors };
       }
@@ -44,162 +40,71 @@ export default function LoginPage() {
   };
 
   return (
-    <>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-      <link href="https://fonts.googleapis.com/css2?family=Playpen+Sans:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-[var(--bg)] dot-grid relative">
+      <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-[var(--primary)] opacity-[0.03] rounded-full blur-[120px] pointer-events-none"></div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
-        body { margin: 0; padding: 0; background: #ffffff; overflow-x: hidden; }
+      <div className="w-full max-w-[960px] bg-white rounded-3xl border border-[var(--border)] shadow-2xl shadow-gray-200/40 overflow-hidden flex flex-col lg:flex-row">
+        
+        {/* LEFT — Form */}
+        <div className="w-full lg:w-1/2 p-8 sm:p-12 lg:p-14">
+          <Link href="/" className="text-xl font-extrabold text-[var(--primary)] mb-10 block" style={{ fontFamily: 'var(--font-heading)' }}>
+            BrainBridge
+          </Link>
 
-        /* Blueprint Grid Background - Consistent 45px grid */
-        .page-wrapper {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-image: 
-            linear-gradient(rgba(58, 56, 222, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(58, 56, 222, 0.05) 1px, transparent 1px);
-          background-size: 45px 45px;
-          position: relative;
-          padding: 40px 20px;
-        }
+          <h2 className="text-3xl font-extrabold text-[var(--text)] mb-1" style={{ fontFamily: 'var(--font-heading)' }}>Welcome back</h2>
+          <p className="text-sm text-[var(--text-muted)] mb-8">
+            Don't have an account?{' '}
+            <Link href="/auth/signup" className="text-[var(--primary)] font-semibold hover:underline">Sign Up</Link>
+          </p>
 
-        /* Arcs using Brand Royal Blue (#3A38DE) */
-        .arc-overlay {
-          position: absolute;
-          width: 1100px; height: 1100px;
-          border-radius: 50%;
-          border: 100px solid rgba(58, 56, 222, 0.03);
-          right: -15%; top: -10%;
-          z-index: 1;
-        }
+          <div className="space-y-5">
+            <div>
+              <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1.5">Email or Username</label>
+              <input type="text" value={formData.emailOrUsername} onChange={(e) => handleChange(e, 'emailOrUsername')}
+                className={`input-field w-full rounded-xl px-4 py-3 text-sm ${errors.emailOrUsername ? 'error-ring animate-shake' : ''}`}
+                placeholder="name@university.edu" />
+            </div>
 
-        .arc-inner {
-          position: absolute;
-          width: 700px; height: 700px;
-          border-radius: 50%;
-          border: 60px solid rgba(8, 7, 92, 0.02);
-          left: -10%; bottom: -5%;
-          z-index: 1;
-        }
+            <div>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider">Password</label>
+                <Link href="/forgot" className="text-xs font-semibold text-[var(--primary)] hover:underline">Forgot?</Link>
+              </div>
+              <div className="relative">
+                <input type={showPassword ? 'text' : 'password'} value={formData.password} onChange={(e) => handleChange(e, 'password')}
+                  className={`input-field w-full rounded-xl px-4 py-3 pr-11 text-sm ${errors.password ? 'error-ring animate-shake' : ''}`} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text)]">
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
 
-        /* Split Glass Card */
-        .main-card {
-          position: relative;
-          z-index: 10;
-          background: rgba(255, 255, 255, 0.96);
-          backdrop-filter: blur(8px);
-          border: 1px solid rgba(8, 7, 92, 0.1);
-          border-radius: 2.5rem;
-          width: 100%;
-          max-width: 1000px;
-          display: flex;
-          overflow: hidden;
-          box-shadow: 0 50px 100px -20px rgba(8, 7, 92, 0.15);
-        }
+            <div className="flex items-center gap-2">
+              <input type="checkbox" id="remember" className="w-4 h-4 accent-[var(--primary)] cursor-pointer rounded" />
+              <label htmlFor="remember" className="text-xs text-[var(--text-muted)] font-medium cursor-pointer">Keep me logged in</label>
+            </div>
 
-        .input-field {
-          background-color: #f9fafb;
-          color: #9ca3af; 
-          transition: all 0.2s ease;
-          border: 1px solid #e5e7eb;
-        }
-        .input-field:focus {
-          color: #000000 !important;
-          background-color: #ffffff !important;
-          border-color: #3A38DE !important;
-          box-shadow: 0 4px 12px rgba(58, 56, 222, 0.08);
-        }
+            <button onClick={handleLogin} className="btn-primary w-full py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 mt-2">
+              Sign In <ArrowRight size={16} />
+            </button>
+          </div>
+        </div>
 
-        .btn-brand {
-          background: linear-gradient(90deg, #08075C, #3A38DE);
-          transition: all 0.3s ease;
-        }
-        .btn-brand:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 24px rgba(58, 56, 222, 0.3);
-          filter: brightness(1.1);
-        }
-
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-        .animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
-        .error-ring { border-color: #ef4444 !important; }
-      `}} />
-
-      <div className="page-wrapper">
-        <div className="arc-overlay"></div>
-        <div className="arc-inner"></div>
-
-        <div className="main-card flex-col lg:flex-row">
-          
-          {/* LEFT SIDE: LOGIN FORM */}
-          <div className="w-full lg:w-1/2 p-8 sm:p-12 md:p-16">
-            <h1 className="text-3xl font-bold mb-10 bg-clip-text text-transparent w-fit"
-              style={{ fontFamily: "'Playpen Sans', cursive", backgroundImage: "linear-gradient(90deg, #08075C, #3A38DE)" }}>
-              BrainBridge
-            </h1>
-
-            <h2 className="text-3xl font-bold mb-1 text-[#08075C]">Welcome Back</h2>
-            <p className="text-sm text-gray-400 mb-8 font-medium">
-              Don't have an account? <Link href="/auth/signup" className="text-[#3A38DE] font-bold hover:underline">Sign Up</Link>
+        {/* RIGHT — Brand Panel */}
+        <div className="hidden lg:flex w-1/2 bg-[var(--bg)] relative items-center justify-center p-14">
+          <div className="relative z-10 text-center">
+            <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg mb-8 mx-auto border border-[var(--border)]">
+              <i className="fa-solid fa-rocket text-3xl text-[var(--primary)] opacity-60"></i>
+            </div>
+            <h3 className="text-2xl font-extrabold text-[var(--text)] mb-3 leading-tight" style={{ fontFamily: 'var(--font-heading)' }}>
+              Showcase Your<br/>Innovation
+            </h3>
+            <p className="text-sm text-[var(--text-muted)] max-w-xs mx-auto leading-relaxed">
+              Access your dashboard, discover trending projects, and connect with peers across 14 innovation fields.
             </p>
-
-            <div className="space-y-6">
-              <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">E-mail Address Or Username</label>
-                <input type="text" value={formData.emailOrUsername} onChange={(e) => handleChange(e, 'emailOrUsername')}
-                  className={`input-field w-full rounded-2xl px-5 py-3.5 outline-none mt-1 ${errors.emailOrUsername ? 'error-ring animate-shake' : ''}`} 
-                  placeholder="name@email.com" />
-              </div>
-
-              <div>
-                <div className="flex justify-between items-center ml-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Password</label>
-                  <Link href="/forgot" className="text-[10px] font-bold text-[#3A38DE] hover:underline uppercase tracking-widest">Forgot?</Link>
-                </div>
-                <input type="password" value={formData.password} onChange={(e) => handleChange(e, 'password')}
-                  className={`input-field w-full rounded-2xl px-5 py-3.5 outline-none mt-1 ${errors.password ? 'error-ring animate-shake' : ''}`} />
-              </div>
-
-              <div className="flex items-center gap-2 ml-1">
-                <input type="checkbox" id="remember" className="w-4 h-4 accent-[#3A38DE] cursor-pointer" />
-                <label htmlFor="remember" className="text-xs text-gray-500 font-medium cursor-pointer">Keep me logged in</label>
-              </div>
-
-              <button
-               onClick={handleLogin}
-              //  href="/dashboard"
-               className="btn-brand w-full text-white py-4 rounded-2xl font-bold text-lg shadow-xl mt-4 active:scale-95 transition-all inline-block text-center">
-                Sign In
-              </button>
-            </div>
           </div>
-
-          {/* RIGHT SIDE: BRAND SHOWCASE */}
-          <div className="hidden lg:flex w-1/2 bg-[#F8F9FF] relative items-center justify-center p-16">
-            <div className="relative z-20 text-center">
-               <div className="w-32 h-32 bg-white rounded-[2.5rem] flex items-center justify-center shadow-xl mb-10 mx-auto border border-blue-50">
-                  <i className="fa-solid fa-rocket text-5xl text-[#3A38DE] opacity-40"></i>
-               </div>
-               <h3 className="text-3xl font-bold text-[#08075C] mb-4 leading-tight">
-                 Elevate Your<br/>Engineering.
-               </h3>
-               <p className="text-[#3A38DE] font-semibold max-w-xs mx-auto mb-8 leading-relaxed opacity-80">
-                 Login to access your personalized developer dashboard and global networking tools.
-               </p>
-               <div className="flex justify-center gap-2">
-                  <span className="w-2 h-2 bg-[#3A38DE] opacity-20 rounded-full"></span>
-                  <span className="w-12 h-2 bg-[#08075C] rounded-full"></span>
-                  <span className="w-2 h-2 bg-[#3A38DE] opacity-20 rounded-full"></span>
-               </div>
-            </div>
-            
-            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-blue-50/50"></div>
-          </div>
-
         </div>
       </div>
-    </>
+    </div>
   );
 }

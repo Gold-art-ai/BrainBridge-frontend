@@ -1,28 +1,32 @@
+"use client";
 import React from 'react';
+import { FIELDS } from '../../utils/taxonomy';
 
-const categories = [
-  'All', 'Web Apps', 'AI / ML', 'IoT', 'FinTech', 'HealthTech', 'Education', 'Open Source'
-];
+const FIELD_COLORS = {
+  'Agriculture': '#4CAF50', 'Healthcare': '#FF5C8D', 'Education': '#FFA726', 'AI': '#6C63FF',
+  'Mining': '#8D6E63', 'Tourism': '#29B6F6', 'Sustainability': '#66BB6A', 'Water': '#26C6DA',
+  'Cybersecurity': '#EF5350', 'Finance': '#AB47BC', 'Food & Nutrition': '#FF7043',
+  'Energy': '#FFD54F', 'Smart Cities': '#5C6BC0', 'Environment': '#81C784', 'Transport': '#42A5F5',
+};
 
 export default function CategoryFilter({ active, setActive }) {
+  const categories = ['All', ...FIELDS];
+
   return (
-    /* Removed -mx-2 and pb-4 which were causing the container collision */
-    /* Added overflow-y-hidden to ensure only horizontal scrolling exists */
-    <div className="flex gap-3 overflow-x-auto overflow-y-hidden no-scrollbar py-2">
-      {categories.map((cat) => (
-        <button
-          key={cat}
-          type="button"
-          onClick={() => setActive(cat)}
-          className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border flex-shrink-0 ${
-            active === cat 
-            ? 'bg-[#3A38DE] text-white border-[#3A38DE] shadow-lg shadow-blue-500/20' 
-            : 'bg-white text-gray-400 border-gray-100 hover:border-gray-300 hover:text-[#08075C]'
-          }`}
-        >
-          {cat}
-        </button>
-      ))}
+    <div className="flex gap-2 overflow-x-auto no-scrollbar">
+      {categories.map(cat => {
+        const isActive = active === cat;
+        const color = FIELD_COLORS[cat] || 'var(--primary)';
+        return (
+          <button key={cat} onClick={() => setActive(cat)}
+            className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+              isActive ? 'text-white' : 'bg-white text-[var(--text-muted)] border border-[var(--border)] hover:text-[var(--text)]'
+            }`}
+            style={isActive ? { background: color } : {}}>
+            {cat}
+          </button>
+        );
+      })}
     </div>
   );
 }

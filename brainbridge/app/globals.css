@@ -1,60 +1,143 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css');
 @import "tailwindcss";
 
+/* ─── Design Tokens ─── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #6C63FF;
+  --primary-dark: #5A52E0;
+  --secondary: #00C9A7;
+  --accent: #FF6584;
+  --bg: #F8F9FF;
+  --surface: #FFFFFF;
+  --text: #1A1A2E;
+  --text-muted: #8892A4;
+  --border: #E8ECF4;
+
+  /* Field Badge Colors */
+  --field-agriculture: #4CAF50;
+  --field-healthcare: #FF5C8D;
+  --field-education: #FFA726;
+  --field-ai: #6C63FF;
+  --field-mining: #8D6E63;
+  --field-tourism: #29B6F6;
+  --field-sustainability: #66BB6A;
+  --field-water: #26C6DA;
+  --field-cybersecurity: #EF5350;
+  --field-finance: #AB47BC;
+  --field-food: #FF7043;
+  --field-energy: #FFD54F;
+  --field-smart-cities: #5C6BC0;
+  --field-environment: #81C784;
+  --field-transport: #42A5F5;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --font-sans: 'Inter', sans-serif;
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ─── Base ─── */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom styles for login page visuals */
-.login-left-bg {
-  background: #f5f7fb;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-.login-right-bg {
-  background: radial-gradient(1200px 1200px at 80% 20%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 30%, transparent 40%),
-              radial-gradient(900px 900px at 20% 80%, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 35%, transparent 45%),
-              linear-gradient(180deg, #06043a 0%, #0b0a5d 40%, #1a124f 100%);
+code, pre, .font-mono {
+  font-family: 'JetBrains Mono', monospace;
 }
 
-.btn-gradient {
-  background: linear-gradient(90deg,#08075C 0%,#3A38DE 100%);
-  box-shadow: 0 8px 22px rgba(10,9,60,0.45);
+/* ─── Glassmorphism Surface ─── */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
-.card-white {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 14px 40px rgba(11,10,93,0.18);
+.glass-strong {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
 }
 
-.large-circle {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(30px);
-  opacity: 0.22;
+/* ─── Buttons ─── */
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  transition: all 0.2s ease;
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+  box-shadow: 0 4px 16px rgba(108, 99, 255, 0.25);
 }
 
-.login-illustration {
-  width: 140px;
-  height: auto;
+/* ─── Inputs ─── */
+.input-field {
+  background-color: var(--bg);
+  color: var(--text);
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+  font-family: 'Inter', sans-serif;
+}
+.input-field::placeholder {
+  color: var(--text-muted);
+}
+.input-field:focus {
+  background-color: var(--surface);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.08);
+  outline: none;
+}
+
+/* ─── Field Badge Utility ─── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Custom Scrollbar ─── */
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { 
+  background: var(--border); 
+  border-radius: 999px; 
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── Utility Animations (subtle, professional) ─── */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slide-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.animate-fade-in { animation: fade-in 0.3s ease-out; }
+.animate-slide-up { animation: slide-up 0.35s ease-out; }
+
+/* ─── Error States ─── */
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+.animate-shake { animation: shake 0.2s ease-in-out 0s 2; }
+.error-ring { border-color: var(--accent) !important; }
+
+/* ─── Dot Grid Background ─── */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(108, 99, 255, 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
