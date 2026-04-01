@@ -163,12 +163,9 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
           {/* Left: Copy */}
           <div className="flex-1 max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-[var(--primary)]/8 text-[var(--primary)] text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
-              <Sparkles size={14} /> Now Open for All Universities
-            </div>
 
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.08] tracking-tight mb-6" style={{ fontFamily: 'var(--font-heading)' }}>
-              Where Student Projects{' '}
+              Where Developer's Projects{' '}
               <span className="text-[var(--primary)]">Come to Life</span>
             </h1>
 
@@ -436,7 +433,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-12">
             <div className="col-span-2 md:col-span-1">
               <p className="text-lg font-extrabold text-[var(--primary)] mb-3" style={{ fontFamily: 'var(--font-heading)' }}>BrainBridge</p>
-              <p className="text-sm text-[var(--text-muted)] leading-relaxed">Where student projects come to life. Built for innovators, by innovators.</p>
+              <p className="text-sm text-[var(--text-muted)] leading-relaxed">Where Developer's projects come to life. Built for innovators, by innovators.</p>
             </div>
             <div>
               <p className="text-xs font-semibold text-[var(--text)] uppercase tracking-wider mb-4">Product</p>
