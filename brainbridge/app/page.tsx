@@ -96,7 +96,7 @@ const PRICING = [
 ];
 
 const STATS = [
-  { value: '2,400+', label: 'Projects Submitted' },
+  { value: '10+', label: 'Projects Submitted' },
   { value: '14', label: 'Innovation Fields' },
   { value: '150+', label: 'Technology Tags' },
   { value: '17', label: 'SDG Goals Covered' },
