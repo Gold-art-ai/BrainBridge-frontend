@@ -63,8 +63,8 @@ export default function NewProjectModal({ isOpen, onClose, onAddProject }) {
   const availableSubTags = useMemo(() => {
     let subs = [];
     selectedMainTags.forEach(main => { if (SUB_TAGS[main]) subs = [...subs, ...SUB_TAGS[main]]; });
-    return subs;
-  }, [selectedMainTags]);
+    return  [...new Set(subs)];
+  }, [selectedMainTags, SUB_TAGS]);
 
   const handleClose = () => {
     setCoverPreview(null); setCoverBase64(null); setTitle(''); setDescription(''); setStatus('DRAFT');

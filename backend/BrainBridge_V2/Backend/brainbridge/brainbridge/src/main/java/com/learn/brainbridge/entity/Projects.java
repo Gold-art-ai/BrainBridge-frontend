@@ -13,14 +13,19 @@ import java.util.ArrayList;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "Projects")
+@Table(
+    name = "Projects",
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uk_owner_title", columnNames = {"owner_id", "title"})
+    }
+)
 public class Projects {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "projects_seq")
     @SequenceGenerator(name = "projects_seq", sequenceName = "projects_seq", allocationSize = 50)
     private Integer id;
 
-    @Column(nullable = false, unique = true, name = "title")
+    @Column(nullable = false, name = "title")
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")

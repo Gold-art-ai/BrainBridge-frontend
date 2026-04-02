@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import jakarta.validation.ConstraintViolationException;
+
 /**
  * GlobalExceptionHandler - Handles exceptions globally across all controllers
  * 
@@ -77,6 +80,24 @@ public class GlobalExceptionHandler {
         response.put("timestamp", LocalDateTime.now());
         
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * Handle database unique/constraint violations (e.g., duplicate title/email)
+     * Returns HTTP 409 CONFLICT
+     */
+    @ExceptionHandler({ DataIntegrityViolationException.class, ConstraintViolationException.class })
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(Exception ex) {
+        String message = ex.getMessage();
+        if (ex instanceof DataIntegrityViolationException dive && dive.getMostSpecificCause() != null) {
+            message = dive.getMostSpecificCause().getMessage();
+        }
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "Constraint violation: " + message,
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
     /**
