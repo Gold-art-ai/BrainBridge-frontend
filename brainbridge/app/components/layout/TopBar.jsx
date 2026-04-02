@@ -15,7 +15,10 @@ export default function TopBar({ onMenuClick }) {
 
   const fullName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username : "Guest";
   const userRole = user ? 'Student' : 'Guest';
-  const avatarUrl = user?.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=6C63FF&color=fff&bold=true`;
+  const avatarUrl =
+    user?.profilePicture ||
+    user?.profileImageUrl ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=6C63FF&color=fff&bold=true`;
 
   return (
     <header className="h-16 bg-white/80 backdrop-blur-xl border-b border-[var(--border)] flex items-center justify-between px-4 sm:px-8 sticky top-0 z-40">

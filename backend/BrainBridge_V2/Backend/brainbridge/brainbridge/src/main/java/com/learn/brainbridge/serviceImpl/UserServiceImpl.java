@@ -66,6 +66,10 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("Email already exists: " + registerDTO.getEmail());
             
         }
+        // Business validation: Check if username already exists
+        if (userRepository.existsByUsername(registerDTO.getUsername())) {
+            throw new BadRequestException("Username already exists: " + registerDTO.getUsername());
+        }
         
         
         

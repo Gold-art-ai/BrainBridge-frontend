@@ -12,6 +12,8 @@ import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.URL;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProjectDTO {
@@ -80,6 +82,24 @@ public class ProjectDTO {
 
     @JsonProperty("enterpriseRequests")
     private Integer enterpriseRequests = 0;
+
+    @JsonProperty("field")
+    private String field;
+
+    @JsonProperty("mainTags")
+    private List<String> mainTags = new ArrayList<>();
+
+    @JsonProperty("subTags")
+    private List<String> subTags = new ArrayList<>();
+
+    @JsonProperty("sdgGoals")
+    private List<String> sdgGoals = new ArrayList<>();
+
+    @JsonProperty("nst2Goals")
+    private List<String> nst2Goals = new ArrayList<>();
+
+    @JsonProperty("additionalMediaUrls")
+    private List<String> additionalMediaUrls = new ArrayList<>();
 
     public ProjectDTO() {
     }
@@ -213,5 +233,53 @@ public class ProjectDTO {
 
     public void setEnterpriseRequests(Integer enterpriseRequests) {
         this.enterpriseRequests = enterpriseRequests;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public void setField(String field) {
+        this.field = field;
+    }
+
+    public List<String> getMainTags() {
+        return mainTags;
+    }
+
+    public void setMainTags(List<String> mainTags) {
+        this.mainTags = mainTags;
+    }
+
+    public List<String> getSubTags() {
+        return subTags;
+    }
+
+    public void setSubTags(List<String> subTags) {
+        this.subTags = subTags;
+    }
+
+    public List<String> getSdgGoals() {
+        return sdgGoals;
+    }
+
+    public void setSdgGoals(List<String> sdgGoals) {
+        this.sdgGoals = sdgGoals;
+    }
+
+    public List<String> getNst2Goals() {
+        return nst2Goals;
+    }
+
+    public void setNst2Goals(List<String> nst2Goals) {
+        this.nst2Goals = nst2Goals;
+    }
+
+    public List<String> getAdditionalMediaUrls() {
+        return additionalMediaUrls;
+    }
+
+    public void setAdditionalMediaUrls(List<String> additionalMediaUrls) {
+        this.additionalMediaUrls = additionalMediaUrls;
     }
 }

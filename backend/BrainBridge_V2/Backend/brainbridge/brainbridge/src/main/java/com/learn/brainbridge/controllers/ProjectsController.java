@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
@@ -44,6 +45,12 @@ public class ProjectsController {
         project.setEndDate(projectDTO.getEndDate());
         project.setProjectStatus(projectDTO.getProjectStatus());
         project.setProjectVisibility(projectDTO.getProjectVisibility());
+        project.setField(projectDTO.getField());
+        project.setMainTags(projectDTO.getMainTags() == null ? new ArrayList<>() : projectDTO.getMainTags());
+        project.setSubTags(projectDTO.getSubTags() == null ? new ArrayList<>() : projectDTO.getSubTags());
+        project.setSdgGoals(projectDTO.getSdgGoals() == null ? new ArrayList<>() : projectDTO.getSdgGoals());
+        project.setNst2Goals(projectDTO.getNst2Goals() == null ? new ArrayList<>() : projectDTO.getNst2Goals());
+        project.setAdditionalMediaUrls(projectDTO.getAdditionalMediaUrls() == null ? new ArrayList<>() : projectDTO.getAdditionalMediaUrls());
         project.setCreatedAt(java.time.LocalDate.now());
         project.setUpdatedAt(java.time.LocalDate.now());
         Projects saved = service.createProject(project);
@@ -112,6 +119,12 @@ public class ProjectsController {
         project.setEndDate(projectDTO.getEndDate());
         project.setProjectStatus(projectDTO.getProjectStatus());
         project.setProjectVisibility(projectDTO.getProjectVisibility());
+        project.setField(projectDTO.getField());
+        project.setMainTags(projectDTO.getMainTags() == null ? new ArrayList<>() : projectDTO.getMainTags());
+        project.setSubTags(projectDTO.getSubTags() == null ? new ArrayList<>() : projectDTO.getSubTags());
+        project.setSdgGoals(projectDTO.getSdgGoals() == null ? new ArrayList<>() : projectDTO.getSdgGoals());
+        project.setNst2Goals(projectDTO.getNst2Goals() == null ? new ArrayList<>() : projectDTO.getNst2Goals());
+        project.setAdditionalMediaUrls(projectDTO.getAdditionalMediaUrls() == null ? new ArrayList<>() : projectDTO.getAdditionalMediaUrls());
         project.setUpdatedAt(java.time.LocalDate.now());
 
         Projects updated = service.updateProject(project);

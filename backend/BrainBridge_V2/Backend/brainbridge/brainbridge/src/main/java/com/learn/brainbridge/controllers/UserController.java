@@ -4,9 +4,11 @@ import com.learn.brainbridge.dtos.AuthResponseDTO;
 import com.learn.brainbridge.dtos.LoginDTO;
 import com.learn.brainbridge.dtos.RegisterUserDTO;
 import com.learn.brainbridge.dtos.UserDTO;
+import com.learn.brainbridge.entity.User;
 import com.learn.brainbridge.generics.ApiResponses1;
 import com.learn.brainbridge.service.EmailVerificationService;
 import com.learn.brainbridge.service.UserService;
+import com.learn.brainbridge.repository.UserRepository;
 import com.learn.brainbridge.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,6 +21,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -61,6 +64,9 @@ public class UserController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private UserRepository userRepository;
 
     /**
      * POST /api/users/register
@@ -115,6 +121,29 @@ public class UserController {
         AuthResponseDTO payload = new AuthResponseDTO(token, user);
         ApiResponses1<AuthResponseDTO> response  = new ApiResponses1<>(true,"Logged in successfully", payload);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * GET /api/users/me
+     * Returns the currently authenticated user's profile.
+     */
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> getMe(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String principalName = authentication.getName();
+
+        // JWT subject is email if present, otherwise username (see loginUser).
+        User user = userRepository.findByEmail(principalName)
+                .orElseGet(() -> userRepository.findByUsername(principalName).orElse(null));
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        return ResponseEntity.ok(userService.getUserById(user.getId()));
     }
     
 

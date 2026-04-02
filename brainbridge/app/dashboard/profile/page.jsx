@@ -9,6 +9,15 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
+  const toTitleCase = (str) => {
+    if (!str || typeof str !== 'string') return '';
+    return str
+      .toLowerCase()
+      .split(' ')
+      .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ');
+  };
+
   useEffect(() => {
     const userStr = localStorage.getItem('user');
     if (userStr) { try { setUser(JSON.parse(userStr)); } catch (e) {} }
@@ -33,8 +42,12 @@ export default function ProfilePage() {
 
   if (!user) return <div className="p-8 text-[var(--text-muted)]">Loading Profile...</div>;
 
-  const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username;
-  const avatarUrl = user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=6C63FF&color=fff&bold=true`;
+  const fullNameRaw = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username;
+  const fullName = toTitleCase(fullNameRaw);
+  const avatarUrl =
+    user.profilePicture ||
+    user.profileImageUrl ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=6C63FF&color=fff&bold=true`;
 
   return (
     <div className="max-w-[960px] mx-auto pb-10">
@@ -91,11 +104,11 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1.5">First Name</label>
-                    <input type="text" disabled defaultValue={user.firstName} className="input-field w-full rounded-xl py-2.5 px-4 text-sm opacity-60 cursor-not-allowed" />
+                    <input type="text" disabled defaultValue={toTitleCase(user.firstName)} className="input-field w-full rounded-xl py-2.5 px-4 text-sm opacity-60 cursor-not-allowed" />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1.5">Last Name</label>
-                    <input type="text" disabled defaultValue={user.lastName} className="input-field w-full rounded-xl py-2.5 px-4 text-sm opacity-60 cursor-not-allowed" />
+                    <input type="text" disabled defaultValue={toTitleCase(user.lastName)} className="input-field w-full rounded-xl py-2.5 px-4 text-sm opacity-60 cursor-not-allowed" />
                   </div>
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1.5">Email</label>

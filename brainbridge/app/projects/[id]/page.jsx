@@ -95,7 +95,7 @@ export default function ProjectPage() {
         <section className="lg:col-span-2 bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden group">
           <div className="relative z-10">
             <h3 className="text-[10px] font-black text-[#3A38DE] uppercase tracking-[0.2em] mb-4">Request Access</h3>
-            <h2 className="text-3xl font-black text-[#08075C] mb-6 tracking-tight">Collaborate with {project.creator}</h2>
+            <h2 className="text-3xl font-black text-[#08075C] mb-6 tracking-tight">Collaborate with {project.creator || 'Architect'}</h2>
             <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-xl">
               Initiate a direct secure channel to discuss technical specifications and development goals.
             </p>

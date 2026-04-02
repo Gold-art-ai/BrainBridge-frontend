@@ -66,7 +66,7 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
                   <span className="bg-blue-600/80 text-white text-xs font-bold uppercase px-3 py-1 rounded-md shadow-sm">
-                    {project.category}
+                    {project.field}
                   </span>
                   <span className="text-white/50 text-xs font-bold uppercase">
                     Node ID: {project.id?.toString().padStart(4, '0') || '7721'}
@@ -127,7 +127,7 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
               </div>
               <p className="text-gray-600 text-sm leading-7">
                 The <span className="font-bold text-gray-900">"{project.title}"</span> infrastructure is currently in <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide ${theme.bg} ${theme.text}`}>{project.projectStatus}</span> stage. 
-                Stack: <span className="text-blue-700 font-semibold">{project.category || 'Custom Frameworks'}</span>.
+                Stack: <span className="text-blue-700 font-semibold">{project.field || 'Custom Frameworks'}</span>.
               </p>
             </section>
 
@@ -171,7 +171,7 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
                   <Binary size={12} /> Tech Stack
               </h4>
               <div className="flex flex-wrap gap-2">
-                {project.category && [project.category].map(skill => (
+                {(project.mainTags || []).slice(0, 6).map(skill => (
                   <span key={skill} className="bg-white/40 text-gray-900 border border-gray-200 px-3 py-1.5 rounded-lg text-xs font-semibold cursor-default">
                     {skill}
                   </span>
@@ -210,7 +210,7 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
                 <ExternalLink size={14} className="text-gray-400 mb-1" />
                 <p className="text-[8px] font-bold text-gray-400 uppercase mb-1">Environment</p>
                 <p className="text-[10px] font-bold text-blue-700 uppercase tracking-tight">
-                    {project.projectType || 'Staging'}
+                    {project.projectVisibility || 'PUBLIC'}
                 </p>
               </div>
             </div>

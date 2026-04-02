@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useLoginMutation } from '../../redux/api/UserApiSlice';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, Eye, EyeOff } from 'lucide-react';
+import Image from 'next/image';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ emailOrUsername: '', password: '' });
@@ -94,7 +95,8 @@ export default function LoginPage() {
         <div className="hidden lg:flex w-1/2 bg-[var(--bg)] relative items-center justify-center p-14">
           <div className="relative z-10 text-center">
             <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg mb-8 mx-auto border border-[var(--border)]">
-              <i className="fa-solid fa-rocket text-3xl text-[var(--primary)] opacity-60"></i>
+              {/* Logo */}
+              <Image src="/logo.png" alt="BrainBridge" width={80} height={80} />
             </div>
             <h3 className="text-2xl font-extrabold text-[var(--text)] mb-3 leading-tight" style={{ fontFamily: 'var(--font-heading)' }}>
               Showcase Your<br/>Innovation

@@ -10,6 +10,13 @@ export default function FeedPost({ project, recommendationReason }) {
   // Default mock behavior for engagement
   const [likesCount, setLikesCount] = useState(Math.floor(Math.random() * 50) + 5);
 
+  const tags =
+    (project.mainTags && project.mainTags.length > 0)
+      ? project.mainTags
+      : (project.tech && project.tech.length > 0)
+        ? project.tech
+        : (project.field ? [project.field] : []);
+
   const handleLike = () => {
     setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
     setIsLiked(!isLiked);
@@ -88,16 +95,16 @@ export default function FeedPost({ project, recommendationReason }) {
         
         {/* Chips */}
         <div className="flex flex-wrap gap-2">
-          {project.tech && project.tech.length > 0 ? (
-            project.tech.map((t, idx) => (
+          {tags.length > 0 ? (
+            tags.map((t, idx) => (
               <span key={idx} className="text-[10px] uppercase tracking-wider font-black bg-gray-100 text-[#08075C] px-3 py-1.5 rounded-xl">
                 #{t.replace(/\s+/g, '')}
               </span>
             ))
           ) : (
-             <span className="text-[10px] uppercase tracking-wider font-black bg-gray-100 text-[#08075C] px-3 py-1.5 rounded-xl">
-               #{project.category?.replace(/\s+/g, '') || 'INNOVATION'}
-             </span>
+            <span className="text-[10px] uppercase tracking-wider font-black bg-gray-100 text-[#08075C] px-3 py-1.5 rounded-xl">
+              #INNOVATION
+            </span>
           )}
         </div>
       </div>

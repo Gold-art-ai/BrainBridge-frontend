@@ -1,11 +1,12 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { FIELDS } from '../../utils/taxonomy';
 
 export default function EditProjectModal({ isOpen, onClose, onUpdateProject, project }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('');
-  const [category, setCategory] = useState('');
+  const [field, setField] = useState('');
   const [github, setGithub] = useState('');
   const [image, setImage] = useState(''); // New state for image
 
@@ -15,7 +16,7 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
       setName(project.title || '');
       setDescription(project.description || '');
       setStatus(project.projectStatus || 'DRAFT');
-      setCategory(project.category || 'Web App');
+      setField(project.field || '');
       setGithub(project.repoUrl || '');
       setImage(project.coverImageUrl || '');
     }
@@ -40,7 +41,7 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
       title: name,
       description,
       projectStatus: status,
-      category,
+      field,
       repoUrl: github,
       coverImageUrl: image 
     });
@@ -56,7 +57,7 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
           <div className="flex justify-between items-center">
             <div>
               <h3 className="text-sm font-black text-[#08075C] uppercase tracking-widest">Update Configuration</h3>
-              <p className="text-[10px] text-gray-400 font-medium italic">Modifying {project.name}</p>
+              <p className="text-[10px] text-gray-400 font-medium italic">Modifying {project.title || project.name}</p>
             </div>
             <button onClick={onClose} className="text-gray-300 hover:text-red-500 transition-colors">
               <i className="fa-solid fa-xmark text-lg"></i>
@@ -114,12 +115,13 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
                 </select>
               </div>
               <div>
-                <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Category</label>
+                <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Field</label>
                 <select 
-                  value={category} onChange={(e) => setCategory(e.target.value)}
+                  value={field} onChange={(e) => setField(e.target.value)}
                   className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold text-[#08075C] outline-none cursor-pointer"
                 >
-                  {['Web App', 'Mobile', 'AI/ML', 'Design', 'Blockchain'].map(c => <option key={c} value={c}>{c}</option>)}
+                  <option value="" disabled>Select Sector...</option>
+                  {FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
                 </select>
               </div>
             </div>

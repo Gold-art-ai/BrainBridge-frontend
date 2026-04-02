@@ -33,6 +33,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/logo.png" />
+      </head>
       <body className={`${jakarta.variable} ${inter.variable} ${jetbrains.variable} antialiased`}>
         <ReduxProvider>{children}</ReduxProvider>
       </body>
