@@ -42,10 +42,10 @@ public class Projects {
     @Column(nullable = false, name = "owner_id")
     private Integer ownerId;
 
-    @Column(nullable = false, name = "team_id")
+    @Column(nullable = true, name = "team_id")
     private Integer teamId;
 
-    @Column(nullable = false, name = "source_idea_id")
+    @Column(nullable = true, name = "source_idea_id")
     private Integer sourceIdeaId;
 
     @Column(nullable = true, columnDefinition = "TEXT", name = "cover_image_url")

@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.URL;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class ProjectDTO {
     private String title;
 
     @NotBlank
-    @Size(min = 2, max = 500)
+    @Size(min = 2, max = 5000)
     @Schema(description = "Project description", example = "This project helps to show case your projects and " +
             "also connect with people who are interested in your project")
     @JsonProperty("description")
@@ -50,13 +51,11 @@ public class ProjectDTO {
     @JsonProperty("ownerId")
     private Integer ownerId;
 
-    @NotNull
     @Positive
     @Schema(description = "Team id", example = "100")
     @JsonProperty("teamId")
     private Integer teamId;
 
-    @NotNull
     @Positive
     @Schema(description = "Source idea id", example = "999")
     @JsonProperty("sourceIdeaId")
@@ -71,10 +70,12 @@ public class ProjectDTO {
     private String repoUrl;
 
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonProperty("startDate")
     private LocalDate startDate;
 
     @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonProperty("endDate")
     private LocalDate endDate;
     @JsonProperty("viewCount")

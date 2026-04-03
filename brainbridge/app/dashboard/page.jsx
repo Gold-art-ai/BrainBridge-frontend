@@ -52,8 +52,6 @@ export default function DashboardPage() {
       projectStatus: newProj.projectStatus,
       projectVisibility: newProj.projectVisibility,
       ownerId: ownerId,
-      teamId: 20,
-      sourceIdeaId: 2002,
       coverImageUrl: newProj.coverImageUrl || "",
       repoUrl: newProj.repoUrl || "",
       field: newProj.field,

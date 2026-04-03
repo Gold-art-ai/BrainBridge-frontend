@@ -29,7 +29,7 @@ export default function PublicDiscoveryPage() {
     const payload = {
       title: newProj.title, description: newProj.description,
       projectStatus: newProj.projectStatus, projectVisibility: newProj.projectVisibility,
-      ownerId, teamId: 20, sourceIdeaId: 2002,
+      ownerId,
       coverImageUrl: newProj.coverImageUrl || "", repoUrl: newProj.repoUrl || "",
       field: newProj.field, mainTags: newProj.mainTags, subTags: newProj.subTags,
       sdgGoals: newProj.sdgGoals, nst2Goals: newProj.nst2Goals,
