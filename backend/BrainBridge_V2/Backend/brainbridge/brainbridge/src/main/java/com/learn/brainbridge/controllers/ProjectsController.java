@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -31,12 +32,35 @@ public class ProjectsController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> createProject(@Valid @RequestBody ProjectDTO projectDTO) {
+    public ResponseEntity<?> createProject(Authentication authentication, @Valid @RequestBody ProjectDTO projectDTO) {
         System.out.println("Received project creation request: " + projectDTO.getTitle());
+
+        // Always bind the created project to the authenticated user.
+        // Otherwise the frontend can accidentally send an incorrect ownerId and the project won't show up in GET /projects/my.
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        String principalName = authentication.getName();
+        User user = userRepository.findByEmail(principalName)
+                .orElseGet(() -> userRepository.findByUsername(principalName).orElse(null));
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        Integer ownerId;
+        try {
+            ownerId = Math.toIntExact(user.getId());
+        } catch (ArithmeticException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("User ID is too large to map to project owner id");
+        }
+
         Projects project = new Projects();
         project.setTitle(projectDTO.getTitle());
         project.setDescription(projectDTO.getDescription());
-        project.setOwnerId(projectDTO.getOwnerId());
+        project.setOwnerId(ownerId);
         project.setTeamId(projectDTO.getTeamId());
         project.setSourceIdeaId(projectDTO.getSourceIdeaId());
         project.setCoverImageUrl(projectDTO.getCoverImageUrl());
@@ -69,6 +93,7 @@ public class ProjectsController {
     }
 
     @GetMapping("/my")
+    @Transactional(readOnly = true)
     public ResponseEntity<?> getMyProjects(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
@@ -92,8 +117,14 @@ public class ProjectsController {
                     .body("User ID is too large to map to project owner id");
         }
 
-        List<Projects> projects = service.getProjectsByOwner(ownerId);
-        return ResponseEntity.status(HttpStatus.OK).body(projects);
+        try {
+            List<Projects> projects = service.getProjectsByOwner(ownerId);
+            return ResponseEntity.status(HttpStatus.OK).body(projects);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to load your projects: " + ex.getMessage());
+        }
     }
 
     @PutMapping("/update")
