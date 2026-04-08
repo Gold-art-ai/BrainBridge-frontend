@@ -97,7 +97,19 @@ public class RegisterUserDTO {
         this.lastName = lastName;
     }
 
-    // public void setOrganizationName(String organizationName) {
-    // this.organizationName = organizationName;
-    // }
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getBiography() {
+        return biography;
+    }
+
+    public void setBiography(String biography) {
+        this.biography = biography;
+    }
 }

@@ -8,6 +8,9 @@ import com.learn.brainbridge.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.learn.brainbridge.dtos.MessageDTO;
+
 import java.util.List;
 
 @Service
@@ -15,11 +18,13 @@ public class MessageService {
 
     private final MessageRepository messageRepo;
     private final NotificationService notificationService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public MessageService(MessageRepository messageRepo, NotificationService notificationService) {
+    public MessageService(MessageRepository messageRepo, NotificationService notificationService, SimpMessagingTemplate messagingTemplate) {
         this.messageRepo = messageRepo;
         this.notificationService = notificationService;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public Message sendMessage(User sender, User receiver, Projects project, String content) {
@@ -30,6 +35,23 @@ public class MessageService {
         message.setContent(content);
         message.setIsRead(false);
         Message saved = messageRepo.save(message);
+
+        MessageDTO dto = new MessageDTO();
+        dto.setId(saved.getId());
+        dto.setSenderId(sender.getId());
+        dto.setSenderUsername(sender.getUsername());
+        dto.setReceiverId(receiver.getId());
+        dto.setReceiverUsername(receiver.getUsername());
+        if (project != null) {
+            dto.setProjectId(project.getId());
+            dto.setProjectName(project.getTitle());
+        }
+        dto.setContent(saved.getContent());
+        dto.setIsRead(saved.getIsRead());
+        dto.setCreatedAt(saved.getCreatedAt());
+
+        // WebSocket connections use Email as the principal identity (extracted from JWT)
+        messagingTemplate.convertAndSendToUser(receiver.getEmail(), "/queue/messages", dto);
 
         // Notify the receiver
         String title = (project != null) ? "Collaboration: " + project.getTitle() : "Direct Message";

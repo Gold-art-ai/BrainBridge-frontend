@@ -7,16 +7,21 @@ import com.learn.brainbridge.repository.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.learn.brainbridge.dtos.NotificationDTO;
+
 import java.util.List;
 
 @Service
 public class NotificationService {
 
     private final NotificationRepository repo;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public NotificationService(NotificationRepository repo) {
+    public NotificationService(NotificationRepository repo, SimpMessagingTemplate messagingTemplate) {
         this.repo = repo;
+        this.messagingTemplate = messagingTemplate;
     }
 
     public void createNotification(User user, NotificationType type, String title, String body) {
@@ -26,7 +31,13 @@ public class NotificationService {
         notification.setTitle(title);
         notification.setBody(body);
         notification.setIsRead(false);
-        repo.save(notification);
+        Notification saved = repo.save(notification);
+
+        NotificationDTO dto = new NotificationDTO(saved.getId(), saved.getType(),
+                saved.getTitle(), saved.getBody(), saved.getIsRead(), saved.getCreatedAt());
+        
+        // Use Email because JWT subject is Email
+        messagingTemplate.convertAndSendToUser(user.getEmail(), "/queue/notifications", dto);
     }
 
     public List<Notification> getNotificationsForUser(User user) {

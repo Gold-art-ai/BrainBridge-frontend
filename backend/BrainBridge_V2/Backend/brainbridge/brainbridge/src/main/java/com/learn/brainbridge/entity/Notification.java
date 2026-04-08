@@ -14,8 +14,6 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "notifications")
-@Data
-@NoArgsConstructor
 public class Notification {
 
     @Id
@@ -47,4 +45,27 @@ public class Notification {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
+    public Notification() {}
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public User getUser() { return user; }
+    public void setUser(User user) { this.user = user; }
+
+    public NotificationType getType() { return type; }
+    public void setType(NotificationType type) { this.type = type; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getBody() { return body; }
+    public void setBody(String body) { this.body = body; }
+
+    public Boolean getIsRead() { return isRead; }
+    public void setIsRead(Boolean isRead) { this.isRead = isRead; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

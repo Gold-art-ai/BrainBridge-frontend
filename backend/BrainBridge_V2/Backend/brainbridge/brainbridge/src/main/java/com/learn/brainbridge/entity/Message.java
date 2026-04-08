@@ -8,9 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "messages")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class Message {
 
     @Id
@@ -42,5 +40,38 @@ public class Message {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
     }
+
+    public Message() {}
+
+    public Message(Long id, User sender, User receiver, Projects project, String content, Boolean isRead, LocalDateTime createdAt) {
+        this.id = id;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.project = project;
+        this.content = content;
+        this.isRead = isRead;
+        this.createdAt = createdAt;
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public User getSender() { return sender; }
+    public void setSender(User sender) { this.sender = sender; }
+
+    public User getReceiver() { return receiver; }
+    public void setReceiver(User receiver) { this.receiver = receiver; }
+
+    public Projects getProject() { return project; }
+    public void setProject(Projects project) { this.project = project; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+
+    public Boolean getIsRead() { return isRead; }
+    public void setIsRead(Boolean isRead) { this.isRead = isRead; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
 }

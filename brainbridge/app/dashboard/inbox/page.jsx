@@ -25,18 +25,32 @@ function InboxContent() {
 
   // Process messages into chats
   const chatGroups = (fetchedMessages || []).reduce((acc, msg) => {
-    const chatId = msg.projectId ? `proj-${msg.projectId}` : 'direct-messages';
+    const otherUserId = msg.senderId === user?.id ? msg.receiverId : msg.senderId;
+    const otherUserUsername = msg.senderId === user?.id ? msg.receiverUsername : msg.senderUsername;
+    
+    const chatId = msg.projectId ? `proj-${msg.projectId}-user-${otherUserId}` : `direct-${otherUserId}`;
+    
     if (!acc[chatId]) {
       acc[chatId] = {
         id: chatId,
-        name: msg.projectName || "Direct Messages",
+        name: otherUserUsername || "Unknown User",
         project: msg.projectName,
         projectId: msg.projectId,
+        otherUserId: otherUserId,
         lastMsg: msg.content,
-        messages: []
+        messages: [],
+        hasUnread: false
       };
     }
     acc[chatId].messages.push(msg);
+    // Keep lastMsg updated with the most recent processing
+    acc[chatId].lastMsg = msg.content;
+    
+    // Check if there are any unread messages from the other user
+    if (!msg.isRead && msg.senderId !== user?.id) {
+        acc[chatId].hasUnread = true;
+    }
+    
     return acc;
   }, {});
 
@@ -62,7 +76,8 @@ function InboxContent() {
     if (!inputText.trim() || !user) return;
 
     try {
-      const receiverId = activeChat.messages?.find(m => m.senderId !== user.id)?.senderId || 1; // Simplification
+      // Send to the specifically grouped other user, fallback to 1 only for global chat if allowed
+      const receiverId = activeChat.otherUserId || 1;
 
       await sendMessage({
         receiverId: receiverId,
@@ -95,12 +110,15 @@ function InboxContent() {
         </div>
         <div className="flex-1 overflow-y-auto px-3 space-y-1">
           {chats.map((chat) => (
-            <div key={chat.id} onClick={() => setActiveChatId(chat.id)} className={`p-4 rounded-2xl cursor-pointer transition-all ${activeChatId === chat.id ? 'bg-[#08075C] text-white shadow-lg shadow-blue-900/20' : 'hover:bg-gray-50 text-gray-500'}`}>
+            <div key={chat.id} onClick={() => setActiveChatId(chat.id)} className={`p-4 rounded-2xl cursor-pointer transition-all relative ${activeChatId === chat.id ? 'bg-[#08075C] text-white shadow-lg shadow-blue-900/20' : 'hover:bg-gray-50 text-gray-500'}`}>
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs ${activeChatId === chat.id ? 'bg-white/10 text-white' : 'bg-gray-100 text-[#08075C]'}`}>{chat.name.charAt(0)}</div>
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs relative overflow-visible ${activeChatId === chat.id ? 'bg-white/10 text-white' : 'bg-gray-100 text-[#08075C]'}`}>
+                  {chat.name.charAt(0)}
+                  {chat.hasUnread && <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white shadow-sm ring-red-200"></span>}
+                </div>
                 <div className="overflow-hidden">
-                  <p className={`text-xs font-black truncate ${activeChatId === chat.id ? 'text-white' : 'text-[#08075C]'}`}>{chat.name}</p>
-                  <p className="text-[9px] opacity-60 truncate font-medium uppercase tracking-tight">{chat.project ? `Proj: ${chat.project}` : chat.lastMsg}</p>
+                  <p className={`text-xs truncate ${chat.hasUnread ? 'font-black' : 'font-bold'} ${activeChatId === chat.id ? 'text-white' : (chat.hasUnread ? 'text-black' : 'text-[#08075C]')}`}>{chat.name}</p>
+                  <p className={`text-[9px] truncate tracking-tight ${chat.hasUnread ? 'font-bold opacity-100 text-black' : 'opacity-60 font-medium uppercase'}`}>{chat.project ? `Proj: ${chat.project}` : chat.lastMsg}</p>
                 </div>
               </div>
             </div>

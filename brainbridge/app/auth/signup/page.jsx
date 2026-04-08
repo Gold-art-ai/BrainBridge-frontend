@@ -49,7 +49,15 @@ export default function SignUpPage() {
         await registerUser(formData).unwrap();
         router.push('/auth/login');
       } catch (error) {
-        if (error.data?.fieldErrors) setErrors(error.data.fieldErrors);
+        if (error.data?.errors) {
+          setErrors(error.data.errors);
+        } else if (error.data?.fieldErrors) {
+          setErrors(error.data.fieldErrors);
+        } else if (error.data?.message) {
+          setErrors({ _root: error.data.message });
+        } else {
+          setErrors({ _root: "Registration failed. Please try again." });
+        }
       } finally {
         setFormData(prev => ({ ...prev, isSubmitting: false }));
       }
@@ -78,6 +86,12 @@ export default function SignUpPage() {
             Already a member?{' '}
             <Link href="/auth/login" className="text-[var(--primary)] font-semibold hover:underline">Log In</Link>
           </p>
+
+          {errors._root && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-semibold">
+              {errors._root}
+            </div>
+          )}
 
           <div className="space-y-4">
             <div>

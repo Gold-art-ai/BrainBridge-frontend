@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import ReduxProvider from './redux/ProviderClient'
+import ReduxProvider from './redux/ProviderClient';
+import { WebSocketProvider } from "./components/providers/WebSocketProvider";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-heading",
@@ -37,7 +38,11 @@ export default function RootLayout({
         <link rel="icon" href="/logo.png" />
       </head>
       <body className={`${jakarta.variable} ${inter.variable} ${jetbrains.variable} antialiased`}>
-        <ReduxProvider>{children}</ReduxProvider>
+        <ReduxProvider>
+          <WebSocketProvider>
+            {children}
+          </WebSocketProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

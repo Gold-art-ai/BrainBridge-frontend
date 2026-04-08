@@ -1,10 +1,17 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Search, Bell, ChevronDown, Menu } from 'lucide-react';
+import { Search, Bell, ChevronDown, Menu, Check } from 'lucide-react';
+import { useGetUnreadNotificationCountQuery, useGetNotificationsQuery, useMarkNotificationAsReadMutation } from '../../redux/api/MessagesApiSlice';
 
 export default function TopBar({ onMenuClick }) {
   const [user, setUser] = useState(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const { data: unreadCount = 0 } = useGetUnreadNotificationCountQuery(undefined, { skip: !user });
+  const { data: notifications = [] } = useGetNotificationsQuery(undefined, { skip: !user });
+  const [markAsRead] = useMarkNotificationAsReadMutation();
 
   useEffect(() => {
     const userStr = localStorage.getItem('user');
@@ -12,6 +19,24 @@ export default function TopBar({ onMenuClick }) {
       try { setUser(JSON.parse(userStr)); } catch (e) {}
     }
   }, []);
+
+  // Close dropdown if clicked outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownRef]);
+
+  const handleNotificationClick = async (notif) => {
+    if (!notif.isRead) {
+      try { await markAsRead(notif.id); } catch(e) {}
+    }
+    setIsDropdownOpen(false);
+  };
 
   const fullName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username : "Guest";
   const userRole = user ? 'Student' : 'Guest';
@@ -39,10 +64,63 @@ export default function TopBar({ onMenuClick }) {
       </div>
 
       <div className="flex items-center gap-3 sm:gap-4 ml-4">
-        <button className="relative p-2 rounded-lg hover:bg-[var(--bg)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors">
-          <Bell size={18} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[var(--accent)] rounded-full ring-2 ring-white"></span>
-        </button>
+        <div className="relative" ref={dropdownRef}>
+          <button 
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="relative p-2 rounded-lg hover:bg-[var(--bg)] text-[var(--text-muted)] hover:text-[var(--text)] transition-colors"
+          >
+            <Bell size={18} />
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 flex items-center justify-center min-w-[1.25rem] h-5 px-1 bg-[var(--accent)] text-white text-[10px] font-bold rounded-full ring-2 ring-white shadow-sm">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
+          </button>
+          
+          {/* Notification Dropdown Box */}
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-80 bg-white border border-[var(--border)] rounded-2xl shadow-xl z-50 overflow-hidden transform opacity-100 scale-100 transition-all origin-top-right">
+              <div className="p-4 border-b border-[var(--border)] flex justify-between items-center bg-gray-50/50">
+                <h3 className="text-xs font-black text-[var(--text)] uppercase tracking-widest">Notifications</h3>
+                <span className="text-[10px] font-bold bg-[#E8E8FF] text-[#3A38DE] px-2 py-0.5 rounded-full">{unreadCount} New</span>
+              </div>
+              <div className="max-h-[350px] overflow-y-auto">
+                {notifications.length === 0 ? (
+                  <div className="p-8 text-center text-[var(--text-muted)] text-xs font-medium">
+                    You have no notifications.
+                  </div>
+                ) : (
+                  notifications.map((notif) => (
+                    <div 
+                      key={notif.id} 
+                      onClick={() => handleNotificationClick(notif)}
+                      className={`p-4 border-b border-[var(--border)] last:border-0 cursor-pointer transition-colors flex gap-3 ${!notif.isRead ? 'bg-blue-50/30 hover:bg-blue-50/60' : 'hover:bg-gray-50/80 grayscale-[0.2] opacity-80'}`}
+                    >
+                      <div className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${!notif.isRead ? 'bg-[#3A38DE] shadow-[0_0_8px_rgba(58,56,222,0.5)]' : 'bg-transparent'}`}></div>
+                      <div className="flex-1">
+                        <p className={`text-[11px] font-bold ${!notif.isRead ? 'text-[#08075C]' : 'text-gray-600'}`}>{notif.title}</p>
+                        <p className={`text-[10px] mt-1 leading-snug ${!notif.isRead ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>{notif.body}</p>
+                        <p className="text-[8px] font-bold tracking-widest uppercase text-gray-400 mt-2">
+                           {new Date(notif.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </p>
+                      </div>
+                      {!notif.isRead && (
+                        <div className="text-[#3A38DE] opacity-0 hover:opacity-100 transition-opacity">
+                          <Check size={14} />
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+              <div className="p-2 border-t border-[var(--border)] bg-gray-50/30 text-center">
+                <Link href="/dashboard/inbox" onClick={() => setIsDropdownOpen(false)} className="text-[10px] font-black text-[#3A38DE] hover:text-[#08075C] uppercase tracking-widest transition-colors">
+                  View all in Inbox
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="h-6 w-px bg-[var(--border)] hidden sm:block"></div>
 
