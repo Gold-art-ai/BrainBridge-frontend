@@ -82,7 +82,7 @@ export default function TopBar({ onMenuClick }) {
             <div className="absolute right-0 mt-2 w-80 bg-white border border-[var(--border)] rounded-2xl shadow-xl z-50 overflow-hidden transform opacity-100 scale-100 transition-all origin-top-right">
               <div className="p-4 border-b border-[var(--border)] flex justify-between items-center bg-gray-50/50">
                 <h3 className="text-xs font-black text-[var(--text)] uppercase tracking-widest">Notifications</h3>
-                <span className="text-[10px] font-bold bg-[#E8E8FF] text-[#3A38DE] px-2 py-0.5 rounded-full">{unreadCount} New</span>
+                <span className="text-[10px] font-bold bg-[var(--primary)]/10 text-[var(--primary)] px-2 py-0.5 rounded-full">{unreadCount} New</span>
               </div>
               <div className="max-h-[350px] overflow-y-auto">
                 {notifications.length === 0 ? (
@@ -96,16 +96,16 @@ export default function TopBar({ onMenuClick }) {
                       onClick={() => handleNotificationClick(notif)}
                       className={`p-4 border-b border-[var(--border)] last:border-0 cursor-pointer transition-colors flex gap-3 ${!notif.isRead ? 'bg-blue-50/30 hover:bg-blue-50/60' : 'hover:bg-gray-50/80 grayscale-[0.2] opacity-80'}`}
                     >
-                      <div className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${!notif.isRead ? 'bg-[#3A38DE] shadow-[0_0_8px_rgba(58,56,222,0.5)]' : 'bg-transparent'}`}></div>
+                      <div className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${!notif.isRead ? 'bg-[var(--primary)] shadow-[0_0_8px_rgba(108,99,255,0.5)]' : 'bg-transparent'}`}></div>
                       <div className="flex-1">
-                        <p className={`text-[11px] font-bold ${!notif.isRead ? 'text-[#08075C]' : 'text-gray-600'}`}>{notif.title}</p>
+                        <p className={`text-[11px] font-bold ${!notif.isRead ? 'text-[var(--text)]' : 'text-gray-600'}`}>{notif.title}</p>
                         <p className={`text-[10px] mt-1 leading-snug ${!notif.isRead ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>{notif.body}</p>
                         <p className="text-[8px] font-bold tracking-widest uppercase text-gray-400 mt-2">
                            {new Date(notif.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                         </p>
                       </div>
                       {!notif.isRead && (
-                        <div className="text-[#3A38DE] opacity-0 hover:opacity-100 transition-opacity">
+                        <div className="text-[var(--primary)] opacity-0 hover:opacity-100 transition-opacity">
                           <Check size={14} />
                         </div>
                       )}
@@ -114,7 +114,7 @@ export default function TopBar({ onMenuClick }) {
                 )}
               </div>
               <div className="p-2 border-t border-[var(--border)] bg-gray-50/30 text-center">
-                <Link href="/dashboard/inbox" onClick={() => setIsDropdownOpen(false)} className="text-[10px] font-black text-[#3A38DE] hover:text-[#08075C] uppercase tracking-widest transition-colors">
+                <Link href="/dashboard/inbox" onClick={() => setIsDropdownOpen(false)} className="text-[10px] font-black text-[var(--primary)] hover:text-[var(--primary-dark)] uppercase tracking-widest transition-colors">
                   View all in Inbox
                 </Link>
               </div>

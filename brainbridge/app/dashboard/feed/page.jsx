@@ -38,7 +38,7 @@ export default function FeedPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <Loader2 className="animate-spin text-[#3A38DE]" size={40} />
+        <Loader2 className="animate-spin text-[var(--primary)]" size={40} />
       </div>
     );
   }
@@ -48,8 +48,8 @@ export default function FeedPage() {
       
       {/* Feed Header */}
       <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-3xl pt-2 pb-4 mb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
-        <h2 className="text-2xl font-black text-[#08075C] mb-4 flex items-center gap-2">
-          Discover Feed <Sparkles size={20} className="text-[#3A38DE]" />
+        <h2 className="text-2xl font-black text-[var(--text)] mb-4 flex items-center gap-2">
+          Discover Feed <Sparkles size={20} className="text-[var(--primary)]" />
         </h2>
         
         {/* Feed Filters / Tabs */}
@@ -60,8 +60,8 @@ export default function FeedPage() {
               onClick={() => setActiveFilter(f)}
               className={`whitespace-nowrap px-5 py-2.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${
                 activeFilter === f 
-                  ? 'bg-[#08075C] text-white shadow-lg shadow-blue-900/20' 
-                  : 'bg-gray-50/50 text-gray-500 border border-gray-100 hover:bg-gray-100/80 hover:text-[#08075C]'
+                  ? 'bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20' 
+                  : 'bg-gray-50/50 text-gray-500 border border-gray-100 hover:bg-gray-100/80 hover:text-[var(--primary)]'
               }`}
             >
               {f}
@@ -82,7 +82,7 @@ export default function FeedPage() {
           ))
         ) : (
           <div className="text-center py-20 bg-gray-50/50 rounded-[40px] border border-gray-100 border-dashed mt-4">
-            <h3 className="text-[#08075C] font-bold mb-2">No projects found</h3>
+            <h3 className="text-[var(--text)] font-bold mb-2" style={{ fontFamily: 'var(--font-heading)' }}>No projects found</h3>
             <p className="text-xs text-gray-400 font-medium tracking-wide uppercase">Try switching your feed filter.</p>
           </div>
         )}

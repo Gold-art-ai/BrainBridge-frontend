@@ -40,9 +40,9 @@ export default function ProjectsWorkspace() {
     <div className="max-w-7xl mx-auto px-6 py-10">
       <header className="mb-10 flex justify-between items-end">
         <div>
-          <h1 className="text-2xl font-black text-[#08075C] tracking-tight uppercase">Projects</h1>
-          <p className="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">
-            Manage all your core workspace modules
+          <h1 className="text-2xl font-extrabold text-[var(--text)] tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>Projects</h1>
+          <p className="text-[var(--text-muted)] text-sm mt-1">
+            Manage all your workspace projects
           </p>
         </div>
         {/* You can trigger your NewProjectModal here too */}

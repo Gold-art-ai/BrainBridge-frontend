@@ -37,4 +37,5 @@ export const {
   useGetNotificationsQuery,
   useGetUnreadNotificationCountQuery,
   useMarkNotificationAsReadMutation,
-} = messagesApi
+} =
+ messagesApi

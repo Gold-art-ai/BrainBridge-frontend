@@ -15,7 +15,7 @@ export default function ProjectCard({ project }) {
   const fieldColor = FIELD_COLORS[project.field] || 'var(--primary)';
 
   return (
-    <div className="bg-white rounded-2xl border border-[var(--border)] hover:shadow-lg hover:shadow-gray-100 hover:border-[var(--primary)]/15 transition-all group flex flex-col overflow-hidden h-full">
+    <div className="bg-white rounded-2xl border border-[var(--border)] hover:border-[var(--primary)]/20 transition-all group flex flex-col overflow-hidden h-full hover:-translate-y-0.5" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }} onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(108,99,255,0.25)'; }} onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)'; }}>
       
       {/* Cover */}
       <div className="relative h-40 w-full bg-[var(--bg)] overflow-hidden">

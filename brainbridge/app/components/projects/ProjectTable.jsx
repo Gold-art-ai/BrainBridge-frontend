@@ -47,11 +47,11 @@ export default function ProjectTable({ projects, onDelete }) {
               <tr 
                 key={proj.id} 
                 className={`transition-all duration-300 ${
-                  isConfirming ? 'bg-red-50/50' : 'hover:bg-[#3A38DE]/5 group'
+                  isConfirming ? 'bg-red-50/50' : 'hover:bg-[var(--primary)]/5 group'
                 }`}
               >
                 <td className="px-8 py-6">
-                  <p className="text-sm font-bold text-[#08075C]">{proj.title}</p>
+                  <p className="text-sm font-bold text-[var(--text)]" style={{ fontFamily: 'var(--font-heading)' }}>{proj.title}</p>
                   <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tight mt-0.5">
                     {proj.category}
                   </p>
@@ -60,7 +60,7 @@ export default function ProjectTable({ projects, onDelete }) {
                 <td className="px-6 py-6">
                   <span className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border ${
                     proj.projectStatus === 'COMPLETED' 
-                    ? 'bg-blue-50 text-[#3A38DE] border-blue-100' 
+                    ? 'bg-[var(--primary)]/8 text-[var(--primary)] border-[var(--primary)]/20' 
                     : 'bg-white text-gray-500 border-gray-200'
                   }`}>
                     {proj.projectStatus}
@@ -70,7 +70,7 @@ export default function ProjectTable({ projects, onDelete }) {
                 <td className="px-6 py-6">
                   <div className="flex gap-1.5">
                     {proj.tech?.slice(0, 2).map(t => (
-                      <span key={t} className="text-[9px] text-[#3A38DE] font-bold bg-[#3A38DE]/5 px-2 py-0.5 rounded border border-[#3A38DE]/10 uppercase">
+                      <span key={t} className="text-[9px] text-[var(--primary)] font-bold bg-[var(--primary)]/5 px-2 py-0.5 rounded border border-[var(--primary)]/10 uppercase">
                         {t}
                       </span>
                     ))}
@@ -78,7 +78,7 @@ export default function ProjectTable({ projects, onDelete }) {
                 </td>
 
                 <td className="px-6 py-6">
-                  <div className="flex items-center gap-1.5 text-[#08075C] font-bold text-xs">
+                  <div className="flex items-center gap-1.5 text-[var(--text)] font-bold text-xs">
                     <Users size={12} className="text-gray-300" />
                     {proj.members?.length || 1}
                   </div>
@@ -89,7 +89,7 @@ export default function ProjectTable({ projects, onDelete }) {
                     <div className="flex items-center justify-end gap-4">
                       <Link 
                         href={`/dashboard/projects/${proj.id}`} 
-                        className="flex items-center gap-1.5 text-[#3A38DE] hover:text-[#08075C] text-[10px] font-black uppercase transition-colors"
+                        className="flex items-center gap-1.5 text-[var(--primary)] hover:text-[var(--primary-dark)] text-[10px] font-black uppercase transition-colors"
                       >
                         Open <ExternalLink size={12} />
                       </Link>

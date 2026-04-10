@@ -70,17 +70,17 @@ export default function ProjectPage() {
 
   if (!project) return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
-       <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#08075C] animate-pulse">Initialising Module...</p>
+       <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--primary)] animate-pulse">Initialising Module...</p>
     </div>
   );
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen pb-20">
+    <div className="bg-[var(--bg)] min-h-screen pb-20">
       <div className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center">
-        <Link href="/projects" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[#3A38DE] transition-all">
+        <Link href="/projects" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[var(--primary)] transition-all">
           <ArrowLeft size={14} /> Discovery Hub
         </Link>
-        <button className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-[#08075C] transition-all"><Share2 size={16} /></button>
+        <button className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-[var(--primary)] transition-all"><Share2 size={16} /></button>
       </div>
 
       {/* FORCE HIDE BUTTONS: 
@@ -94,15 +94,15 @@ export default function ProjectPage() {
       <div className="max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
         <section className="lg:col-span-2 bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden group">
           <div className="relative z-10">
-            <h3 className="text-[10px] font-black text-[#3A38DE] uppercase tracking-[0.2em] mb-4">Request Access</h3>
-            <h2 className="text-3xl font-black text-[#08075C] mb-6 tracking-tight">Collaborate with {project.creator || 'Architect'}</h2>
+            <h3 className="text-[10px] font-black text-[var(--primary)] uppercase tracking-[0.2em] mb-4">Request Access</h3>
+            <h2 className="text-3xl font-black text-[var(--text)] mb-6 tracking-tight">Collaborate with {project.creator || 'Architect'}</h2>
             <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-xl">
               Initiate a direct secure channel to discuss technical specifications and development goals.
             </p>
             
             <button 
               onClick={handleCollaborate}
-              className="flex items-center gap-4 bg-[#08075C] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#3A38DE] transition-all shadow-xl shadow-blue-900/10 active:scale-95"
+              className="flex items-center gap-4 bg-[var(--primary)] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--primary-dark)] transition-all shadow-xl shadow-[var(--primary)]/20 active:scale-95"
             >
               <MessageSquare size={18} />
               Start Collaboration Chat
@@ -111,7 +111,7 @@ export default function ProjectPage() {
         </section>
 
         <div className="space-y-8">
-           <section className="bg-[#08075C] p-8 rounded-[2.5rem] text-white">
+           <section className="bg-[var(--primary)] p-8 rounded-[2.5rem] text-white">
               <h3 className="text-[9px] font-black text-blue-300 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
                 <Terminal size={14} /> System Profile
               </h3>

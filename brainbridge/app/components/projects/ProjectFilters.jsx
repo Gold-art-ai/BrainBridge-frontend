@@ -16,13 +16,13 @@ export default function ProjectFilters({
         
         {/* A. Search Input */}
         <div className="relative w-full md:w-96 group">
-          <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-xs group-focus-within:text-[#3A38DE] transition-colors"></i>
+          <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-xs group-focus-within:text-[var(--primary)] transition-colors"></i>
           <input 
             type="text"
             placeholder="Search Project Name or Tech..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-gray-100 rounded-2xl py-3.5 pl-12 pr-4 text-xs font-bold text-[#08075C] shadow-sm outline-none focus:ring-2 focus:ring-[#3A38DE]/10 transition-all"
+            className="w-full bg-white border border-gray-100 rounded-2xl py-3.5 pl-12 pr-4 text-xs font-bold text-[var(--text)] shadow-sm outline-none focus:ring-2 focus:ring-[var(--primary)]/10 transition-all"
           />
         </div>
 
@@ -32,7 +32,7 @@ export default function ProjectFilters({
           <select 
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="bg-white border border-gray-100 rounded-xl px-4 py-2 text-[10px] font-bold text-[#08075C] outline-none cursor-pointer hover:border-[#3A38DE]/20 transition-all"
+            className="bg-white border border-gray-100 rounded-xl px-4 py-2 text-[10px] font-bold text-[var(--text)] outline-none cursor-pointer hover:border-[var(--primary)]/20 transition-all"
           >
             <option value="newest">Last Updated</option>
             <option value="alpha">Name (A-Z)</option>
@@ -48,8 +48,8 @@ export default function ProjectFilters({
             onClick={() => setActiveStatus(status)}
             className={`px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all whitespace-nowrap border ${
               activeStatus === status 
-              ? 'bg-[#08075C] text-white border-[#08075C] shadow-lg shadow-blue-900/10' 
-              : 'bg-white text-gray-400 border-gray-100 hover:text-[#08075C] hover:border-gray-200'
+              ? 'bg-[var(--primary)] text-white border-[var(--primary)] shadow-lg shadow-[var(--primary)]/10' 
+              : 'bg-white text-gray-400 border-gray-100 hover:text-[var(--primary)] hover:border-gray-200'
             }`}
           >
             {status}

@@ -36,9 +36,9 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
   const theme = getStatusTheme(project.projectStatus);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--bg)]">
       {/* Hero Section */}
-      <div className="relative h-[400px] w-full overflow-hidden bg-blue-900/70">
+      <div className="relative h-[400px] w-full overflow-hidden" style={{ background: 'var(--primary)' }}>
         <button 
           onClick={() => router.push('/dashboard')}
           className="absolute top-8 left-8 z-30 text-white/70 hover:text-white flex items-center gap-2 text-xs font-bold uppercase tracking-widest transition-all group"
@@ -54,10 +54,10 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
               className="w-full h-full object-cover opacity-20 grayscale" 
               alt={project.title}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/70 via-blue-900/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--primary-dark)]/80 via-[var(--primary)]/50 to-transparent" />
           </div>
         ) : (
-          <div className="absolute inset-0 bg-blue-900/50" />
+          <div className="absolute inset-0 bg-[var(--primary)]/40" />
         )}
 
         <div className="absolute inset-0 flex items-end">
@@ -65,7 +65,7 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <span className="bg-blue-600/80 text-white text-xs font-bold uppercase px-3 py-1 rounded-md shadow-sm">
+                  <span className="bg-[var(--primary)]/80 text-white text-xs font-bold uppercase px-3 py-1 rounded-md shadow-sm">
                     {project.field}
                   </span>
                   <span className="text-white/50 text-xs font-bold uppercase">
@@ -80,7 +80,7 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
               <div className="flex items-center gap-4">
                 <button 
                   onClick={() => setIsEditOpen(true)}
-                  className="bg-white text-blue-900 px-6 py-3 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-blue-700 hover:text-white transition-all flex items-center gap-2 shadow-sm"
+                  className="bg-white text-[var(--primary)] px-6 py-3 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-[var(--primary)] hover:text-white transition-all flex items-center gap-2 shadow-sm"
                 >
                   <PenSquare size={14} />
                   Modify
@@ -114,7 +114,7 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
                 <div className="w-8 h-[1px] bg-gray-200"></div>
                 Project Core Intelligence
               </h3>
-              <p className="text-xl text-gray-900 font-semibold leading-relaxed italic border-l-4 border-blue-600 pl-6">
+              <p className="text-xl text-[var(--text)] font-semibold leading-relaxed italic border-l-4 border-[var(--primary)] pl-6">
                 {project.description}
               </p>
             </section>
@@ -122,12 +122,12 @@ export default function ProjectView({ project, onUpdate, onDelete }) {
             {/* Technical Details */}
             <section className="bg-white p-6 rounded-2xl border border-gray-100">
               <div className="flex items-center gap-2 mb-4">
-                <Code2 size={16} className="text-blue-700" />
+                <Code2 size={16} className="text-[var(--primary)]" />
                 <h4 className="font-bold text-gray-900 uppercase tracking-wide text-sm">Architectural Overview</h4>
               </div>
               <p className="text-gray-600 text-sm leading-7">
-                The <span className="font-bold text-gray-900">"{project.title}"</span> infrastructure is currently in <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide ${theme.bg} ${theme.text}`}>{project.projectStatus}</span> stage. 
-                Stack: <span className="text-blue-700 font-semibold">{project.field || 'Custom Frameworks'}</span>.
+                The <span className="font-bold text-[var(--text)]">"{project.title}"</span> infrastructure is currently in <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide ${theme.bg} ${theme.text}`}>{project.projectStatus}</span> stage. 
+                Stack: <span className="text-[var(--primary)] font-semibold">{project.field || 'Custom Frameworks'}</span>.
               </p>
             </section>
 

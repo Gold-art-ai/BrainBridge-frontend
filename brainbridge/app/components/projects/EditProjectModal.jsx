@@ -51,7 +51,7 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-[#08075C]/40 backdrop-blur-md">
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-[var(--primary)]/25 backdrop-blur-md">
       <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-gray-100 animate-in fade-in zoom-in duration-200">
         <div className="p-10 space-y-6">
           <div className="flex justify-between items-center">
@@ -78,7 +78,7 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
               </div>
               <div className="flex-1">
                 <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Visual Asset</label>
-                <label className="text-[10px] font-bold text-[#3A38DE] cursor-pointer hover:underline">
+                <label className="text-[10px] font-bold text-[var(--primary)] cursor-pointer hover:underline">
                   Change Image
                   <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                 </label>
@@ -89,7 +89,7 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
               <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Project Name</label>
               <input 
                 value={name} onChange={(e) => setName(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold text-[#08075C] outline-none focus:ring-2 focus:ring-[#3A38DE]/20"
+                className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold text-[var(--text)] outline-none focus:ring-2 focus:ring-[var(--primary)]/20"
               />
             </div>
             
@@ -97,7 +97,7 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
               <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Value Proposition</label>
               <textarea 
                 value={description} onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-medium text-[#08075C] outline-none h-24 resize-none leading-relaxed"
+                className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-medium text-[var(--text)] outline-none h-24 resize-none leading-relaxed"
               />
             </div>
 
@@ -106,7 +106,7 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
                 <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Current Phase</label>
                 <select 
                   value={status} onChange={(e) => setStatus(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold text-[#08075C] outline-none cursor-pointer"
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold text-[var(--text)] outline-none cursor-pointer"
                 >
                   <option value="DRAFT">Draft</option>
                   <option value="ONGOING">Ongoing</option>
@@ -118,7 +118,7 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
                 <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Field</label>
                 <select 
                   value={field} onChange={(e) => setField(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold text-[#08075C] outline-none cursor-pointer"
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold text-[var(--text)] outline-none cursor-pointer"
                 >
                   <option value="" disabled>Select Sector...</option>
                   {FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
@@ -128,10 +128,10 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
 
             {status !== 'Idea' && (
               <div>
-                <label className="block text-[9px] font-black text-[#3A38DE] uppercase tracking-widest mb-2 ml-1">GitHub Repository</label>
+                <label className="block text-[9px] font-black text-[var(--primary)] uppercase tracking-widest mb-2 ml-1">GitHub Repository</label>
                 <input 
                   value={github} onChange={(e) => setGithub(e.target.value)}
-                  className="w-full bg-blue-50/50 border border-blue-100 rounded-xl py-3 px-4 text-xs font-medium text-[#08075C] outline-none"
+                  className="w-full bg-[var(--primary)]/5 border border-[var(--primary)]/20 rounded-xl py-3 px-4 text-xs font-medium text-[var(--text)] outline-none"
                   placeholder="https://github.com/..."
                 />
               </div>
@@ -139,7 +139,7 @@ export default function EditProjectModal({ isOpen, onClose, onUpdateProject, pro
 
             <button 
               type="submit"
-              className="w-full bg-[#08075C] hover:bg-[#3A38DE] text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all mt-4"
+              className="w-full bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl transition-all mt-4"
             >
               Update
             </button>
