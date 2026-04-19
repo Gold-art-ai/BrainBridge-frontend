@@ -68,9 +68,12 @@ public class GlobalExceptionHandler {
         
         // Extract field errors from validation
         ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            if (error instanceof FieldError fieldError) {
+                errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+            } else {
+                // Class-level constraint (e.g. @PasswordMatches)
+                errors.put(error.getObjectName(), error.getDefaultMessage());
+            }
         });
         
         Map<String, Object> response = new HashMap<>();

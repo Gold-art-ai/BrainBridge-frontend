@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @RestController
-@Tag(name = "Projects API", description = "Projects operations")
+@Tag(name = "Projects API", description = "Projects operations(ADD,GET,DELETE OR UPDATE)")
 @RequestMapping("/projects")
 public class ProjectsController {
     private final ProjectsService service;

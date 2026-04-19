@@ -19,9 +19,14 @@ export default function LoginPage() {
     if (!formData.emailOrUsername) newErrors.emailOrUsername = "Required";
     if (!formData.password) newErrors.password = "Required";
 
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     try {
       const res = await login(formData).unwrap();
-      if (res.success && res.data && res.data.token) {
+      if (res.data?.token) {
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data.user));
       }
@@ -30,6 +35,10 @@ export default function LoginPage() {
     } catch (error) {
       if (error.data?.fieldErrors) {
         newErrors = { ...newErrors, ...error.data.fieldErrors };
+      } else if (error.data?.message) {
+        newErrors._root = error.data.message;
+      } else {
+        newErrors._root = "Login failed. Please check your credentials.";
       }
       setErrors(newErrors);
     }
@@ -59,6 +68,11 @@ export default function LoginPage() {
           </p>
 
           <div className="space-y-5">
+            {errors._root && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-semibold">
+                {errors._root}
+              </div>
+            )}
             <div>
               <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1.5">Email or Username</label>
               <input type="text" value={formData.emailOrUsername} onChange={(e) => handleChange(e, 'emailOrUsername')}

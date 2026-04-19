@@ -16,8 +16,8 @@ import java.util.Arrays;
  * 2. @Configuration - Marks this as a Spring configuration class
  * 3. CorsFilter - Spring filter that handles CORS preflight requests
  * 
- * This allows your NextJS frontend (typically on port 3000) to make requests
- * to your Spring Boot backend (on port 8080)
+ * This allows your NextJS frontend (typically on port 3000 or another other one) to make requests
+ * to your Spring Boot backend (on port 8080 or Any other one)
  */
 @Configuration
 public class CorsConfig {
@@ -31,10 +31,10 @@ public class CorsConfig {
         config.setAllowCredentials(true);
         
         // Allow requests from frontend origin (Vite default port is 5173)
-        config.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",// Vite dev server
-            "https://brain-bridge-eight.vercel.app/",
-            "http://127.0.0.1:3000"
+        config.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:*",// Vite dev server
+            "https://*.vercel.app",
+            "http://127.0.0.1:*"
         ));
         
         // Allow all HTTP methods

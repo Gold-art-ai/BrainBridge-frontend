@@ -15,12 +15,13 @@ export default function SignUpPage() {
     username: '', firstName: '', lastName: '', email: '', password: '', confirmPassword: '', isSubmitting: false
   });
 
-  const [requirements, setRequirements] = useState({ length: false, upper: false, number: false, special: false });
+  const [requirements, setRequirements] = useState({ length: false, lower: false, upper: false, number: false, special: false });
 
   useEffect(() => {
     const pass = formData.password;
     setRequirements({
       length: pass.length >= 8,
+      lower: /[a-z]/.test(pass),
       upper: /[A-Z]/.test(pass),
       number: /[0-9]/.test(pass),
       special: /[^A-Za-z0-9]/.test(pass)
@@ -38,15 +39,17 @@ export default function SignUpPage() {
     });
 
     if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
-    if (!requirements.length || !requirements.upper || !requirements.number || !requirements.special) {
+    if (!requirements.length || !requirements.lower || !requirements.upper || !requirements.number || !requirements.special) {
       newErrors.password = "Password does not meet all requirements";
     }
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length === 0) {
       setFormData(prev => ({ ...prev, isSubmitting: true }));
+      console.log(formData);
       try {
-        await registerUser(formData).unwrap();
+        const { isSubmitting, ...payload } = formData;
+        await registerUser(payload).unwrap();
         router.push('/auth/login');
       } catch (error) {
         if (error.data?.errors) {
@@ -131,6 +134,7 @@ export default function SignUpPage() {
               <div className="grid grid-cols-2 gap-2 mt-2.5">
                 {[
                   { label: '8+ characters', met: requirements.length },
+                  { label: 'Lowercase', met: requirements.lower },
                   { label: 'Uppercase', met: requirements.upper },
                   { label: 'Number', met: requirements.number },
                   { label: 'Special char', met: requirements.special },

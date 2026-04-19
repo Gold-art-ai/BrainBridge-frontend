@@ -11,7 +11,7 @@ public class PasswordMatchesValidator implements ConstraintValidator<PasswordMat
     public void initialize(PasswordMatches constraintAnnotation) {
         // Optional initialization code
     }
-
+    // Compiling the password from the form with the RegExp set
     @Override
     public boolean isValid(Object obj,ConstraintValidatorContext context) {
         if(obj instanceof RegisterUserDTO dto) {
