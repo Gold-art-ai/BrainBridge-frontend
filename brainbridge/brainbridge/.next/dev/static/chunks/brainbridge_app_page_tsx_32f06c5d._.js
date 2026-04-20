@@ -319,6 +319,8 @@ function LandingPage() {
     ]);
     const x = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$motion$2d$value$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMotionValue"])(0);
     const y = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$motion$2d$value$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMotionValue"])(0);
+    const mouseXProgress = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$motion$2d$value$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMotionValue"])(0.5);
+    const mouseYProgress = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$motion$2d$value$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMotionValue"])(0.5);
     const cursorX = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$spring$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSpring"])(x, {
         stiffness: 450,
         damping: 30
@@ -333,6 +335,8 @@ function LandingPage() {
                 "LandingPage.useEffect.handleMouseMove": (e)=>{
                     x.set(e.clientX);
                     y.set(e.clientY);
+                    mouseXProgress.set(e.clientX / window.innerWidth);
+                    mouseYProgress.set(e.clientY / window.innerHeight);
                 }
             }["LandingPage.useEffect.handleMouseMove"];
             window.addEventListener('mousemove', handleMouseMove);
@@ -342,7 +346,9 @@ function LandingPage() {
         }
     }["LandingPage.useEffect"], [
         x,
-        y
+        y,
+        mouseXProgress,
+        mouseYProgress
     ]);
     // Parallax Refs
     const featuresRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
@@ -355,6 +361,23 @@ function LandingPage() {
         damping: 25,
         mass: 0.5
     };
+    // Hero Card 3D Rotation
+    const cardRotateXRaw = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$transform$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useTransform"])(mouseYProgress, [
+        0,
+        1
+    ], [
+        15,
+        -15
+    ]);
+    const cardRotateYRaw = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$transform$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useTransform"])(mouseXProgress, [
+        0,
+        1
+    ], [
+        -15,
+        15
+    ]);
+    const cardRotateX = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$spring$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSpring"])(cardRotateXRaw, smoothConfig);
+    const cardRotateY = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$spring$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSpring"])(cardRotateYRaw, smoothConfig);
     // Features Parallax
     const { scrollYProgress: fProg } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$scroll$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useScroll"])({
         target: featuresRef,
@@ -528,17 +551,17 @@ function LandingPage() {
                         className: "w-3.5 h-3.5 bg-[var(--primary)] rounded-full scale-75"
                     }, void 0, false, {
                         fileName: "[project]/brainbridge/app/page.tsx",
-                        lineNumber: 184,
+                        lineNumber: 195,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/brainbridge/app/page.tsx",
-                    lineNumber: 183,
+                    lineNumber: 194,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/brainbridge/app/page.tsx",
-                lineNumber: 174,
+                lineNumber: 185,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
@@ -553,7 +576,7 @@ function LandingPage() {
                                 children: "BrainBridge"
                             }, void 0, false, {
                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                lineNumber: 191,
+                                lineNumber: 202,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -564,12 +587,12 @@ function LandingPage() {
                                         children: link.label
                                     }, link.href, false, {
                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                        lineNumber: 197,
+                                        lineNumber: 208,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                lineNumber: 195,
+                                lineNumber: 206,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -581,7 +604,7 @@ function LandingPage() {
                                         children: "Log In"
                                     }, void 0, false, {
                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                        lineNumber: 204,
+                                        lineNumber: 215,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -590,13 +613,13 @@ function LandingPage() {
                                         children: "Sign Up Free"
                                     }, void 0, false, {
                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                        lineNumber: 205,
+                                        lineNumber: 216,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                lineNumber: 203,
+                                lineNumber: 214,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -606,24 +629,24 @@ function LandingPage() {
                                     size: 24
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 211,
+                                    lineNumber: 222,
                                     columnNumber: 31
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$menu$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Menu$3e$__["Menu"], {
                                     size: 24
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 211,
+                                    lineNumber: 222,
                                     columnNumber: 49
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                lineNumber: 210,
+                                lineNumber: 221,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/brainbridge/app/page.tsx",
-                        lineNumber: 190,
+                        lineNumber: 201,
                         columnNumber: 9
                     }, this),
                     mobileMenuOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -636,7 +659,7 @@ function LandingPage() {
                                     children: link.label
                                 }, link.href, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 218,
+                                    lineNumber: 229,
                                     columnNumber: 15
                                 }, this)),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -645,7 +668,7 @@ function LandingPage() {
                                 children: "Log In"
                             }, void 0, false, {
                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                lineNumber: 222,
+                                lineNumber: 233,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -654,19 +677,19 @@ function LandingPage() {
                                 children: "Sign Up Free"
                             }, void 0, false, {
                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                lineNumber: 223,
+                                lineNumber: 234,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/brainbridge/app/page.tsx",
-                        lineNumber: 216,
+                        lineNumber: 227,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/brainbridge/app/page.tsx",
-                lineNumber: 189,
+                lineNumber: 200,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -679,7 +702,7 @@ function LandingPage() {
                         }
                     }, void 0, false, {
                         fileName: "[project]/brainbridge/app/page.tsx",
-                        lineNumber: 230,
+                        lineNumber: 241,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -718,13 +741,13 @@ function LandingPage() {
                                                 ' ',
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(TypingText, {}, void 0, false, {
                                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                                    lineNumber: 249,
+                                                    lineNumber: 260,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 242,
+                                            lineNumber: 253,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].p, {
@@ -744,7 +767,7 @@ function LandingPage() {
                                             children: "BrainBridge is the platform where students showcase innovation, connect across disciplines, and get discovered by the people who matter."
                                         }, void 0, false, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 253,
+                                            lineNumber: 264,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -779,18 +802,18 @@ function LandingPage() {
                                                                 size: 22
                                                             }, void 0, false, {
                                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                                lineNumber: 272,
+                                                                lineNumber: 283,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                        lineNumber: 270,
+                                                        lineNumber: 281,
                                                         columnNumber: 19
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                                    lineNumber: 269,
+                                                    lineNumber: 280,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].a, {
@@ -802,13 +825,13 @@ function LandingPage() {
                                                     children: "Explore Features"
                                                 }, void 0, false, {
                                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                                    lineNumber: 275,
+                                                    lineNumber: 286,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 263,
+                                            lineNumber: 274,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -831,14 +854,14 @@ function LandingPage() {
                                                             size: 18
                                                         }, void 0, false, {
                                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                                            lineNumber: 291,
+                                                            lineNumber: 302,
                                                             columnNumber: 59
                                                         }, this),
                                                         " Free to start"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                                    lineNumber: 291,
+                                                    lineNumber: 302,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -849,14 +872,14 @@ function LandingPage() {
                                                             size: 18
                                                         }, void 0, false, {
                                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                                            lineNumber: 292,
+                                                            lineNumber: 303,
                                                             columnNumber: 59
                                                         }, this),
                                                         " No credit card"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                                    lineNumber: 292,
+                                                    lineNumber: 303,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -867,39 +890,37 @@ function LandingPage() {
                                                             size: 18
                                                         }, void 0, false, {
                                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                                            lineNumber: 293,
+                                                            lineNumber: 304,
                                                             columnNumber: 59
                                                         }, this),
                                                         " 14 fields"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                                    lineNumber: 293,
+                                                    lineNumber: 304,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 285,
+                                            lineNumber: 296,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 237,
+                                    lineNumber: 248,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
                                     className: "flex-1 max-w-lg w-full",
                                     initial: {
                                         opacity: 0,
-                                        y: 140,
-                                        rotateX: 30
+                                        y: 140
                                     },
                                     animate: {
                                         opacity: 1,
-                                        y: 0,
-                                        rotateX: 0
+                                        y: 0
                                     },
                                     transition: {
                                         duration: 1.5,
@@ -911,27 +932,13 @@ function LandingPage() {
                                         ],
                                         delay: 0.6
                                     },
-                                    whileHover: {
-                                        y: -25,
-                                        rotateX: 18,
-                                        rotateY: -22,
-                                        scale: 1.04
-                                    },
                                     style: {
                                         perspective: 1800
                                     },
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
-                                        animate: {
-                                            y: [
-                                                0,
-                                                -24,
-                                                0
-                                            ]
-                                        },
-                                        transition: {
-                                            duration: 7.2,
-                                            repeat: Infinity,
-                                            ease: "easeInOut"
+                                        style: {
+                                            rotateX: cardRotateX,
+                                            rotateY: cardRotateY
                                         },
                                         className: "bg-white rounded-3xl border border-zinc-100 shadow-2xl shadow-[var(--primary)]/35 p-7 relative overflow-hidden",
                                         children: [
@@ -942,21 +949,21 @@ function LandingPage() {
                                                         className: "w-3 h-3 rounded-full bg-red-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                        lineNumber: 312,
+                                                        lineNumber: 321,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                         className: "w-3 h-3 rounded-full bg-yellow-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                        lineNumber: 313,
+                                                        lineNumber: 322,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                         className: "w-3 h-3 rounded-full bg-emerald-500"
                                                     }, void 0, false, {
                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                        lineNumber: 314,
+                                                        lineNumber: 323,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -964,13 +971,13 @@ function LandingPage() {
                                                         children: "BrainBridge Dashboard"
                                                     }, void 0, false, {
                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                        lineNumber: 315,
+                                                        lineNumber: 324,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 311,
+                                                lineNumber: 320,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -986,7 +993,7 @@ function LandingPage() {
                                                                         children: "Welcome back"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                                        lineNumber: 321,
+                                                                        lineNumber: 330,
                                                                         columnNumber: 23
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -994,13 +1001,13 @@ function LandingPage() {
                                                                         children: "Gold I. 👋"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                                        lineNumber: 322,
+                                                                        lineNumber: 331,
                                                                         columnNumber: 23
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                                lineNumber: 320,
+                                                                lineNumber: 329,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1008,13 +1015,13 @@ function LandingPage() {
                                                                 children: "GI"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                                lineNumber: 324,
+                                                                lineNumber: 333,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                        lineNumber: 319,
+                                                        lineNumber: 328,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1044,7 +1051,7 @@ function LandingPage() {
                                                                         children: s.v
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                                        lineNumber: 334,
+                                                                        lineNumber: 343,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1052,18 +1059,18 @@ function LandingPage() {
                                                                         children: s.l
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                                        lineNumber: 335,
+                                                                        lineNumber: 344,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, s.l, true, {
                                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                                lineNumber: 329,
+                                                                lineNumber: 338,
                                                                 columnNumber: 23
                                                             }, this))
                                                     }, void 0, false, {
                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                        lineNumber: 327,
+                                                        lineNumber: 336,
                                                         columnNumber: 19
                                                     }, this),
                                                     [
@@ -1096,12 +1103,12 @@ function LandingPage() {
                                                                                 size: 20
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                                                lineNumber: 351,
+                                                                                lineNumber: 360,
                                                                                 columnNumber: 27
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                                                            lineNumber: 350,
+                                                                            lineNumber: 359,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1111,7 +1118,7 @@ function LandingPage() {
                                                                                     children: p.title
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                                                                    lineNumber: 354,
+                                                                                    lineNumber: 363,
                                                                                     columnNumber: 27
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1119,19 +1126,19 @@ function LandingPage() {
                                                                                     children: p.field
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                                                                    lineNumber: 355,
+                                                                                    lineNumber: 364,
                                                                                     columnNumber: 27
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                                                            lineNumber: 353,
+                                                                            lineNumber: 362,
                                                                             columnNumber: 25
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                                                    lineNumber: 349,
+                                                                    lineNumber: 358,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
@@ -1139,47 +1146,47 @@ function LandingPage() {
                                                                     className: "text-zinc-400 group-hover:text-[var(--primary)] transition"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                                                    lineNumber: 358,
+                                                                    lineNumber: 367,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, i, true, {
                                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                                            lineNumber: 344,
+                                                            lineNumber: 353,
                                                             columnNumber: 21
                                                         }, this))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 318,
+                                                lineNumber: 327,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                        lineNumber: 306,
+                                        lineNumber: 316,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 298,
+                                    lineNumber: 309,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 236,
+                            lineNumber: 247,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/brainbridge/app/page.tsx",
-                        lineNumber: 235,
+                        lineNumber: 246,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/brainbridge/app/page.tsx",
-                lineNumber: 229,
+                lineNumber: 240,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1192,7 +1199,7 @@ function LandingPage() {
                             children: "Projects Across Every Sector"
                         }, void 0, false, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 371,
+                            lineNumber: 380,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1214,30 +1221,30 @@ function LandingPage() {
                                             }
                                         }, void 0, false, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 379,
+                                            lineNumber: 388,
                                             columnNumber: 17
                                         }, this),
                                         f.name
                                     ]
                                 }, i, true, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 374,
+                                    lineNumber: 383,
                                     columnNumber: 15
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 372,
+                            lineNumber: 381,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/brainbridge/app/page.tsx",
-                    lineNumber: 370,
+                    lineNumber: 379,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/brainbridge/app/page.tsx",
-                lineNumber: 369,
+                lineNumber: 378,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1267,7 +1274,7 @@ function LandingPage() {
                                     children: s.value
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 399,
+                                    lineNumber: 408,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1275,23 +1282,23 @@ function LandingPage() {
                                     children: s.label
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 400,
+                                    lineNumber: 409,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, i, true, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 391,
+                            lineNumber: 400,
                             columnNumber: 13
                         }, this))
                 }, void 0, false, {
                     fileName: "[project]/brainbridge/app/page.tsx",
-                    lineNumber: 389,
+                    lineNumber: 398,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/brainbridge/app/page.tsx",
-                lineNumber: 388,
+                lineNumber: 397,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1315,7 +1322,7 @@ function LandingPage() {
                                     children: "PLATFORM FEATURES"
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 416,
+                                    lineNumber: 425,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1323,7 +1330,7 @@ function LandingPage() {
                                     children: "Everything you need to showcase your work"
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 417,
+                                    lineNumber: 426,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1331,13 +1338,13 @@ function LandingPage() {
                                     children: "Built specifically for university students and academic innovators."
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 418,
+                                    lineNumber: 427,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 409,
+                            lineNumber: 418,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1383,7 +1390,7 @@ function LandingPage() {
                                                 children: f.icon
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 437,
+                                                lineNumber: 446,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
@@ -1391,7 +1398,7 @@ function LandingPage() {
                                                 children: f.title
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 444,
+                                                lineNumber: 453,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1399,34 +1406,34 @@ function LandingPage() {
                                                 children: f.desc
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 445,
+                                                lineNumber: 454,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                        lineNumber: 424,
+                                        lineNumber: 433,
                                         columnNumber: 17
                                     }, this)
                                 }, i, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 423,
+                                    lineNumber: 432,
                                     columnNumber: 15
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 421,
+                            lineNumber: 430,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/brainbridge/app/page.tsx",
-                    lineNumber: 408,
+                    lineNumber: 417,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/brainbridge/app/page.tsx",
-                lineNumber: 407,
+                lineNumber: 416,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1450,7 +1457,7 @@ function LandingPage() {
                                     children: "HOW IT WORKS"
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 463,
+                                    lineNumber: 472,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1458,7 +1465,7 @@ function LandingPage() {
                                     children: "From idea to visibility in minutes"
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 464,
+                                    lineNumber: 473,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1466,13 +1473,13 @@ function LandingPage() {
                                     children: "Three steps to becoming part of the innovation community."
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 465,
+                                    lineNumber: 474,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 456,
+                            lineNumber: 465,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1506,7 +1513,7 @@ function LandingPage() {
                                             children: s.number
                                         }, void 0, false, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 479,
+                                            lineNumber: 488,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1517,7 +1524,7 @@ function LandingPage() {
                                                     children: s.title
                                                 }, void 0, false, {
                                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                                    lineNumber: 481,
+                                                    lineNumber: 490,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1525,35 +1532,35 @@ function LandingPage() {
                                                     children: s.desc
                                                 }, void 0, false, {
                                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                                    lineNumber: 482,
+                                                    lineNumber: 491,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 480,
+                                            lineNumber: 489,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, i, true, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 470,
+                                    lineNumber: 479,
                                     columnNumber: 15
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 468,
+                            lineNumber: 477,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/brainbridge/app/page.tsx",
-                    lineNumber: 455,
+                    lineNumber: 464,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/brainbridge/app/page.tsx",
-                lineNumber: 454,
+                lineNumber: 463,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1577,7 +1584,7 @@ function LandingPage() {
                                     children: "PRICING"
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 500,
+                                    lineNumber: 509,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1585,7 +1592,7 @@ function LandingPage() {
                                     children: "Plans for every stage"
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 501,
+                                    lineNumber: 510,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1593,13 +1600,13 @@ function LandingPage() {
                                     children: "Start free. Scale when you're ready."
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 502,
+                                    lineNumber: 511,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 493,
+                            lineNumber: 502,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1639,7 +1646,7 @@ function LandingPage() {
                                                 children: plan.name
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 520,
+                                                lineNumber: 529,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1650,7 +1657,7 @@ function LandingPage() {
                                                         children: plan.price
                                                     }, void 0, false, {
                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                        lineNumber: 522,
+                                                        lineNumber: 531,
                                                         columnNumber: 21
                                                     }, this),
                                                     plan.period && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1658,13 +1665,13 @@ function LandingPage() {
                                                         children: plan.period
                                                     }, void 0, false, {
                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                        lineNumber: 523,
+                                                        lineNumber: 532,
                                                         columnNumber: 37
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 521,
+                                                lineNumber: 530,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1672,7 +1679,7 @@ function LandingPage() {
                                                 children: plan.desc
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 525,
+                                                lineNumber: 534,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -1685,7 +1692,7 @@ function LandingPage() {
                                                                 className: plan.highlighted ? 'text-white mt-0.5' : 'text-[var(--primary)] mt-0.5'
                                                             }, void 0, false, {
                                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                                lineNumber: 530,
+                                                                lineNumber: 539,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1693,18 +1700,18 @@ function LandingPage() {
                                                                 children: feat
                                                             }, void 0, false, {
                                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                                lineNumber: 531,
+                                                                lineNumber: 540,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, fi, true, {
                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                        lineNumber: 529,
+                                                        lineNumber: 538,
                                                         columnNumber: 23
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 527,
+                                                lineNumber: 536,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1713,34 +1720,34 @@ function LandingPage() {
                                                 children: plan.cta
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 536,
+                                                lineNumber: 545,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                        lineNumber: 508,
+                                        lineNumber: 517,
                                         columnNumber: 17
                                     }, this)
                                 }, i, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 507,
+                                    lineNumber: 516,
                                     columnNumber: 15
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 505,
+                            lineNumber: 514,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/brainbridge/app/page.tsx",
-                    lineNumber: 492,
+                    lineNumber: 501,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/brainbridge/app/page.tsx",
-                lineNumber: 491,
+                lineNumber: 500,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1768,7 +1775,7 @@ function LandingPage() {
                                     children: "ABOUT BRAINBRIDGE"
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 564,
+                                    lineNumber: 573,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1776,7 +1783,7 @@ function LandingPage() {
                                     children: "Bridging academia and industry"
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 565,
+                                    lineNumber: 574,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1786,20 +1793,20 @@ function LandingPage() {
                                             children: "BrainBridge was born from a simple observation: brilliant student projects often die in classroom folders, unseen by the world. We built a platform that gives every student — regardless of their university or field — a professional space to showcase their innovation, connect with peers, and attract real-world opportunities."
                                         }, void 0, false, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 568,
+                                            lineNumber: 577,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             children: "Our taxonomy covers 14 sectors from Agriculture to Smart Cities, aligns with the UN's 17 SDGs and Rwanda's NST2 strategy, and supports 150+ technology sub-tags. Whether you're building an IoT sensor for farms or an AI model for healthcare, BrainBridge is where your work gets the visibility it deserves."
                                         }, void 0, false, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 569,
+                                            lineNumber: 578,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 567,
+                                    lineNumber: 576,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1813,24 +1820,24 @@ function LandingPage() {
                                                 size: 18
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 574,
+                                                lineNumber: 583,
                                                 columnNumber: 36
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                        lineNumber: 573,
+                                        lineNumber: 582,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 572,
+                                    lineNumber: 581,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 556,
+                            lineNumber: 565,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -1853,7 +1860,7 @@ function LandingPage() {
                                             size: 32
                                         }, void 0, false, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 589,
+                                            lineNumber: 598,
                                             columnNumber: 25
                                         }, this),
                                         label: 'Global Reach',
@@ -1864,7 +1871,7 @@ function LandingPage() {
                                             size: 32
                                         }, void 0, false, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 590,
+                                            lineNumber: 599,
                                             columnNumber: 25
                                         }, this),
                                         label: 'Community First',
@@ -1875,7 +1882,7 @@ function LandingPage() {
                                             size: 32
                                         }, void 0, false, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 591,
+                                            lineNumber: 600,
                                             columnNumber: 25
                                         }, this),
                                         label: 'Real Impact',
@@ -1886,7 +1893,7 @@ function LandingPage() {
                                             size: 32
                                         }, void 0, false, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 592,
+                                            lineNumber: 601,
                                             columnNumber: 25
                                         }, this),
                                         label: 'Trusted',
@@ -1904,7 +1911,7 @@ function LandingPage() {
                                                 children: item.icon
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 599,
+                                                lineNumber: 608,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1912,7 +1919,7 @@ function LandingPage() {
                                                 children: item.label
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 600,
+                                                lineNumber: 609,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1920,34 +1927,34 @@ function LandingPage() {
                                                 children: item.sub
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 601,
+                                                lineNumber: 610,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, i, true, {
                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                        lineNumber: 594,
+                                        lineNumber: 603,
                                         columnNumber: 17
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                lineNumber: 587,
+                                lineNumber: 596,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 579,
+                            lineNumber: 588,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/brainbridge/app/page.tsx",
-                    lineNumber: 555,
+                    lineNumber: 564,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/brainbridge/app/page.tsx",
-                lineNumber: 554,
+                lineNumber: 563,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1973,7 +1980,7 @@ function LandingPage() {
                             className: "absolute inset-0 bg-[var(--primary)] opacity-10"
                         }, void 0, false, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 618,
+                            lineNumber: 627,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -1981,7 +1988,7 @@ function LandingPage() {
                             children: "Ready to showcase your projects?"
                         }, void 0, false, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 620,
+                            lineNumber: 629,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1989,7 +1996,7 @@ function LandingPage() {
                             children: "Join thousands of students already building their portfolio on BrainBridge. It's free to start."
                         }, void 0, false, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 621,
+                            lineNumber: 630,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$render$2f$components$2f$motion$2f$proxy$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["motion"].div, {
@@ -2005,29 +2012,29 @@ function LandingPage() {
                                         size: 20
                                     }, void 0, false, {
                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                        lineNumber: 625,
+                                        lineNumber: 634,
                                         columnNumber: 40
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                lineNumber: 624,
+                                lineNumber: 633,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 623,
+                            lineNumber: 632,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/brainbridge/app/page.tsx",
-                    lineNumber: 611,
+                    lineNumber: 620,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/brainbridge/app/page.tsx",
-                lineNumber: 610,
+                lineNumber: 619,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("footer", {
@@ -2046,7 +2053,7 @@ function LandingPage() {
                                             children: "BrainBridge"
                                         }, void 0, false, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 636,
+                                            lineNumber: 645,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2054,13 +2061,13 @@ function LandingPage() {
                                             children: "Where developer projects come to life. Built for innovators, by innovators."
                                         }, void 0, false, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 637,
+                                            lineNumber: 646,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 635,
+                                    lineNumber: 644,
                                     columnNumber: 13
                                 }, this),
                                 [
@@ -2097,7 +2104,7 @@ function LandingPage() {
                                                 children: col.title
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 646,
+                                                lineNumber: 655,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -2109,29 +2116,29 @@ function LandingPage() {
                                                             children: l
                                                         }, void 0, false, {
                                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                                            lineNumber: 649,
+                                                            lineNumber: 658,
                                                             columnNumber: 33
                                                         }, this)
                                                     }, l, false, {
                                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                                        lineNumber: 649,
+                                                        lineNumber: 658,
                                                         columnNumber: 21
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 647,
+                                                lineNumber: 656,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, idx, true, {
                                         fileName: "[project]/brainbridge/app/page.tsx",
-                                        lineNumber: 645,
+                                        lineNumber: 654,
                                         columnNumber: 15
                                     }, this))
                             ]
                         }, void 0, true, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 634,
+                            lineNumber: 643,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2145,7 +2152,7 @@ function LandingPage() {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 657,
+                                    lineNumber: 666,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2161,34 +2168,34 @@ function LandingPage() {
                                                 className: `fa-brands fa-${icon}`
                                             }, void 0, false, {
                                                 fileName: "[project]/brainbridge/app/page.tsx",
-                                                lineNumber: 661,
+                                                lineNumber: 670,
                                                 columnNumber: 19
                                             }, this)
                                         }, icon, false, {
                                             fileName: "[project]/brainbridge/app/page.tsx",
-                                            lineNumber: 660,
+                                            lineNumber: 669,
                                             columnNumber: 17
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/brainbridge/app/page.tsx",
-                                    lineNumber: 658,
+                                    lineNumber: 667,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/brainbridge/app/page.tsx",
-                            lineNumber: 656,
+                            lineNumber: 665,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/brainbridge/app/page.tsx",
-                    lineNumber: 633,
+                    lineNumber: 642,
                     columnNumber: 9
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/brainbridge/app/page.tsx",
-                lineNumber: 632,
+                lineNumber: 641,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("style", {
@@ -2230,17 +2237,17 @@ function LandingPage() {
                 }
             }, void 0, false, {
                 fileName: "[project]/brainbridge/app/page.tsx",
-                lineNumber: 669,
+                lineNumber: 678,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/brainbridge/app/page.tsx",
-        lineNumber: 172,
+        lineNumber: 183,
         columnNumber: 5
     }, this);
 }
-_s1(LandingPage, "jH4aQiH1H4Wpd7AJgWVEc6CYUMA=", false, function() {
+_s1(LandingPage, "VANsNd05AXAAldiaQYomHZsbarE=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$scroll$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useScroll"],
         __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$transform$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useTransform"],
@@ -2248,6 +2255,12 @@ _s1(LandingPage, "jH4aQiH1H4Wpd7AJgWVEc6CYUMA=", false, function() {
         __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$transform$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useTransform"],
         __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$motion$2d$value$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMotionValue"],
         __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$motion$2d$value$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMotionValue"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$motion$2d$value$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMotionValue"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$motion$2d$value$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMotionValue"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$spring$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSpring"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$spring$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSpring"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$transform$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useTransform"],
+        __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$transform$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useTransform"],
         __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$spring$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSpring"],
         __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$spring$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSpring"],
         __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge$2f$node_modules$2f$framer$2d$motion$2f$dist$2f$es$2f$value$2f$use$2d$scroll$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useScroll"],

@@ -91,6 +91,9 @@ export default function LandingPage() {
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const mouseXProgress = useMotionValue(0.5);
+  const mouseYProgress = useMotionValue(0.5);
+  
   const cursorX = useSpring(x, { stiffness: 450, damping: 30 });
   const cursorY = useSpring(y, { stiffness: 450, damping: 30 });
 
@@ -98,10 +101,12 @@ export default function LandingPage() {
     const handleMouseMove = (e: MouseEvent) => {
       x.set(e.clientX);
       y.set(e.clientY);
+      mouseXProgress.set(e.clientX / window.innerWidth);
+      mouseYProgress.set(e.clientY / window.innerHeight);
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [x, y]);
+  }, [x, y, mouseXProgress, mouseYProgress]);
 
   // Parallax Refs
   const featuresRef = useRef<HTMLElement>(null);
@@ -111,6 +116,12 @@ export default function LandingPage() {
 
   // Smooth Spring Configuration
   const smoothConfig = { stiffness: 80, damping: 25, mass: 0.5 };
+
+  // Hero Card 3D Rotation
+  const cardRotateXRaw = useTransform(mouseYProgress, [0, 1], [15, -15]);
+  const cardRotateYRaw = useTransform(mouseXProgress, [0, 1], [-15, 15]);
+  const cardRotateX = useSpring(cardRotateXRaw, smoothConfig);
+  const cardRotateY = useSpring(cardRotateYRaw, smoothConfig);
 
   // Features Parallax
   const { scrollYProgress: fProg } = useScroll({ target: featuresRef, offset: ["start end", "end start"] });
@@ -294,18 +305,16 @@ export default function LandingPage() {
               </motion.div>
             </motion.div>
 
-            {/* Floating 3D Dashboard with Spring Physics */}
+            {/* 3D Dashboard tracking cursor */}
             <motion.div 
               className="flex-1 max-w-lg w-full"
-              initial={{ opacity: 0, y: 140, rotateX: 30 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0 }}
+              initial={{ opacity: 0, y: 140 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] as [number, number, number, number], delay: 0.6 }}
-              whileHover={{ y: -25, rotateX: 18, rotateY: -22, scale: 1.04 }}
               style={{ perspective: 1800 }}
             >
               <motion.div 
-                animate={{ y: [0, -24, 0] }}
-                transition={{ duration: 7.2, repeat: Infinity, ease: "easeInOut" }}
+                style={{ rotateX: cardRotateX, rotateY: cardRotateY }}
                 className="bg-white rounded-3xl border border-zinc-100 shadow-2xl shadow-[var(--primary)]/35 p-7 relative overflow-hidden"
               >
                 <div className="flex items-center gap-2 mb-6">
