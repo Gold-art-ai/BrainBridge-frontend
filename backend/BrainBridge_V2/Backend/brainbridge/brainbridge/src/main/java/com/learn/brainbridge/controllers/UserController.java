@@ -68,6 +68,9 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private com.learn.brainbridge.service.CloudinaryService cloudinaryService;
+
     /**
      * POST /api/users/register
      * Register a new user
@@ -90,16 +93,48 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @PostMapping("/verify-otp")
+    @Operation(summary = "Verify OTP", description = "Verifies a user's email using a 6-digit OTP code.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Email verified successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid or expired OTP")
+    })
+    public ResponseEntity<ApiResponses1<Void>> verifyOTP(
+            @RequestBody java.util.Map<String, String> request) {
+        String email = request.get("email");
+        String otp = request.get("otp");
+        
+        emailVerificationService.verifyOTP(email, otp);
+        ApiResponses1<Void> response = new ApiResponses1<>(true, "Email verified successfully", null);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/resend-otp")
+    @Operation(summary = "Resend OTP", description = "Resends a new 6-digit OTP code to the user's email.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OTP sent successfully"),
+            @ApiResponse(responseCode = "400", description = "Email already verified or user not found")
+    })
+    public ResponseEntity<ApiResponses1<Void>> resendOTP(
+            @RequestBody java.util.Map<String, String> request) {
+        String email = request.get("email");
+        
+        emailVerificationService.resendOTP(email);
+        ApiResponses1<Void> response = new ApiResponses1<>(true, "Verification code sent to your email", null);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/verify-email")
-    @Operation(summary = "Verify email", description = "Verifies a user's email using a verification token sent by email.")
+    @Operation(summary = "Verify email (deprecated)", description = "Legacy endpoint for token-based verification. Use /verify-otp instead.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Email verified successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid or expired token")
     })
+    @Deprecated
     public ResponseEntity<ApiResponses1<Void>> verifyEmail(@RequestParam("token") String token) {
-        emailVerificationService.verifyToken(token);
-        ApiResponses1<Void> response = new ApiResponses1<>(true, "Email verified successfully", null);
-        return ResponseEntity.ok(response);
+        // This is kept for backward compatibility but should use OTP flow
+        ApiResponses1<Void> response = new ApiResponses1<>(false, "Please use OTP verification instead", null);
+        return ResponseEntity.badRequest().body(response);
     }
     
     @PostMapping("/login")
@@ -107,10 +142,29 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login successful",
                     content = @Content(schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "403", description = "Email not verified - OTP sent"),
             @ApiResponse(responseCode = "400", description = "Invalid credentials or account deactivated")
     })
     public ResponseEntity<ApiResponses1<AuthResponseDTO>> loginUser(@Valid @RequestBody LoginDTO loginDTO) {
         UserDTO user  = userService.loginUser(loginDTO);
+
+        // Check if email is verified
+        if (Boolean.FALSE.equals(user.getIsEmailVerified())) {
+            // Send OTP for verification
+            User userEntity = userRepository.findByEmail(user.getEmail())
+                    .orElseGet(() -> userRepository.findByUsername(user.getUsername()).orElse(null));
+            
+            if (userEntity != null) {
+                emailVerificationService.sendVerificationEmail(userEntity);
+            }
+            
+            ApiResponses1<AuthResponseDTO> response = new ApiResponses1<>(
+                false, 
+                "Email not verified. Verification code sent to your email.", 
+                null
+            );
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
 
         // Use email if present, otherwise username as JWT subject
         String subject = (user.getEmail() != null && !user.getEmail().isEmpty())
@@ -212,6 +266,68 @@ public class UserController {
             @Valid @RequestBody UserDTO userDTO) {
         UserDTO updatedUser = userService.updateUser(id, userDTO);
         return ResponseEntity.ok(updatedUser);
+    }
+
+    /**
+     * POST /api/users/me/profile-picture
+     * Upload profile picture for authenticated user
+     */
+    @PostMapping(value = "/me/profile-picture", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+            summary = "Upload profile picture",
+            description = "Uploads a profile picture for the authenticated user to Cloudinary."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Profile picture uploaded successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid file or file too large"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized")
+    })
+    public ResponseEntity<?> uploadProfilePicture(
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+            Authentication authentication) {
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", "Please select a file to upload."));
+        }
+
+        // Validate file type
+        String contentType = file.getContentType();
+        if (contentType == null || (!contentType.startsWith("image/"))) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", "Only image files are allowed."));
+        }
+
+        // Validate file size (max 5MB)
+        if (file.getSize() > 5 * 1024 * 1024) {
+            return ResponseEntity.badRequest().body(java.util.Map.of("error", "File size must be less than 5MB."));
+        }
+
+        try {
+            String principalName = authentication.getName();
+            User user = userRepository.findByEmail(principalName)
+                    .orElseGet(() -> userRepository.findByUsername(principalName).orElse(null));
+
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+
+            // Upload to Cloudinary
+            String imageUrl = cloudinaryService.uploadImage(file, "profile_pictures");
+            
+            // Update user profile
+            user.setProfileImageUrl(imageUrl);
+            userRepository.save(user);
+
+            return ResponseEntity.ok(java.util.Map.of(
+                    "url", imageUrl,
+                    "message", "Profile picture uploaded successfully"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(java.util.Map.of("error", "Error uploading file: " + e.getMessage()));
+        }
     }
 
     /**

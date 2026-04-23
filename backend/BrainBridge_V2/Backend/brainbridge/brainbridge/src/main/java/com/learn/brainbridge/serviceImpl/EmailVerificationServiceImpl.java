@@ -1,18 +1,19 @@
 package com.learn.brainbridge.serviceImpl;
 
 import com.learn.brainbridge.Exception.BadRequestException;
+import com.learn.brainbridge.Exception.ResourceNotFoundException;
 import com.learn.brainbridge.entity.EmailVerificationToken;
 import com.learn.brainbridge.entity.User;
 import com.learn.brainbridge.repository.EmailVerificationTokenRepository;
+import com.learn.brainbridge.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.Random;
 
 @Service
 public class EmailVerificationServiceImpl implements com.learn.brainbridge.service.EmailVerificationService {
@@ -21,61 +22,84 @@ public class EmailVerificationServiceImpl implements com.learn.brainbridge.servi
     private EmailVerificationTokenRepository tokenRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private JavaMailSender mailSender;
 
-    @Value("${app.frontend.base-url:http://localhost:5173}")
-    private String frontendBaseUrl;
-
-    @Override
-    @Transactional
-    public void sendVerificationEmail(User user) {
-        // remove existing tokens for this user
-        tokenRepository.deleteByUser(user);
-
-        String token = UUID.randomUUID().toString();
-        LocalDateTime expiresAt = LocalDateTime.now().plusHours(24);
-
-        EmailVerificationToken verificationToken = new EmailVerificationToken();
-        verificationToken.setUser(user);
-        verificationToken.setToken(token);
-        verificationToken.setExpiresAt(expiresAt);
-        verificationToken.setUsed(false);
-        tokenRepository.save(verificationToken);
-
-        String verificationLink = frontendBaseUrl + "/verify-email?token=" + token;
-
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(user.getEmail());
-        message.setSubject("Verify your BrainBridge account");
-        message.setText("Hi " + (user.getFirstName() != null ? user.getFirstName() : "") + ",\n\n"
-                + "Please verify your email by clicking the link below:\n"
-                + verificationLink + "\n\n"
-                + "This link will expire in 24 hours.\n\n"
-                + "If you did not create an account, please ignore this email.\n\n"
-                + "BrainBridge Team");
-
-        mailSender.send(message);
+    /**
+     * Generate a random 6-digit OTP code
+     */
+    private String generateOTP() {
+        Random random = new Random();
+        int otp = 100000 + random.nextInt(900000); // Generates 6-digit number
+        return String.valueOf(otp);
     }
 
     @Override
     @Transactional
-    public void verifyToken(String token) {
-        EmailVerificationToken verificationToken = tokenRepository.findByToken(token)
-                .orElseThrow(() -> new BadRequestException("Invalid verification token"));
+    public String sendVerificationEmail(User user) {
+        // Remove existing tokens for this user
+        tokenRepository.deleteByUser(user);
+
+        String otp = generateOTP();
+        LocalDateTime expiresAt = LocalDateTime.now().plusMinutes(10); // OTP expires in 10 minutes
+
+        EmailVerificationToken verificationToken = new EmailVerificationToken();
+        verificationToken.setUser(user);
+        verificationToken.setToken(otp);
+        verificationToken.setExpiresAt(expiresAt);
+        verificationToken.setUsed(false);
+        tokenRepository.save(verificationToken);
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setSubject("Verify your BrainBridge account");
+        message.setText("Hi " + (user.getFirstName() != null ? user.getFirstName() : user.getUsername()) + ",\n\n"
+                + "Your verification code is: " + otp + "\n\n"
+                + "This code will expire in 10 minutes.\n\n"
+                + "If you did not create an account, please ignore this email.\n\n"
+                + "BrainBridge Team");
+
+        mailSender.send(message);
+        return otp; // Return for testing purposes (remove in production)
+    }
+
+    @Override
+    @Transactional
+    public void verifyOTP(String email, String otp) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+
+        EmailVerificationToken verificationToken = tokenRepository.findByUserAndToken(user, otp)
+                .orElseThrow(() -> new BadRequestException("Invalid verification code"));
 
         if (Boolean.TRUE.equals(verificationToken.getUsed())) {
-            throw new BadRequestException("Verification token has already been used");
+            throw new BadRequestException("Verification code has already been used");
         }
 
         if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("Verification token has expired");
+            throw new BadRequestException("Verification code has expired");
         }
 
-        User user = verificationToken.getUser();
         user.setIsEmailVerified(true);
+        userRepository.save(user);
 
         verificationToken.setUsed(true);
         tokenRepository.save(verificationToken);
+    }
+
+    @Override
+    @Transactional
+    public String resendOTP(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+
+        if (Boolean.TRUE.equals(user.getIsEmailVerified())) {
+            throw new BadRequestException("Email is already verified");
+        }
+
+        return sendVerificationEmail(user);
     }
 }
 

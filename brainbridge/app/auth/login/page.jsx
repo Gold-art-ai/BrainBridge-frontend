@@ -33,6 +33,16 @@ export default function LoginPage() {
       setErrors({});
       router.push('/dashboard');
     } catch (error) {
+      // Check if it's an email verification error (403)
+      if (error.status === 403) {
+        // Redirect to OTP verification
+        const email = formData.emailOrUsername.includes('@') 
+          ? formData.emailOrUsername 
+          : error.data?.email || formData.emailOrUsername;
+        router.push(`/auth/verify-otp?email=${encodeURIComponent(email)}`);
+        return;
+      }
+      
       if (error.data?.fieldErrors) {
         newErrors = { ...newErrors, ...error.data.fieldErrors };
       } else if (error.data?.message) {
