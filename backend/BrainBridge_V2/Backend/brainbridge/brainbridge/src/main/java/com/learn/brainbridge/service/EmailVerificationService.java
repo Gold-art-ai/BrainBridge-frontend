@@ -4,8 +4,10 @@ import com.learn.brainbridge.entity.User;
 
 public interface EmailVerificationService {
 
-    void sendVerificationEmail(User user);
+    String sendVerificationEmail(User user);
 
-    void verifyToken(String token);
+    void verifyOTP(String email, String otp);
+    
+    String resendOTP(String email);
 }
 

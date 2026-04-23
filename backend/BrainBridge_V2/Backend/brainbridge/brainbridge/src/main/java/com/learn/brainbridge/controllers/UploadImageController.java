@@ -1,10 +1,12 @@
 package com.learn.brainbridge.controllers;
 
+import com.learn.brainbridge.service.CloudinaryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,13 +19,13 @@ import java.util.Map;
 @Tag(name = "Image Upload", description = "Endpoints for managing profile pictures and course assets")
 public class UploadImageController {
 
-    // You would normally inject your ImageService here
-    // private final ImageService imageService;
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
             summary = "Upload an image file",
-            description = "Accepts an image file (PNG, JPG) and returns the public URL."
+            description = "Accepts an image file (PNG, JPG) and uploads to Cloudinary, returns the public URL."
     )
     public ResponseEntity<?> uploadImage(
             @Parameter(
@@ -31,25 +33,34 @@ public class UploadImageController {
                     content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
                             schema = @Schema(type = "string", format = "binary"))
             )
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "folder", required = false, defaultValue = "brainbridge") String folder) {
 
         if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body("Please select a file to upload.");
+            return ResponseEntity.badRequest().body(Map.of("error", "Please select a file to upload."));
+        }
+
+        // Validate file type
+        String contentType = file.getContentType();
+        if (contentType == null || (!contentType.startsWith("image/"))) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Only image files are allowed."));
+        }
+
+        // Validate file size (max 5MB)
+        if (file.getSize() > 5 * 1024 * 1024) {
+            return ResponseEntity.badRequest().body(Map.of("error", "File size must be less than 5MB."));
         }
 
         try {
-            // Logic to save the file (Local storage, Cloudinary, or S3)
-            // String imageUrl = imageService.saveImage(file);
-
-            String fakeUrl = "https://brainbridge.com/images/sample-result.jpg";
+            String imageUrl = cloudinaryService.uploadImage(file, folder);
 
             return ResponseEntity.ok(Map.of(
-                    "url", fakeUrl,
+                    "url", imageUrl,
                     "name", file.getOriginalFilename(),
                     "size", file.getSize()
             ));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error uploading file: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("error", "Error uploading file: " + e.getMessage()));
         }
     }
 }

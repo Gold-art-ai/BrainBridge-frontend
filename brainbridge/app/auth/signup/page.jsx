@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRegisterMutation } from '../../redux/api/UserApiSlice';
 import { ArrowRight, Eye, EyeOff, Check } from 'lucide-react';
+import Image from "next/image";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -49,8 +50,8 @@ export default function SignUpPage() {
       console.log(formData);
       try {
         const { isSubmitting, ...payload } = formData;
-        await registerUser(payload).unwrap();
-        router.push('/auth/login');
+        const response = await registerUser(payload).unwrap();
+        router.push(`/auth/verify-otp?email=${encodeURIComponent(formData.email)}`);
       } catch (error) {
         if (error.data?.errors) {
           setErrors(error.data.errors);
@@ -167,7 +168,7 @@ export default function SignUpPage() {
         <div className="hidden lg:flex w-1/2 bg-[var(--bg)] relative items-center justify-center p-14">
           <div className="relative z-10 text-center">
             <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg mb-8 mx-auto border border-[var(--border)]">
-              <i className="fa-solid fa-code-branch text-3xl text-[var(--primary)] opacity-60"></i>
+              <Image src="/logo.png" alt="BrainBridge" width={80} height={80} />
             </div>
             <h3 className="text-2xl font-extrabold text-[var(--text)] mb-3 leading-tight" style={{ fontFamily: 'var(--font-heading)' }}>
               Build. Showcase.<br/>Connect.

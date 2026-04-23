@@ -26,8 +26,8 @@ public class EmailVerificationToken {
     @JsonIgnore
     private User user;
 
-    @Column(nullable = false, length = 255)
-    private String token;
+    @Column(nullable = false, length = 6)
+    private String token; // 6-digit OTP code
 
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
