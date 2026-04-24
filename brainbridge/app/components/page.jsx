@@ -65,7 +65,7 @@ export default function NavigationShell({ children }) {
       </aside>
 
       {/* RIGHT SIDE CONTENT AREA */}
-      <div className="flex-1 ml-64 flex flex-col">
+      <div className="flex-1 md:ml-64 flex flex-col">
         
         {/* TOP NAVIGATION BAR */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-20">

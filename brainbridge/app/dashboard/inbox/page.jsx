@@ -94,9 +94,9 @@ function InboxContent() {
   if (isLoading) return <div className="p-8 text-center text-[10px] font-black uppercase text-[var(--primary)] animate-pulse">Synchronizing Nodes...</div>;
 
   return (
-    <div className="flex h-[calc(100vh-120px)] bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm">
+    <div className="flex flex-col lg:flex-row lg:h-[calc(100vh-120px)] bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm">
       {/* Sidebar */}
-      <div className="w-80 border-r border-gray-50 flex flex-col bg-white">
+      <div className="w-full lg:w-80 border-b lg:border-b-0 lg:border-r border-gray-50 flex flex-col bg-white">
         <div className="p-6">
           <h2 className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[var(--primary)] mb-6">Active Nodes</h2>
           <div className="relative mb-4">

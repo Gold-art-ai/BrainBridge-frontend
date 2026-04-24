@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }) {
       <Sidebar />
       
       {/* Main Content Area */}
-      <div className="ml-64 flex flex-col min-h-screen relative z-10">
+      <div className="lg:ml-64 flex flex-col min-h-screen relative z-10">
         <TopBar />
         <main className="p-8 flex-1">
           {children}
