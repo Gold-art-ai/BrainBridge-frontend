@@ -7,6 +7,8 @@ import com.learn.brainbridge.repository.UserRepository;
 import com.learn.brainbridge.service.ProjectsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.util.Optional;
 @Tag(name = "Projects API", description = "Projects operations(ADD,GET,DELETE OR UPDATE)")
 @RequestMapping("/projects")
 public class ProjectsController {
+    private static final Logger log = LoggerFactory.getLogger(ProjectsController.class);
     private final ProjectsService service;
     private final UserRepository userRepository;
 
@@ -33,12 +36,16 @@ public class ProjectsController {
 
     @PostMapping("/add")
     public ResponseEntity<?> createProject(Authentication authentication, @Valid @RequestBody ProjectDTO projectDTO) {
-        System.out.println("Received project creation request: " + projectDTO.getTitle());
+        log.info("=== Project Creation Request ===");
+        log.info("  Title: {}", projectDTO.getTitle());
+        log.info("  Description: {}", projectDTO.getDescription());
+        log.info("  Field: {}", projectDTO.getField());
+        log.info("  Authentication: {}", authentication);
+        log.info("  Principal: {}", authentication != null ? authentication.getName() : "NULL");
 
-        // Always bind the created project to the authenticated user.
-        // Otherwise the frontend can accidentally send an incorrect ownerId and the project won't show up in GET /projects/my.
         if (authentication == null || !authentication.isAuthenticated()
                 || "anonymousUser".equals(authentication.getName())) {
+            log.warn("  REJECTED: No valid authentication");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(java.util.Map.of("error", "Unauthorized"));
         }
@@ -48,13 +55,17 @@ public class ProjectsController {
                 .orElseGet(() -> userRepository.findByUsername(principalName).orElse(null));
 
         if (user == null) {
+            log.warn("  REJECTED: User not found for principal: {}", principalName);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
+
+        log.info("  User found: {} (ID: {})", user.getUsername(), user.getId());
 
         Integer ownerId;
         try {
             ownerId = Math.toIntExact(user.getId());
         } catch (ArithmeticException ex) {
+            log.error("  User ID too large: {}", user.getId());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("User ID is too large to map to project owner id");
         }
@@ -79,7 +90,11 @@ public class ProjectsController {
         project.setAdditionalMediaUrls(projectDTO.getAdditionalMediaUrls() == null ? new ArrayList<>() : projectDTO.getAdditionalMediaUrls());
         project.setCreatedAt(java.time.LocalDate.now());
         project.setUpdatedAt(java.time.LocalDate.now());
+        
+        log.info("  Creating project with title: {}", project.getTitle());
         Projects saved = service.createProject(project);
+        log.info("  Project created successfully with ID: {}", saved.getId());
+        
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
