@@ -37,8 +37,10 @@ public class ProjectsController {
 
         // Always bind the created project to the authenticated user.
         // Otherwise the frontend can accidentally send an incorrect ownerId and the project won't show up in GET /projects/my.
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(java.util.Map.of("error", "Unauthorized"));
         }
 
         String principalName = authentication.getName();
@@ -95,8 +97,10 @@ public class ProjectsController {
     @GetMapping("/my")
     @Transactional(readOnly = true)
     public ResponseEntity<?> getMyProjects(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(java.util.Map.of("error", "Unauthorized"));
         }
 
         String principalName = authentication.getName();
