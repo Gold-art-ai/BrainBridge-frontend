@@ -51,6 +51,12 @@ export default function SignUpPage() {
       try {
         const { isSubmitting, ...payload } = formData;
         const response = await registerUser(payload).unwrap();
+        // Store the token returned from registration so authenticated
+        // endpoints (e.g. profile-picture upload) work immediately
+        if (response.data?.token) {
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('user', JSON.stringify(response.data.user));
+        }
         router.push(`/auth/verify-otp?email=${encodeURIComponent(formData.email)}`);
       } catch (error) {
         if (error.data?.errors) {
