@@ -29,16 +29,72 @@ public class ProjectsController {
     private final ProjectsService service;
     private final UserRepository userRepository;
     private final com.learn.brainbridge.repository.FavoriteRepository favoriteRepository;
+    private final com.learn.brainbridge.repository.ProjectCommentRepository projectCommentRepository;
 
     @Autowired
     public ProjectsController(
             ProjectsService service, 
             UserRepository userRepository,
-            com.learn.brainbridge.repository.FavoriteRepository favoriteRepository
+            com.learn.brainbridge.repository.FavoriteRepository favoriteRepository,
+            com.learn.brainbridge.repository.ProjectCommentRepository projectCommentRepository
     ) {
         this.service = service;
         this.userRepository = userRepository;
         this.favoriteRepository = favoriteRepository;
+        this.projectCommentRepository = projectCommentRepository;
+    }
+
+    @GetMapping("/{id}/comments")
+    public ResponseEntity<?> getComments(@PathVariable("id") Integer id) {
+        List<com.learn.brainbridge.entity.ProjectComment> comments = projectCommentRepository.findByProjectIdOrderByCreatedAtDesc(id);
+        List<com.learn.brainbridge.dtos.CommentDTO> dtos = comments.stream().map(c -> {
+            com.learn.brainbridge.dtos.CommentDTO dto = new com.learn.brainbridge.dtos.CommentDTO();
+            dto.setId(c.getId());
+            dto.setProjectId(Long.valueOf(c.getProjectId()));
+            dto.setUserId(c.getUserId());
+            dto.setContent(c.getContent());
+            dto.setCreatedAt(c.getCreatedAt());
+            
+            userRepository.findById(c.getUserId()).ifPresent(u -> {
+                dto.setUsername(u.getUsername());
+            });
+            
+            return dto;
+        }).toList();
+        
+        return ResponseEntity.ok(dtos);
+    }
+
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<?> addComment(
+            @PathVariable("id") Integer id,
+            Authentication authentication,
+            @Valid @RequestBody com.learn.brainbridge.dtos.CommentDTO commentDto
+    ) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        String principalName = authentication.getName();
+        User user = userRepository.findByEmail(principalName)
+                .orElseGet(() -> userRepository.findByUsername(principalName).orElse(null));
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        com.learn.brainbridge.entity.ProjectComment comment = new com.learn.brainbridge.entity.ProjectComment(id, user.getId(), commentDto.getContent());
+        com.learn.brainbridge.entity.ProjectComment saved = projectCommentRepository.save(comment);
+        
+        com.learn.brainbridge.dtos.CommentDTO response = new com.learn.brainbridge.dtos.CommentDTO();
+        response.setId(saved.getId());
+        response.setProjectId(Long.valueOf(saved.getProjectId()));
+        response.setUserId(saved.getUserId());
+        response.setContent(saved.getContent());
+        response.setCreatedAt(saved.getCreatedAt());
+        response.setUsername(user.getUsername());
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/add")

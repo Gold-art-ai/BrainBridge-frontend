@@ -35,6 +35,18 @@ export const projectsApi = apiSlice.injectEndpoints({
       query: id => ({ url: `/projects/view/${id}`, method: 'POST' }),
       invalidatesTags: ['Projects']
     }),
+    getProjectComments: builder.query({
+      query: id => ({ url: `/projects/${id}/comments` }),
+      providesTags: ['Comments']
+    }),
+    addProjectComment: builder.mutation({
+      query: ({ id, content }) => ({ 
+        url: `/projects/${id}/comments`, 
+        method: 'POST', 
+        body: { content } 
+      }),
+      invalidatesTags: ['Comments']
+    }),
   }),
   overrideExisting: false,
 })
@@ -48,4 +60,6 @@ export const {
   useGetTeamProjectsQuery,
   useRemoveProjectMutation,
   useIncrementViewCountMutation,
+  useGetProjectCommentsQuery,
+  useAddProjectCommentMutation,
 } = projectsApi

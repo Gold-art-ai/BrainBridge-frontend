@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useGetProjectByIdQuery, useIncrementViewCountMutation } from '../../redux/api/ProjectsApiSlice';
+import { useGetProjectByIdQuery, useIncrementViewCountMutation, useGetProjectCommentsQuery, useAddProjectCommentMutation } from '../../redux/api/ProjectsApiSlice';
+import { useCheckFavoriteQuery, useAddFavoriteMutation, useRemoveFavoriteMutation } from '../../redux/api/FavoritesApiSlice';
 import { useSendMessageMutation } from '../../redux/api/MessagesApiSlice';
-import { ArrowLeft, MessageSquare, Share2, Terminal, Activity, Eye } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Heart, Send, Terminal, Activity, Eye } from 'lucide-react';
 import Link from 'next/link';
 import ProjectView from "../../components/projects/ProjectView"; 
 
@@ -11,9 +12,17 @@ export default function ProjectPage() {
   const { id } = useParams();
   const router = useRouter();
   const [project, setProject] = useState(null);
-  const { data: fetchedProject } = useGetProjectByIdQuery(id, { skip: !id });
+  const [commentText, setCommentText] = useState("");
+  
+  const { data: fetchedProject, refetch: refetchProject } = useGetProjectByIdQuery(id, { skip: !id });
+  const { data: comments = [] } = useGetProjectCommentsQuery(id, { skip: !id });
+  const { data: isFavorited } = useCheckFavoriteQuery(id, { skip: !id });
+  
   const [incrementViewCount] = useIncrementViewCountMutation();
   const [sendMessage] = useSendMessageMutation();
+  const [addComment] = useAddProjectCommentMutation();
+  const [addFavorite] = useAddFavoriteMutation();
+  const [removeFavorite] = useRemoveFavoriteMutation();
 
   const [user, setUser] = useState(null);
   useEffect(() => {
@@ -23,119 +32,160 @@ export default function ProjectPage() {
     }
   }, []);
 
-  useEffect(() => {
-    if (fetchedProject && !isNaN(Number(id))) {
-      incrementViewCount(id);
-      setProject(fetchedProject);
-      return;
-    }
-    const saved = localStorage.getItem('my_projects');
-    const userProjects = saved ? JSON.parse(saved) : [];
-    const initialData = [
-      { id: "p1", name: "Quantum Ledger", creator: "Alex Rivers", category: "Fintech", description: "Decentralized protocol for high-frequency quantum trading.", tech: ["Rust", "Solidity"], status: "Active Node", image: "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=900&q=80" },
-      { id: "p2", name: "CryptoSec AI", creator: "Sarah Chen", category: "AI / ML", description: "LLM-driven monitoring for global trading groups.", tech: ["Python", "PyTorch"], status: "Operational", image: "https://images.unsplash.com/photo-1640161704729-cbe966a08476?auto=format&fit=crop&w=800&q=80" }
-    ];
+  const isOwner = user && project && (
+    user.id === project.ownerId || 
+    user.username === project.ownerName ||
+    user.username === project.creator
+  );
 
-    const found = [...userProjects, ...initialData].find(p => p.id.toString() === id.toString());
-    if (found) setProject(found);
+  useEffect(() => {
+    const handleInitialLoad = async () => {
+      if (fetchedProject && !isNaN(Number(id))) {
+        try {
+          await incrementViewCount(id).unwrap();
+          refetchProject();
+        } catch (e) {}
+        setProject(fetchedProject);
+        return;
+      }
+    };
+    handleInitialLoad();
+
+    if (!fetchedProject) {
+      const saved = localStorage.getItem('my_projects');
+      const userProjects = saved ? JSON.parse(saved) : [];
+      const initialData = [
+        { id: "p1", name: "Quantum Ledger", creator: "Alex Rivers", category: "Fintech", description: "Decentralized protocol for high-frequency quantum trading.", tech: ["Rust", "Solidity"], status: "Active Node" },
+        { id: "p2", name: "CryptoSec AI", creator: "Sarah Chen", category: "AI / ML", description: "LLM-driven monitoring for global trading groups.", tech: ["Python", "PyTorch"], status: "Operational" }
+      ];
+      const found = [...userProjects, ...initialData].find(p => p.id.toString() === id.toString());
+      if (found) setProject(found);
+    }
   }, [id, fetchedProject]);
+
+  const handleToggleFavorite = async () => {
+    if (!user) return;
+    try {
+      if (isFavorited) await removeFavorite(id).unwrap();
+      else await addFavorite(id).unwrap();
+    } catch (err) { console.error(err); }
+  };
+
+  const handlePostComment = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim() || !user) return;
+    try {
+      await addComment({ id, content: commentText }).unwrap();
+      setCommentText("");
+    } catch (err) { console.error(err); }
+  };
 
   const handleCollaborate = async () => {
     if (!project || !user) return;
-    
-    const messageContent = `Hi ${project.creator || 'Architect'}, I'm interested in collaborating on the "${project.name || project.title}" node.`;
-    
-    // Ensure we only send requests for real (numeric ID) projects
-    const isMockProject = isNaN(Number(project.id));
-    if (isMockProject) {
-      console.warn("Cannot collaborate on a mock project node.");
-      return;
-    }
-
     try {
       await sendMessage({
         receiverId: project.ownerId || 1, 
         projectId: parseInt(project.id),
-        content: messageContent
+        content: `Hi, I'm interested in collaborating on "${project.title || project.name}".`
       }).unwrap();
-      
-      const params = new URLSearchParams({
-        newChat: "true",
-        project: project.title || project.name,
-        to: project.creator || "Architect",
-      });
-      router.push(`/dashboard/inbox?${params.toString()}`);
-    } catch (err) {
-      console.error("Failed to send collaboration message", err);
-    }
+      router.push(`/dashboard/inbox`);
+    } catch (err) { console.error(err); }
   };
 
   if (!project) return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
-       <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--primary)] animate-pulse">Initialising Module...</p>
+       <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--primary)] animate-pulse">Initialising...</p>
     </div>
   );
 
   return (
-    <div className="bg-[var(--bg)] min-h-screen pb-20">
-      <div className="max-w-7xl mx-auto px-6 py-8 flex justify-between items-center">
-        <Link href="/projects" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[var(--primary)] transition-all">
-          <ArrowLeft size={14} /> Discovery Hub
+    <div className="bg-[#FAFBFD] min-h-screen pb-24">
+      <header className="max-w-5xl mx-auto px-6 py-12 flex justify-between items-center">
+        <Link href="/projects" className="inline-flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-[var(--primary)] transition-all group">
+          <div className="w-10 h-10 rounded-2xl bg-white border border-gray-100 flex items-center justify-center group-hover:bg-[var(--primary)] group-hover:text-white transition-all shadow-sm">
+            <ArrowLeft size={16} />
+          </div>
+          System Hub
         </Link>
-        <button className="p-2.5 bg-white border border-gray-100 rounded-xl text-gray-400 hover:text-[var(--primary)] transition-all"><Share2 size={16} /></button>
+        <button 
+          onClick={handleToggleFavorite}
+          className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl border transition-all text-[10px] font-black uppercase tracking-widest shadow-sm ${
+            isFavorited ? 'bg-red-50 border-red-100 text-red-500' : 'bg-white border-gray-100 text-gray-400 hover:text-red-500'
+          }`}
+        >
+          <Heart size={18} className={isFavorited ? 'fill-red-500' : ''} />
+          {project.likesCount || 0} Engagement
+        </button>
+      </header>
+
+      <div className="px-6">
+        <ProjectView project={project} isOwner={isOwner} />
       </div>
 
-      {/* FORCE HIDE BUTTONS: 
-        We wrap ProjectView in a div that targets any button tags 
-        inside the ProjectView and sets them to display: none.
-      */}
-      <div className="public-view-only-wrapper [&_button]:hidden">
-         <ProjectView project={project} />
-      </div>
-
-      <div className="max-w-7xl mx-auto px-6 mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <section className="lg:col-span-2 bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden group">
-          <div className="relative z-10">
-            <h3 className="text-[10px] font-black text-[var(--primary)] uppercase tracking-[0.2em] mb-4">Request Access</h3>
-            <h2 className="text-3xl font-black text-[var(--text)] mb-6 tracking-tight">Collaborate with {project.creator || 'Architect'}</h2>
-            <p className="text-gray-500 text-sm leading-relaxed mb-8 max-w-xl">
-              Initiate a direct secure channel to discuss technical specifications and development goals.
-            </p>
-            
+      <div className="max-w-5xl mx-auto px-6 mt-16 space-y-16">
+        {!isOwner && (
+          <section className="bg-white p-12 rounded-[3.5rem] border border-gray-100 shadow-xl shadow-blue-900/5 flex flex-col md:flex-row md:items-center justify-between gap-10">
+            <div className="flex-1">
+              <h3 className="text-[10px] font-black text-[var(--primary)] uppercase tracking-[0.3em] mb-4">Network Protocols</h3>
+              <h2 className="text-4xl font-black text-[var(--text)] mb-6 tracking-tight italic">Work with {project.ownerName || project.creator}</h2>
+              <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-lg">Initiate a direct link to the architect of this node for synchronization and resource sharing.</p>
+            </div>
             <button 
               onClick={handleCollaborate}
-              className="flex items-center gap-4 bg-[var(--primary)] text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--primary-dark)] transition-all shadow-xl shadow-[var(--primary)]/20 active:scale-95"
+              className="bg-[var(--text)] text-white px-12 py-6 rounded-[2.5rem] text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--primary)] transition-all shadow-2xl shadow-blue-900/20 active:scale-95 flex items-center gap-4"
             >
-              <MessageSquare size={18} />
-              Start Collaboration Chat
+              <MessageSquare size={20} />
+              Connect Now
             </button>
-          </div>
-        </section>
+          </section>
+        )}
 
-        <div className="space-y-8">
-           <section className="bg-[var(--primary)] p-8 rounded-[2.5rem] text-white">
-              <h3 className="text-[9px] font-black text-blue-300 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                <Terminal size={14} /> System Profile
-              </h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-2 border-b border-white/10">
-                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Architect</span>
-                  <span className="text-xs font-black">{project.ownerName || project.creator}</span>
+        {/* Discussion Section Centered */}
+        <section className="bg-white p-12 rounded-[3.5rem] border border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between mb-12">
+            <h3 className="text-2xl font-black text-[var(--text)] flex items-center gap-4">
+              Discussion Log <span className="text-[10px] bg-gray-50 px-5 py-2 rounded-full text-gray-400 uppercase tracking-widest">{comments.length} Entries</span>
+            </h3>
+          </div>
+
+          <form onSubmit={handlePostComment} className="mb-12 relative">
+            <textarea 
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Input technical feedback..."
+              className="w-full bg-[#FCFDFF] border border-gray-100 rounded-[2.5rem] p-8 text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 transition-all min-h-[160px] resize-none font-medium text-gray-600"
+            />
+            <button 
+              type="submit"
+              disabled={!commentText.trim()}
+              className="absolute bottom-6 right-6 bg-[var(--primary)] text-white p-4 rounded-2xl hover:bg-[var(--primary-dark)] transition-all disabled:opacity-50 shadow-lg shadow-blue-500/30"
+            >
+              <Send size={20} />
+            </button>
+          </form>
+
+          <div className="space-y-10">
+            {comments.map((c) => (
+              <div key={c.id} className="flex gap-8 group">
+                <div className="w-14 h-14 rounded-3xl bg-[#F8F9FF] border border-gray-100 flex items-center justify-center text-sm font-black text-[var(--primary)] uppercase">
+                  {c.username?.[0] || 'U'}
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-white/10">
-                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">System Load</span>
-                  <div className="flex items-center gap-1.5">
-                    <Eye size={12} className="text-blue-300" />
-                    <span className="text-xs font-black">{project.viewCount || 0} Views</span>
+                <div className="flex-1">
+                  <div className="flex items-center gap-4 mb-3">
+                    <span className="text-sm font-black text-[var(--text)]">@{c.username || 'user'}</span>
+                    <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">{new Date(c.createdAt).toLocaleDateString()}</span>
                   </div>
-                </div>
-                <div className="flex justify-between items-center py-2">
-                   <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Verified</span>
-                   <Activity size={14} className="text-green-400" />
+                  <p className="text-base text-gray-500 leading-relaxed font-medium">{c.content}</p>
                 </div>
               </div>
-           </section>
-        </div>
+            ))}
+            {comments.length === 0 && (
+              <div className="text-center py-12 bg-gray-50/50 rounded-[2.5rem] border border-dashed border-gray-200">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Protocol standing by. No discussion logged.</p>
+              </div>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );
