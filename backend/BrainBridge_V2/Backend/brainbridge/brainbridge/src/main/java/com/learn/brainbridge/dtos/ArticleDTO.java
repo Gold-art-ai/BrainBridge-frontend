@@ -30,7 +30,7 @@ public class ArticleDTO {
     @JsonProperty("content")
     private String content;
 
-    @Schema(description = "Field/discipline", example = "Healthcare")
+    @Schema(description = "Legacy field (deprecated)", example = "Healthcare")
     @JsonProperty("field")
     private String field;
 
@@ -48,6 +48,9 @@ public class ArticleDTO {
 
     @JsonProperty("additionalMediaUrls")
     private List<String> additionalMediaUrls = new ArrayList<>();
+
+    @JsonProperty("technologies")
+    private List<String> technologies = new ArrayList<>();
 
     @JsonProperty("createdAt")
     private LocalDate createdAt;
@@ -120,6 +123,14 @@ public class ArticleDTO {
 
     public void setAdditionalMediaUrls(List<String> additionalMediaUrls) {
         this.additionalMediaUrls = additionalMediaUrls;
+    }
+
+    public List<String> getTechnologies() {
+        return technologies;
+    }
+
+    public void setTechnologies(List<String> technologies) {
+        this.technologies = technologies;
     }
 
     public LocalDate getCreatedAt() {

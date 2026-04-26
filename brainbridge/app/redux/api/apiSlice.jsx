@@ -9,6 +9,9 @@ const baseQuery = fetchBaseQuery({
     if (token) {
       headers.set('authorization', `Bearer ${token}`);
     }
+    if (!headers.has('content-type')) {
+      headers.set('content-type', 'application/json');
+    }
     return headers;
   },
 });
@@ -16,7 +19,7 @@ const baseQuery = fetchBaseQuery({
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery,
-  tagTypes: ['User', 'Projects', 'Articles', 'Favorites', 'Messages', 'Notifications'],
+  tagTypes: ['User', 'Projects', 'Articles', 'Article', 'ArticleLikes', 'ArticleComments', 'Favorites', 'Messages', 'Notifications'],
   endpoints: builder => ({
     
   })

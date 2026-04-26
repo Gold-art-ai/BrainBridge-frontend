@@ -20,6 +20,9 @@ const baseQuery = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridg
         if (token) {
             headers.set('authorization', `Bearer ${token}`);
         }
+        if (!headers.has('content-type')) {
+            headers.set('content-type', 'application/json');
+        }
         return headers;
     }
 });
@@ -30,6 +33,9 @@ const apiSlice = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge
         'User',
         'Projects',
         'Articles',
+        'Article',
+        'ArticleLikes',
+        'ArticleComments',
         'Favorites',
         'Messages',
         'Notifications'

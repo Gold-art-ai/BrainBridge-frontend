@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { FIELDS } from '../../utils/taxonomy';
+import { SUB_TAGS } from '../../utils/taxonomy';
 
 export default function EditArticleModal({ isOpen, onClose, onUpdateArticle, article }) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [field, setField] = useState('');
+  const [technologies, setTechnologies] = useState([]);
   const [visibility, setVisibility] = useState('PUBLIC');
   const [coverImageUrl, setCoverImageUrl] = useState('');
   const [relatedUrlsText, setRelatedUrlsText] = useState('');
@@ -14,7 +14,7 @@ export default function EditArticleModal({ isOpen, onClose, onUpdateArticle, art
     if (article && isOpen) {
       setTitle(article.title || '');
       setContent(article.content || '');
-      setField(article.field || '');
+      setTechnologies(article.technologies || []);
       setVisibility(article.visibility || 'PUBLIC');
       setCoverImageUrl(article.coverImageUrl || '');
       setRelatedUrlsText((article.relatedUrls || []).join('\n'));
@@ -43,7 +43,7 @@ export default function EditArticleModal({ isOpen, onClose, onUpdateArticle, art
       ...article,
       title,
       content,
-      field,
+      technologies,
       visibility,
       coverImageUrl,
       relatedUrls,
@@ -120,15 +120,26 @@ export default function EditArticleModal({ isOpen, onClose, onUpdateArticle, art
                 </select>
               </div>
               <div>
-                <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Field</label>
-                <select
-                  value={field}
-                  onChange={(e) => setField(e.target.value)}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-xl py-3 px-4 text-xs font-bold text-[var(--text)] outline-none cursor-pointer"
-                >
-                  <option value="">Select Sector...</option>
-                  {FIELDS.map(f => <option key={f} value={f}>{f}</option>)}
-                </select>
+                <label className="block text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Technologies</label>
+                <div className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                  <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto pr-1 custom-scrollbar">
+                    {Object.values(SUB_TAGS).flat().slice(0, 40).map((t) => {
+                      const active = technologies.includes(t);
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setTechnologies(prev => active ? prev.filter(x => x !== t) : [...prev, t])}
+                          className={`px-3 py-1 rounded-md text-[11px] font-semibold transition-colors ${
+                            active ? 'bg-[var(--text)] text-white' : 'bg-white border border-gray-200 text-gray-500 hover:border-[var(--primary)]'
+                          }`}
+                        >
+                          {t}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             </div>
 

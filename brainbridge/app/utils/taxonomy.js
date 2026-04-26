@@ -1,7 +1,7 @@
 export const FIELDS = [
-  "Agriculture", "Healthcare", "Education", "Mining", "Tourism", "Transport", 
-  "Sustainability", "Water", "Cybersecurity", "Food & Nutrition", "Finance", 
-  "Energy", "Smart Cities", "Environment"
+  "Web Development", "Artificial Intelligence", "Cloud Computing", "Mobile Development", 
+  "Data Science", "Cybersecurity", "Blockchain", "DevOps", "Game Development", 
+  "Embedded Systems", "UI/UX Design", "Software Architecture"
 ];
 
 export const MAIN_TAGS = [

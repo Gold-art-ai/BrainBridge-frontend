@@ -22,7 +22,7 @@ export default function PublicDiscoveryPage() {
     const payload = {
       title: newArticle.title,
       content: newArticle.content,
-      field: newArticle.field,
+      technologies: newArticle.technologies,
       visibility: newArticle.visibility,
       coverImageUrl: newArticle.coverImageUrl || "",
       relatedUrls: newArticle.relatedUrls,
@@ -37,7 +37,7 @@ export default function PublicDiscoveryPage() {
     return articles.filter(a => {
       const matchesSearch = (a.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
                             (a.content || "").toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCat = activeCategory === 'All' || a.field === activeCategory;
+      const matchesCat = activeCategory === 'All' || (a.technologies || []).includes(activeCategory);
       return matchesSearch && matchesCat;
     });
   }, [searchQuery, activeCategory, articles]);
@@ -59,10 +59,14 @@ export default function PublicDiscoveryPage() {
           <h3 className="text-base font-bold text-[var(--text)] mb-1.5 group-hover:text-[var(--primary)] transition-colors line-clamp-1" style={{ fontFamily: 'var(--font-heading)' }}>
             {article.title}
           </h3>
-          {!!article.field && (
-            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tight -mt-1 mb-2">
-              {article.field}
-            </p>
+          {!!(article.technologies || []).length && (
+            <div className="flex flex-wrap gap-1.5 -mt-0.5 mb-3">
+              {(article.technologies || []).slice(0, 3).map((t) => (
+                <span key={t} className="text-[10px] font-semibold text-[var(--primary)] bg-[var(--primary)]/6 px-2 py-0.5 rounded-md">
+                  {t}
+                </span>
+              ))}
+            </div>
           )}
           <p className="text-xs text-[var(--text-muted)] leading-relaxed line-clamp-3 mb-4">{article.content}</p>
 

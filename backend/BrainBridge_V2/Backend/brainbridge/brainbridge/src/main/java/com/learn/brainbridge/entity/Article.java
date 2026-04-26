@@ -53,6 +53,11 @@ public class Article {
     @Column(name = "media_url", columnDefinition = "TEXT")
     private List<String> additionalMediaUrls = new ArrayList<>();
 
+    @ElementCollection
+    @CollectionTable(name = "article_technologies", joinColumns = @JoinColumn(name = "article_id"))
+    @Column(name = "technology", columnDefinition = "TEXT")
+    private List<String> technologies = new ArrayList<>();
+
     @Column(nullable = false, updatable = false, name = "created_at")
     @CreatedDate
     private LocalDate createdAt;
@@ -149,6 +154,14 @@ public class Article {
 
     public void setAdditionalMediaUrls(List<String> additionalMediaUrls) {
         this.additionalMediaUrls = additionalMediaUrls;
+    }
+
+    public List<String> getTechnologies() {
+        return technologies;
+    }
+
+    public void setTechnologies(List<String> technologies) {
+        this.technologies = technologies;
     }
 
     public LocalDate getCreatedAt() {

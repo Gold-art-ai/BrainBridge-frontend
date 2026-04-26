@@ -25,13 +25,24 @@ export default function ArticleTable({ articles, onDelete }) {
     setDeletingId(null);
   };
 
+  if (!articles || articles.length === 0) {
+    return (
+      <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
+        <div className="px-8 py-16 text-center">
+          <p className="text-lg font-extrabold text-[var(--text)] tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>No articles yet</p>
+          <p className="text-sm text-[var(--text-muted)] mt-2">Create an article from the Articles hub, then manage it here.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-sm">
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="border-b border-gray-50 bg-[#F8F9FF]/50">
             <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Article</th>
-            <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Field</th>
+            <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Technologies</th>
             <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Visibility</th>
             <th className="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Actions</th>
           </tr>
@@ -55,9 +66,16 @@ export default function ArticleTable({ articles, onDelete }) {
                 </td>
 
                 <td className="px-6 py-6">
-                  <span className="text-[10px] text-gray-500 font-black uppercase tracking-wider">
-                    {a.field || '—'}
-                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(a.technologies || []).slice(0, 3).map((t) => (
+                      <span key={t} className="text-[10px] font-semibold text-[var(--primary)] bg-[var(--primary)]/6 px-2 py-0.5 rounded-md">
+                        {t}
+                      </span>
+                    ))}
+                    {(!(a.technologies || []).length) && (
+                      <span className="text-[10px] text-gray-400 font-bold">—</span>
+                    )}
+                  </div>
                 </td>
 
                 <td className="px-6 py-6">
