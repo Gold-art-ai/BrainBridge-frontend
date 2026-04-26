@@ -20,25 +20,28 @@ export default function PublicDiscoveryPage() {
   useEffect(() => { setProjects(fetched || []); }, [fetched]);
 
   const addProject = async (newProj) => {
-    let ownerId = 201;
-    try {
-      const userStr = localStorage.getItem('user');
-      if (userStr) { const u = JSON.parse(userStr); if (u.id) ownerId = u.id; }
-    } catch (e) {}
-
     const payload = {
-      title: newProj.title, description: newProj.description,
-      projectStatus: newProj.projectStatus, projectVisibility: newProj.projectVisibility,
-      ownerId,
-      coverImageUrl: newProj.coverImageUrl || "", repoUrl: newProj.repoUrl || "",
-      field: newProj.field, mainTags: newProj.mainTags, subTags: newProj.subTags,
-      sdgGoals: newProj.sdgGoals, nst2Goals: newProj.nst2Goals,
-      additionalMediaUrls: newProj.additionalMediaUrls,
+      title: newProj.title,
+      description: newProj.description,
+      projectStatus: newProj.projectStatus,
+      projectVisibility: newProj.projectVisibility,
+      coverImageUrl: newProj.coverImageUrl || "",
+      repoUrl: newProj.repoUrl || "",
+      field: newProj.field,
+      mainTags: newProj.mainTags || [],
+      subTags: newProj.subTags || [],
+      sdgGoals: newProj.sdgGoals || [],
+      nst2Goals: newProj.nst2Goals || [],
+      additionalMediaUrls: newProj.additionalMediaUrls || [],
       startDate: new Date().toISOString().split('T')[0],
       endDate: new Date().toISOString().split('T')[0]
     };
 
-    try { await addProjectMutation(payload).unwrap(); } catch (e) { console.error(e); }
+    try {
+      await addProjectMutation(payload).unwrap();
+    } catch (e) {
+      console.error('[Projects] addProject error:', e);
+    }
     setIsModalOpen(false);
   };
 
