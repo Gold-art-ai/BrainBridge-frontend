@@ -1984,10 +1984,6 @@
     background-color: var(--color-blue-500);
   }
 
-  .bg-blue-600 {
-    background-color: var(--color-blue-600);
-  }
-
   .bg-emerald-500 {
     background-color: var(--color-emerald-500);
   }
@@ -3608,12 +3604,6 @@
   }
 
   @media (hover: hover) {
-    .hover\:bg-blue-700:hover {
-      background-color: var(--color-blue-700);
-    }
-  }
-
-  @media (hover: hover) {
     .hover\:bg-gray-50:hover {
       background-color: var(--color-gray-50);
     }
@@ -4269,12 +4259,6 @@
   @media (min-width: 64rem) {
     .lg\:text-\[5\.1rem\] {
       font-size: 5.1rem;
-    }
-  }
-
-  @media (min-width: 80rem) {
-    .xl\:grid-cols-3 {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 

@@ -14,7 +14,7 @@ export default function StatsOverview({ projects = [] }) {
         growth="Live"
       />
       <StatCard
-        title="Explore Hub"
+        title="Articles"
         value={projects.filter(p => p.projectVisibility === 'PUBLIC').length.toString()}
         growth="Visible"
       />

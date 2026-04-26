@@ -3,68 +3,98 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import PublicHero from '../components/projects/PublicHero';
 import CategoryFilter from '../components/projects/CategoryFilter';
-import PublicProjectCard from '../components/projects/PublicProjectCard';
 import TechTrends from '../components/projects/TechTrends';
-import NewProjectModal from "../components/projects/NewProjectModal";
+import NewArticleModal from "../components/articles/NewArticleModal";
 import { Search, Plus } from "lucide-react";
-import { useGetAllProjectsQuery, useAddProjectMutation } from '../redux/api/ProjectsApiSlice';
+import { useGetAllArticlesQuery, useAddArticleMutation } from '../redux/api/ArticlesApiSlice';
 
 export default function PublicDiscoveryPage() {
-  const [projects, setProjects] = useState([]);
+  const [articles, setArticles] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { data: fetched } = useGetAllProjectsQuery();
-  const [addProjectMutation] = useAddProjectMutation();
+  const { data: fetched } = useGetAllArticlesQuery();
+  const [addArticleMutation] = useAddArticleMutation();
 
-  useEffect(() => { setProjects(fetched || []); }, [fetched]);
+  useEffect(() => { setArticles(fetched || []); }, [fetched]);
 
-  const addProject = async (newProj) => {
-    let ownerId = 201;
-    try {
-      const userStr = localStorage.getItem('user');
-      if (userStr) { const u = JSON.parse(userStr); if (u.id) ownerId = u.id; }
-    } catch (e) {}
-
+  const addArticle = async (newArticle) => {
     const payload = {
-      title: newProj.title, description: newProj.description,
-      projectStatus: newProj.projectStatus, projectVisibility: newProj.projectVisibility,
-      ownerId,
-      coverImageUrl: newProj.coverImageUrl || "", repoUrl: newProj.repoUrl || "",
-      field: newProj.field, mainTags: newProj.mainTags, subTags: newProj.subTags,
-      sdgGoals: newProj.sdgGoals, nst2Goals: newProj.nst2Goals,
-      additionalMediaUrls: newProj.additionalMediaUrls,
-      startDate: new Date().toISOString().split('T')[0],
-      endDate: new Date().toISOString().split('T')[0]
+      title: newArticle.title,
+      content: newArticle.content,
+      visibility: newArticle.visibility,
+      coverImageUrl: newArticle.coverImageUrl || "",
+      relatedUrls: newArticle.relatedUrls,
+      additionalMediaUrls: newArticle.additionalMediaUrls,
     };
 
-    try { await addProjectMutation(payload).unwrap(); } catch (e) { console.error(e); }
+    try { await addArticleMutation(payload).unwrap(); } catch (e) { console.error(e); }
     setIsModalOpen(false);
   };
 
-  const filteredProjects = useMemo(() => {
-    return projects.filter(p => {
-      const matchesSearch = (p.title || "").toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            (p.description || "").toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCat = activeCategory === 'All' || p.field === activeCategory;
+  const filteredArticles = useMemo(() => {
+    return articles.filter(a => {
+      const matchesSearch = (a.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            (a.content || "").toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCat = activeCategory === 'All' || a.field === activeCategory;
       return matchesSearch && matchesCat;
     });
-  }, [searchQuery, activeCategory, projects]);
+  }, [searchQuery, activeCategory, articles]);
+
+  const ArticleCard = ({ article }) => {
+    return (
+      <div className="bg-white rounded-2xl border border-[var(--border)] overflow-hidden hover:shadow-lg hover:shadow-gray-100 transition-all group">
+        <div className="relative h-48 bg-[var(--bg)] overflow-hidden">
+          {article.coverImageUrl ? (
+            <img src={article.coverImageUrl} alt={article.title} className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-[var(--text-muted)]">
+              <span className="text-xs font-semibold uppercase">Article</span>
+            </div>
+          )}
+        </div>
+
+        <div className="p-5">
+          <h3 className="text-base font-bold text-[var(--text)] mb-1.5 group-hover:text-[var(--primary)] transition-colors line-clamp-1" style={{ fontFamily: 'var(--font-heading)' }}>
+            {article.title}
+          </h3>
+          <p className="text-xs text-[var(--text-muted)] leading-relaxed line-clamp-3 mb-4">{article.content}</p>
+
+          {!!(article.relatedUrls || []).length && (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {(article.relatedUrls || []).slice(0, 2).map((url) => (
+                <span key={url} className="text-[10px] font-semibold text-[var(--primary)] bg-[var(--primary)]/6 px-2 py-0.5 rounded-md">Link</span>
+              ))}
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-3 border-t border-[var(--border)]">
+            <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
+              {(article.visibility || 'PUBLIC').toString()}
+            </div>
+            <span className="text-xs font-semibold text-[var(--primary)] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              Read
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
-      <PublicHero projects={projects.slice(0, 5)} />
+      <PublicHero projects={[]} />
 
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
             <p className="text-sm font-semibold text-[var(--primary)] mb-1 uppercase tracking-wider">Discovery</p>
-            <h2 className="text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>All Projects</h2>
+            <h2 className="text-3xl font-extrabold tracking-tight" style={{ fontFamily: 'var(--font-heading)' }}>All Articles</h2>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative w-full md:w-72">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" size={16} />
-              <input type="text" placeholder="Search projects..." value={searchQuery}
+              <input type="text" placeholder="Search articles..." value={searchQuery}
                 className="input-field w-full rounded-lg py-2.5 pl-10 pr-4 text-sm"
                 onChange={(e) => setSearchQuery(e.target.value)} />
             </div>
@@ -81,22 +111,22 @@ export default function PublicDiscoveryPage() {
         <TechTrends />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-          {filteredProjects.map(proj => (
-            <Link href={`/projects/${proj.id}`} key={proj.id} className="block group">
-              <PublicProjectCard project={proj} />
-            </Link>
+          {filteredArticles.map(article => (
+            <div key={article.id} className="block group">
+              <ArticleCard article={article} />
+            </div>
           ))}
         </div>
 
-        {filteredProjects.length === 0 && (
+        {filteredArticles.length === 0 && (
           <div className="py-20 text-center">
-            <p className="text-lg font-bold text-[var(--text)] mb-1" style={{ fontFamily: 'var(--font-heading)' }}>No projects found</p>
+            <p className="text-lg font-bold text-[var(--text)] mb-1" style={{ fontFamily: 'var(--font-heading)' }}>No articles found</p>
             <p className="text-sm text-[var(--text-muted)]">Try adjusting your search or filters.</p>
           </div> 
         )}
       </div>
 
-      <NewProjectModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddProject={addProject} />
+      <NewArticleModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAddArticle={addArticle} />
     </div>
   );
 }
