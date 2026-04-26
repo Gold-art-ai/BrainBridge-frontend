@@ -1,6 +1,7 @@
 package com.learn.brainbridge.controllers;
 
 import com.learn.brainbridge.dtos.ProjectDTO;
+import com.learn.brainbridge.dtos.ProjectResponseDTO;
 import com.learn.brainbridge.entity.Projects;
 import com.learn.brainbridge.entity.User;
 import com.learn.brainbridge.repository.UserRepository;
@@ -106,45 +107,117 @@ public class ProjectsController {
                     .status(HttpStatus.NOT_FOUND)
                     .body("No projects found");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(projects);
+        
+        // Convert to DTOs to avoid Hibernate serialization issues
+        List<ProjectResponseDTO> projectDTOs = projects.stream()
+            .map(p -> new ProjectResponseDTO(
+                p.getId(),
+                p.getTitle(),
+                p.getDescription(),
+                p.getProjectStatus(),
+                p.getProjectVisibility(),
+                p.getOwnerId(),
+                p.getTeamId(),
+                p.getSourceIdeaId(),
+                p.getCoverImageUrl(),
+                p.getRepoUrl(),
+                p.getStartDate(),
+                p.getEndDate(),
+                p.getViewCount(),
+                p.getEnterpriseRequests(),
+                p.getField(),
+                p.getMainTags() != null ? new java.util.ArrayList<>(p.getMainTags()) : new java.util.ArrayList<>(),
+                p.getSubTags() != null ? new java.util.ArrayList<>(p.getSubTags()) : new java.util.ArrayList<>(),
+                p.getSdgGoals() != null ? new java.util.ArrayList<>(p.getSdgGoals()) : new java.util.ArrayList<>(),
+                p.getNst2Goals() != null ? new java.util.ArrayList<>(p.getNst2Goals()) : new java.util.ArrayList<>(),
+                p.getAdditionalMediaUrls() != null ? new java.util.ArrayList<>(p.getAdditionalMediaUrls()) : new java.util.ArrayList<>(),
+                p.getCreatedAt(),
+                p.getUpdatedAt()
+            ))
+            .collect(java.util.stream.Collectors.toList());
+        
+        return ResponseEntity.status(HttpStatus.OK).body(projectDTOs);
     }
 
     @GetMapping("/my")
-    @Transactional(readOnly = true)
-    public ResponseEntity<?> getMyProjects(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()
-                || "anonymousUser".equals(authentication.getName())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(java.util.Map.of("error", "Unauthorized"));
+        @Transactional(readOnly = true)
+        public ResponseEntity<?> getMyProjects(Authentication authentication) {
+            log.info("=== Get My Projects Request ===");
+            log.info("  Authentication: {}", authentication);
+            log.info("  Principal: {}", authentication != null ? authentication.getName() : "NULL");
+
+            if (authentication == null || !authentication.isAuthenticated()
+                    || "anonymousUser".equals(authentication.getName())) {
+                log.warn("  REJECTED: No valid authentication");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(java.util.Map.of("error", "Unauthorized"));
+            }
+
+            String principalName = authentication.getName();
+            log.info("  Looking up user by email/username: {}", principalName);
+
+            // Try to resolve the current user by email first, then by username
+            User user = userRepository.findByEmail(principalName)
+                    .orElseGet(() -> userRepository.findByUsername(principalName).orElse(null));
+
+            if (user == null) {
+                log.warn("  REJECTED: User not found for principal: {}", principalName);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            }
+
+            log.info("  User found: {} (ID: {})", user.getUsername(), user.getId());
+
+            Integer ownerId;
+            try {
+                ownerId = Math.toIntExact(user.getId());
+            } catch (ArithmeticException ex) {
+                log.error("  User ID too large: {}", user.getId());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("User ID is too large to map to project owner id");
+            }
+
+            try {
+                log.info("  Fetching projects for owner ID: {}", ownerId);
+                List<Projects> projects = service.getProjectsByOwner(ownerId);
+                log.info("  Found {} projects", projects.size());
+                
+                // Convert to DTOs to avoid Hibernate serialization issues
+                List<ProjectResponseDTO> projectDTOs = projects.stream()
+                    .map(p -> new ProjectResponseDTO(
+                        p.getId(),
+                        p.getTitle(),
+                        p.getDescription(),
+                        p.getProjectStatus(),
+                        p.getProjectVisibility(),
+                        p.getOwnerId(),
+                        p.getTeamId(),
+                        p.getSourceIdeaId(),
+                        p.getCoverImageUrl(),
+                        p.getRepoUrl(),
+                        p.getStartDate(),
+                        p.getEndDate(),
+                        p.getViewCount(),
+                        p.getEnterpriseRequests(),
+                        p.getField(),
+                        p.getMainTags() != null ? new java.util.ArrayList<>(p.getMainTags()) : new java.util.ArrayList<>(),
+                        p.getSubTags() != null ? new java.util.ArrayList<>(p.getSubTags()) : new java.util.ArrayList<>(),
+                        p.getSdgGoals() != null ? new java.util.ArrayList<>(p.getSdgGoals()) : new java.util.ArrayList<>(),
+                        p.getNst2Goals() != null ? new java.util.ArrayList<>(p.getNst2Goals()) : new java.util.ArrayList<>(),
+                        p.getAdditionalMediaUrls() != null ? new java.util.ArrayList<>(p.getAdditionalMediaUrls()) : new java.util.ArrayList<>(),
+                        p.getCreatedAt(),
+                        p.getUpdatedAt()
+                    ))
+                    .collect(java.util.stream.Collectors.toList());
+                
+                log.info("  Converted to {} DTOs", projectDTOs.size());
+                return ResponseEntity.status(HttpStatus.OK).body(projectDTOs);
+            } catch (Exception ex) {
+                log.error("  ERROR fetching projects: {}", ex.getMessage(), ex);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(java.util.Map.of("error", "Failed to load your projects: " + ex.getMessage()));
+            }
         }
 
-        String principalName = authentication.getName();
-
-        // Try to resolve the current user by email first, then by username
-        User user = userRepository.findByEmail(principalName)
-                .orElseGet(() -> userRepository.findByUsername(principalName).orElse(null));
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-
-        Integer ownerId;
-        try {
-            ownerId = Math.toIntExact(user.getId());
-        } catch (ArithmeticException ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("User ID is too large to map to project owner id");
-        }
-
-        try {
-            List<Projects> projects = service.getProjectsByOwner(ownerId);
-            return ResponseEntity.status(HttpStatus.OK).body(projects);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to load your projects: " + ex.getMessage());
-        }
-    }
 
     @PutMapping("/update")
     public ResponseEntity<?> updateProject(@Valid @RequestBody ProjectDTO projectDTO) {
@@ -187,7 +260,36 @@ public class ProjectsController {
         if (projects.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No projects found for team " + teamName);
         }
-        return ResponseEntity.status(HttpStatus.OK).body(projects);
+        
+        // Convert to DTOs to avoid Hibernate serialization issues
+        List<ProjectResponseDTO> projectDTOs = projects.stream()
+            .map(p -> new ProjectResponseDTO(
+                p.getId(),
+                p.getTitle(),
+                p.getDescription(),
+                p.getProjectStatus(),
+                p.getProjectVisibility(),
+                p.getOwnerId(),
+                p.getTeamId(),
+                p.getSourceIdeaId(),
+                p.getCoverImageUrl(),
+                p.getRepoUrl(),
+                p.getStartDate(),
+                p.getEndDate(),
+                p.getViewCount(),
+                p.getEnterpriseRequests(),
+                p.getField(),
+                p.getMainTags() != null ? new java.util.ArrayList<>(p.getMainTags()) : new java.util.ArrayList<>(),
+                p.getSubTags() != null ? new java.util.ArrayList<>(p.getSubTags()) : new java.util.ArrayList<>(),
+                p.getSdgGoals() != null ? new java.util.ArrayList<>(p.getSdgGoals()) : new java.util.ArrayList<>(),
+                p.getNst2Goals() != null ? new java.util.ArrayList<>(p.getNst2Goals()) : new java.util.ArrayList<>(),
+                p.getAdditionalMediaUrls() != null ? new java.util.ArrayList<>(p.getAdditionalMediaUrls()) : new java.util.ArrayList<>(),
+                p.getCreatedAt(),
+                p.getUpdatedAt()
+            ))
+            .collect(java.util.stream.Collectors.toList());
+        
+        return ResponseEntity.status(HttpStatus.OK).body(projectDTOs);
     }
 
     @GetMapping("/fetch/{id}")
@@ -196,7 +298,35 @@ public class ProjectsController {
         if (project.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No projects found");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(project.get());
+        
+        // Convert to DTO to avoid Hibernate serialization issues
+        Projects p = project.get();
+        ProjectResponseDTO projectDTO = new ProjectResponseDTO(
+            p.getId(),
+            p.getTitle(),
+            p.getDescription(),
+            p.getProjectStatus(),
+            p.getProjectVisibility(),
+            p.getOwnerId(),
+            p.getTeamId(),
+            p.getSourceIdeaId(),
+            p.getCoverImageUrl(),
+            p.getRepoUrl(),
+            p.getStartDate(),
+            p.getEndDate(),
+            p.getViewCount(),
+            p.getEnterpriseRequests(),
+            p.getField(),
+            p.getMainTags() != null ? new java.util.ArrayList<>(p.getMainTags()) : new java.util.ArrayList<>(),
+            p.getSubTags() != null ? new java.util.ArrayList<>(p.getSubTags()) : new java.util.ArrayList<>(),
+            p.getSdgGoals() != null ? new java.util.ArrayList<>(p.getSdgGoals()) : new java.util.ArrayList<>(),
+            p.getNst2Goals() != null ? new java.util.ArrayList<>(p.getNst2Goals()) : new java.util.ArrayList<>(),
+            p.getAdditionalMediaUrls() != null ? new java.util.ArrayList<>(p.getAdditionalMediaUrls()) : new java.util.ArrayList<>(),
+            p.getCreatedAt(),
+            p.getUpdatedAt()
+        );
+        
+        return ResponseEntity.status(HttpStatus.OK).body(projectDTO);
     }
 
     @DeleteMapping("/remove/{id}")
