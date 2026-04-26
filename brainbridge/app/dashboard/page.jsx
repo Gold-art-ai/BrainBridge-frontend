@@ -37,37 +37,35 @@ export default function DashboardPage() {
   }, [searchQuery, activeField, projects]);
 
   const addProject = async (newProj) => {
-    let ownerId = 201;
-    try {
-      const userStr = localStorage.getItem('user');
-      if (userStr) {
-        const userObj = JSON.parse(userStr);
-        if (userObj.id) ownerId = userObj.id;
-      }
-    } catch (e) {}
+    console.log('[Dashboard] addProject called with:', newProj);
 
     const payload = {
       title: newProj.title,
       description: newProj.description,
       projectStatus: newProj.projectStatus,
       projectVisibility: newProj.projectVisibility,
-      ownerId: ownerId,
       coverImageUrl: newProj.coverImageUrl || "",
       repoUrl: newProj.repoUrl || "",
       field: newProj.field,
-      mainTags: newProj.mainTags,
-      subTags: newProj.subTags,
-      sdgGoals: newProj.sdgGoals,
-      nst2Goals: newProj.nst2Goals,
-      additionalMediaUrls: newProj.additionalMediaUrls,
+      mainTags: newProj.mainTags || [],
+      subTags: newProj.subTags || [],
+      sdgGoals: newProj.sdgGoals || [],
+      nst2Goals: newProj.nst2Goals || [],
+      additionalMediaUrls: newProj.additionalMediaUrls || [],
       startDate: new Date().toISOString().split('T')[0],
       endDate: new Date().toISOString().split('T')[0]
     };
 
+    console.log('[Dashboard] Sending payload to API:', payload);
+
     try {
-      await addProjectMutation(payload).unwrap();
+      const result = await addProjectMutation(payload).unwrap();
+      console.log('[Dashboard] Project created successfully:', result);
     } catch (e) {
-      console.error('Add project failed', e);
+      console.error('[Dashboard] Add project failed:', e);
+      console.error('[Dashboard] Error status:', e.status);
+      console.error('[Dashboard] Error data:', e.data);
+      alert(`Failed to create project: ${e.data?.message || e.data?.error || e.message || 'Unknown error'}`);
     }
     setIsModalOpen(false);
   };
@@ -84,7 +82,6 @@ export default function DashboardPage() {
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
-
         <button onClick={() => setIsModalOpen(true)}
           className="btn-primary px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 w-fit">
           <Plus size={16} /> New Project

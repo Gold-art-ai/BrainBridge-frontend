@@ -11,7 +11,7 @@ export const projectsApi = apiSlice.injectEndpoints({
       providesTags: ['Projects']
     }),
     getMyProjects: builder.query({
-      // User-specific endpoints hit Backend 2 (8080) because it implements User linkage
+      // User-specific endpoints hit Backend 2 (8081) because it implements User linkage
       query: () => ({ url: '/projects/my' }),
       providesTags: ['Projects']
     }),

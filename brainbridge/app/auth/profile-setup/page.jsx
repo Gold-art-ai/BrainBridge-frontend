@@ -2,18 +2,17 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUploadProfilePictureMutation } from '../../redux/api/UserApiSlice';
 import { Upload, User, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ProfileSetupPage() {
   const router = useRouter();
   const fileInputRef = useRef(null);
-  const [uploadProfilePicture, { isLoading }] = useUploadProfilePictureMutation();
   
   const [preview, setPreview] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
@@ -48,14 +47,46 @@ export default function ProfileSetupPage() {
       return;
     }
 
+    const token = localStorage.getItem('token');
+    console.log('[ProfileSetup] Token:', token ? `${token.substring(0, 20)}...` : 'MISSING');
+
+    if (!token) {
+      setError('Session expired. Please log in again.');
+      router.push('/auth/login');
+      return;
+    }
+
+    setIsUploading(true);
+    setError('');
+
     const formData = new FormData();
     formData.append('file', selectedFile);
 
     try {
-      await uploadProfilePicture(formData).unwrap();
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8081';
+      const res = await fetch(`${apiUrl}/api/users/me/profile-picture`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Do NOT set Content-Type — browser sets it with the correct boundary for multipart
+        },
+        body: formData,
+      });
+
+      console.log('[ProfileSetup] Response status:', res.status);
+      const data = await res.json();
+      console.log('[ProfileSetup] Response data:', data);
+
+      if (!res.ok) {
+        throw new Error(data.error || data.message || `Upload failed (${res.status})`);
+      }
+
       router.push('/dashboard');
     } catch (err) {
-      setError(err.data?.error || 'Failed to upload profile picture');
+      console.error('[ProfileSetup] Upload error:', err);
+      setError(err.message || 'Failed to upload profile picture');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -118,10 +149,10 @@ export default function ProfileSetupPage() {
         <div className="space-y-3">
           <button
             onClick={handleUpload}
-            disabled={!selectedFile || isLoading}
+            disabled={!selectedFile || isUploading}
             className="btn-primary w-full py-3.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? (
+            {isUploading ? (
               'Uploading...'
             ) : (
               <>
@@ -133,7 +164,7 @@ export default function ProfileSetupPage() {
 
           <button
             onClick={handleSkip}
-            disabled={isLoading}
+            disabled={isUploading}
             className="w-full py-3.5 rounded-xl font-semibold text-sm text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg)] transition-colors flex items-center justify-center gap-2"
           >
             Skip for now <ArrowRight size={16} />

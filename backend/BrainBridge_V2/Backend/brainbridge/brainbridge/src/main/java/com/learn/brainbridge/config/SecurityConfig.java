@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(
-                                "/api-docs/**", 
+                                "/api-docs/**",
                                 "/api/users/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
@@ -38,6 +38,9 @@ public class SecurityConfig {
                                 "/health",
                                 "/ws/**"
                         ).permitAll()
+                        // Public read-only project endpoints
+                        .requestMatchers(HttpMethod.GET, "/projects/all", "/projects/fetch/**", "/projects/team/**").permitAll()
+                        // All other project endpoints (POST, PUT, DELETE) require auth
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -1542,6 +1542,13 @@
     overflow: hidden;
   }
 
+  .line-clamp-3 {
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    overflow: hidden;
+  }
+
   .block {
     display: block;
   }
@@ -4132,6 +4139,12 @@
   @media (hover: hover) {
     .hover\:border-\[\#FFA726\]:hover {
       border-color: #ffa726;
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:border-\[var\(--accent\)\]:hover {
+      border-color: var(--accent);
     }
   }
 

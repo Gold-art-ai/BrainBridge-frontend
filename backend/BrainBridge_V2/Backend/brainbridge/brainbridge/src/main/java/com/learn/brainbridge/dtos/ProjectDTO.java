@@ -45,8 +45,6 @@ public class ProjectDTO {
     @JsonProperty("projectVisibility")
     private ProjectVisibility projectVisibility;
 
-    @NotNull
-    @Positive
     @Schema(description = "Owner id", example = "101")
     @JsonProperty("ownerId")
     private Integer ownerId;

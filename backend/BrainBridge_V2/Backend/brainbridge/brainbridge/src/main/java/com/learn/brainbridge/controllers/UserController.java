@@ -18,6 +18,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,15 +49,11 @@ import java.util.List;
  * 9. HttpStatus - HTTP status codes (OK, CREATED, NOT_FOUND, etc.)
  */
 @RestController
-@RequestMapping("/api/users") // All endpoints start with /api/users
+@RequestMapping("/api/users")
 @Tag(name = "Users", description = "API endpoints for managing users and authentication")
 public class UserController {
 
-    /**
-     * @Autowired - Spring injects UserService automatically
-     * Controller depends on Service, Service depends on Repository
-     * This is the "layered architecture" pattern
-     */
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private UserService userService;
 
@@ -81,15 +79,24 @@ public class UserController {
     @PostMapping("/register")
     @Operation(summary = "Register a new user", description = "Creates a new user account with email, username, and password.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User registered successfully",
-                    content = @Content(schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "201", description = "User registered successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid input or email/username already exists"),
             @ApiResponse(responseCode = "500", description="Internal Server Error")
     })
-    public ResponseEntity<ApiResponses1<UserDTO>> registerUser(
+    public ResponseEntity<ApiResponses1<AuthResponseDTO>> registerUser(
             @Valid @RequestBody RegisterUserDTO registerUserDTO) {
-        // For now we ignore profileImage and pass null; you can extend this later for file upload
-        ApiResponses1<UserDTO> response = userService.registerUser(registerUserDTO, null);
+        ApiResponses1<UserDTO> userResponse = userService.registerUser(registerUserDTO, null);
+        UserDTO user = userResponse.getData();
+
+        // Issue a JWT immediately so the frontend can call authenticated endpoints
+        // (e.g. profile-picture upload) without requiring a separate login step
+        String subject = (user.getEmail() != null && !user.getEmail().isEmpty())
+                ? user.getEmail()
+                : user.getUsername();
+        String token = jwtUtil.generateToken(subject);
+
+        AuthResponseDTO payload = new AuthResponseDTO(token, user);
+        ApiResponses1<AuthResponseDTO> response = new ApiResponses1<>(true, "User registered successfully", payload);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -286,8 +293,17 @@ public class UserController {
             @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
             Authentication authentication) {
         
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        log.info("=== Profile Picture Upload Request ===");
+        log.info("  Authentication: {}", authentication);
+        log.info("  Principal: {}", authentication != null ? authentication.getName() : "NULL");
+        log.info("  File: {}", file != null ? file.getOriginalFilename() + " (" + file.getSize() + " bytes)" : "NULL");
+
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            log.warn("  REJECTED: No valid authentication. Principal={}",
+                    authentication != null ? authentication.getName() : "NULL");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(java.util.Map.of("error", "Unauthorized - please log in"));
         }
 
         if (file.isEmpty()) {

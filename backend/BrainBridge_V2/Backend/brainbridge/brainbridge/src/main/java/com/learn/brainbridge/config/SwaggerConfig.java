@@ -29,7 +29,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI brainBridgeOpenAPI() {
         Server devServer = new Server();
-        devServer.setUrl("http://localhost:8080");
+        devServer.setUrl("http://localhost:8081");
         devServer.setDescription("Development Server");
 
         Server prodServer = new Server();
@@ -67,7 +67,7 @@ public class SwaggerConfig {
     public GroupedOpenApi publicApi() {
         return GroupedOpenApi.builder()
                 .group("default")
-                .pathsToMatch("/api/**")
+                .pathsToMatch("/api/**", "/projects/**", "/messages/**", "/notifications/**", "/favorites/**")
                 .build();
     }
 }
