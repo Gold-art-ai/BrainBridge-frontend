@@ -30,6 +30,10 @@ public class ArticleDTO {
     @JsonProperty("content")
     private String content;
 
+    @Schema(description = "Field/discipline", example = "Healthcare")
+    @JsonProperty("field")
+    private String field;
+
     @NotNull
     @Schema(description = "Article visibility", example = "PUBLIC")
     @JsonProperty("visibility")
@@ -76,6 +80,14 @@ public class ArticleDTO {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public void setField(String field) {
+        this.field = field;
     }
 
     public ProjectVisibility getVisibility() {

@@ -30,6 +30,9 @@ public class Article {
     @Column(nullable = false, columnDefinition = "TEXT", name = "content")
     private String content;
 
+    @Column(nullable = true, name = "field")
+    private String field;
+
     @Column(nullable = false, name = "owner_id")
     private Long ownerId;
 
@@ -98,6 +101,14 @@ public class Article {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getField() {
+        return field;
+    }
+
+    public void setField(String field) {
+        this.field = field;
     }
 
     public Long getOwnerId() {

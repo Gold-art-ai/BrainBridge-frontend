@@ -33,4 +33,8 @@ public class ArticlesService {
     public Optional<Article> getArticleById(Long id) {
         return repo.findById(id);
     }
+
+    public void deleteArticle(Long id) {
+        repo.deleteById(id);
+    }
 }

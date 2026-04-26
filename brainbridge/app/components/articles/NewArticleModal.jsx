@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Upload, Plus, Trash2 } from 'lucide-react';
+import { FIELDS } from '../../utils/taxonomy';
 
 export default function NewArticleModal({ isOpen, onClose, onAddArticle }) {
   const [mounted, setMounted] = useState(false);
@@ -12,6 +13,7 @@ export default function NewArticleModal({ isOpen, onClose, onAddArticle }) {
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [field, setField] = useState('');
   const [visibility, setVisibility] = useState('PUBLIC');
 
   const [relatedUrls, setRelatedUrls] = useState(['']);
@@ -60,6 +62,7 @@ export default function NewArticleModal({ isOpen, onClose, onAddArticle }) {
     setCoverBase64(null);
     setTitle('');
     setContent('');
+    setField('');
     setVisibility('PUBLIC');
     setRelatedUrls(['']);
     setAdditionalMediaPreviews([]);
@@ -76,6 +79,7 @@ export default function NewArticleModal({ isOpen, onClose, onAddArticle }) {
     onAddArticle({
       title,
       content,
+      field,
       visibility,
       coverImageUrl: coverBase64 || coverPreview,
       relatedUrls: relatedUrls.map(u => u.trim()).filter(Boolean),
@@ -132,6 +136,15 @@ export default function NewArticleModal({ isOpen, onClose, onAddArticle }) {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1.5">Field</label>
+                <select value={field} onChange={(e) => setField(e.target.value)} className="input-field w-full rounded-xl py-2.5 px-3 text-sm">
+                  <option value="">Select field...</option>
+                  {FIELDS.map((f) => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1.5">Visibility</label>
                 <select value={visibility} onChange={(e) => setVisibility(e.target.value)} className="input-field w-full rounded-xl py-2.5 px-3 text-sm">

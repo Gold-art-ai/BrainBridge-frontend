@@ -22,6 +22,7 @@ export default function PublicDiscoveryPage() {
     const payload = {
       title: newArticle.title,
       content: newArticle.content,
+      field: newArticle.field,
       visibility: newArticle.visibility,
       coverImageUrl: newArticle.coverImageUrl || "",
       relatedUrls: newArticle.relatedUrls,
@@ -58,6 +59,11 @@ export default function PublicDiscoveryPage() {
           <h3 className="text-base font-bold text-[var(--text)] mb-1.5 group-hover:text-[var(--primary)] transition-colors line-clamp-1" style={{ fontFamily: 'var(--font-heading)' }}>
             {article.title}
           </h3>
+          {!!article.field && (
+            <p className="text-[10px] text-gray-400 font-medium uppercase tracking-tight -mt-1 mb-2">
+              {article.field}
+            </p>
+          )}
           <p className="text-xs text-[var(--text-muted)] leading-relaxed line-clamp-3 mb-4">{article.content}</p>
 
           {!!(article.relatedUrls || []).length && (
@@ -72,9 +78,9 @@ export default function PublicDiscoveryPage() {
             <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
               {(article.visibility || 'PUBLIC').toString()}
             </div>
-            <span className="text-xs font-semibold text-[var(--primary)] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Link href={`/articles/${article.id}`} className="text-xs font-semibold text-[var(--primary)] flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               Read
-            </span>
+            </Link>
           </div>
         </div>
       </div>

@@ -23,7 +23,7 @@ export default function PublicHero({ projects = [] }) {
             Browse deep dives, guides, and updates from the community. Find inspiration, collaborate, and build the future.
           </p>
           <div className="flex gap-4">
-            <Link href="/auth/signup" className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold">
+            <Link href="/dashboard/articles" className="btn-primary inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold">
               Start Sharing <ArrowRight size={16} />
             </Link>
           </div>
