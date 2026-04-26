@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useGetProjectByIdQuery } from '../../redux/api/ProjectsApiSlice';
+import { useGetProjectByIdQuery, useIncrementViewCountMutation } from '../../redux/api/ProjectsApiSlice';
 import { useSendMessageMutation } from '../../redux/api/MessagesApiSlice';
-import { ArrowLeft, MessageSquare, Share2, Terminal, Activity } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Share2, Terminal, Activity, Eye } from 'lucide-react';
 import Link from 'next/link';
 import ProjectView from "../../components/projects/ProjectView"; 
 
@@ -12,6 +12,7 @@ export default function ProjectPage() {
   const router = useRouter();
   const [project, setProject] = useState(null);
   const { data: fetchedProject } = useGetProjectByIdQuery(id, { skip: !id });
+  const [incrementViewCount] = useIncrementViewCountMutation();
   const [sendMessage] = useSendMessageMutation();
 
   const [user, setUser] = useState(null);
@@ -23,7 +24,8 @@ export default function ProjectPage() {
   }, []);
 
   useEffect(() => {
-    if (fetchedProject) {
+    if (fetchedProject && !isNaN(Number(id))) {
+      incrementViewCount(id);
       setProject(fetchedProject);
       return;
     }
@@ -118,11 +120,14 @@ export default function ProjectPage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-2 border-b border-white/10">
                   <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Architect</span>
-                  <span className="text-xs font-black">{project.creator}</span>
+                  <span className="text-xs font-black">{project.ownerName || project.creator}</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-white/10">
-                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Visibility</span>
-                  <span className="text-xs font-black text-blue-400 uppercase tracking-widest">Global Node</span>
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">System Load</span>
+                  <div className="flex items-center gap-1.5">
+                    <Eye size={12} className="text-blue-300" />
+                    <span className="text-xs font-black">{project.viewCount || 0} Views</span>
+                  </div>
                 </div>
                 <div className="flex justify-between items-center py-2">
                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Verified</span>

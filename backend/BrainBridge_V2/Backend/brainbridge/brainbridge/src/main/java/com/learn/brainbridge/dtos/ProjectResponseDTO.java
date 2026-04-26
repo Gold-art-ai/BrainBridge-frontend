@@ -67,6 +67,12 @@ public class ProjectResponseDTO {
     @JsonProperty("additionalMediaUrls")
     private List<String> additionalMediaUrls;
 
+    @JsonProperty("ownerName")
+    private String ownerName;
+
+    @JsonProperty("likesCount")
+    private Long likesCount;
+
     @JsonProperty("createdAt")
     private LocalDate createdAt;
 
@@ -81,7 +87,8 @@ public class ProjectResponseDTO {
             String coverImageUrl, String repoUrl, LocalDate startDate, LocalDate endDate,
             Integer viewCount, Integer enterpriseRequests, String field, List<String> mainTags,
             List<String> subTags, List<String> sdgGoals, List<String> nst2Goals,
-            List<String> additionalMediaUrls, LocalDate createdAt, LocalDate updatedAt) {
+            List<String> additionalMediaUrls, LocalDate createdAt, LocalDate updatedAt,
+            String ownerName, Long likesCount) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -104,6 +111,8 @@ public class ProjectResponseDTO {
         this.additionalMediaUrls = additionalMediaUrls;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.ownerName = ownerName;
+        this.likesCount = likesCount;
     }
 
     // Getters and Setters
@@ -172,4 +181,10 @@ public class ProjectResponseDTO {
 
     public LocalDate getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDate updatedAt) { this.updatedAt = updatedAt; }
+
+    public String getOwnerName() { return ownerName; }
+    public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
+
+    public Long getLikesCount() { return likesCount; }
+    public void setLikesCount(Long likesCount) { this.likesCount = likesCount; }
 }

@@ -1,14 +1,13 @@
 // FeedPost.jsx
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Heart, MessageCircle, Share2, Bookmark } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Bookmark, Activity } from 'lucide-react';
 import RecommendationBadge from './RecommendationBadge';
 
 export default function FeedPost({ project, recommendationReason }) {
   const [isLiked, setIsLiked] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  // Default mock behavior for engagement
-  const [likesCount, setLikesCount] = useState(Math.floor(Math.random() * 50) + 5);
+  const [likesCount, setLikesCount] = useState(project.likesCount || 0);
 
   const tags =
     (project.mainTags && project.mainTags.length > 0)
@@ -18,15 +17,18 @@ export default function FeedPost({ project, recommendationReason }) {
         : (project.field ? [project.field] : []);
 
   const handleLike = () => {
+    // Note: Actual like/favorite API call should be here, but using local toggle for now
     setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
     setIsLiked(!isLiked);
   };
 
   const handleSave = () => setIsSaved(!isSaved);
 
-  const authorName = project.creator || "Anonymous Developer";
+  const authorName = project.ownerName || "Anonymous Developer";
   const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random&color=fff`;
-  const timeAgo = Math.floor(Math.random() * 5) + 1 + " hours ago";
+  
+  // Format creation date
+  const timeAgo = project.createdAt ? new Date(project.createdAt).toLocaleDateString() : "Recent";
 
   // Provide high-quality default images if backend lacks one
   const coverUrl = project.coverImageUrl || "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop";
@@ -45,9 +47,10 @@ export default function FeedPost({ project, recommendationReason }) {
             <p className="text-[9px] text-gray-400 font-bold uppercase tracking-[0.2em]">{timeAgo}</p>
           </div>
         </div>
-        <button className="text-[10px] font-black tracking-widest uppercase text-[var(--primary)] bg-[var(--primary)]/10 hover:bg-[var(--primary)]/20 px-4 py-2 rounded-xl transition-all active:scale-95">
-          Follow
-        </button>
+        <div className="flex items-center gap-2 text-gray-400">
+           <Activity size={14} className="text-gray-300" />
+           <span className="text-[10px] font-bold uppercase tracking-widest">{project.viewCount || 0} Views</span>
+        </div>
       </div>
 
       {/* Media Box */}

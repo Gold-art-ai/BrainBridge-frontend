@@ -189,7 +189,22 @@ public class ArticlesController {
     @GetMapping("/{id}/comments")
     public ResponseEntity<?> getComments(@PathVariable("id") Long id) {
         List<ArticleComment> comments = articleCommentRepository.findByArticleIdOrderByCreatedAtDesc(id);
-        return ResponseEntity.ok(comments);
+        List<com.learn.brainbridge.dtos.ArticleCommentResponseDTO> dtos = comments.stream().map(c -> {
+            com.learn.brainbridge.dtos.ArticleCommentResponseDTO dto = new com.learn.brainbridge.dtos.ArticleCommentResponseDTO();
+            dto.setId(c.getId());
+            dto.setArticleId(c.getArticleId());
+            dto.setUserId(c.getUserId());
+            dto.setContent(c.getContent());
+            dto.setCreatedAt(c.getCreatedAt());
+            
+            userRepository.findById(c.getUserId()).ifPresent(u -> {
+                dto.setUserName(u.getUsername());
+            });
+            
+            return dto;
+        }).toList();
+        
+        return ResponseEntity.ok(dtos);
     }
 
     @PostMapping("/{id}/comments")
@@ -205,6 +220,16 @@ public class ArticlesController {
 
         ArticleComment comment = new ArticleComment(id, user.getId(), dto.getContent());
         ArticleComment saved = articleCommentRepository.save(comment);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+        
+        com.learn.brainbridge.dtos.ArticleCommentResponseDTO response = new com.learn.brainbridge.dtos.ArticleCommentResponseDTO();
+        response.setId(saved.getId());
+        response.setArticleId(saved.getArticleId());
+        response.setUserId(saved.getUserId());
+        response.setContent(saved.getContent());
+        response.setCreatedAt(saved.getCreatedAt());
+        
+        response.setUserName(user.getUsername());
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

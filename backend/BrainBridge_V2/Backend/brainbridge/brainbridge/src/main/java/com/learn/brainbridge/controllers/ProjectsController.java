@@ -28,11 +28,17 @@ public class ProjectsController {
     private static final Logger log = LoggerFactory.getLogger(ProjectsController.class);
     private final ProjectsService service;
     private final UserRepository userRepository;
+    private final com.learn.brainbridge.repository.FavoriteRepository favoriteRepository;
 
     @Autowired
-    public ProjectsController(ProjectsService service, UserRepository userRepository) {
+    public ProjectsController(
+            ProjectsService service, 
+            UserRepository userRepository,
+            com.learn.brainbridge.repository.FavoriteRepository favoriteRepository
+    ) {
         this.service = service;
         this.userRepository = userRepository;
+        this.favoriteRepository = favoriteRepository;
     }
 
     @PostMapping("/add")
@@ -99,6 +105,46 @@ public class ProjectsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+    private ProjectResponseDTO mapToDTO(Projects p) {
+        String ownerName = "Anonymous";
+        User user = userRepository.findById(Long.valueOf(p.getOwnerId())).orElse(null);
+        if (user != null) {
+            ownerName = user.getUsername();
+            if (user.getFirstName() != null && !user.getFirstName().isEmpty()) {
+                ownerName = user.getFirstName() + (user.getLastName() != null ? " " + user.getLastName() : "");
+            }
+        }
+
+        long likesCount = favoriteRepository.countByProjectId(p.getId());
+
+        return new ProjectResponseDTO(
+            p.getId(),
+            p.getTitle(),
+            p.getDescription(),
+            p.getProjectStatus(),
+            p.getProjectVisibility(),
+            p.getOwnerId(),
+            p.getTeamId(),
+            p.getSourceIdeaId(),
+            p.getCoverImageUrl(),
+            p.getRepoUrl(),
+            p.getStartDate(),
+            p.getEndDate(),
+            p.getViewCount(),
+            p.getEnterpriseRequests(),
+            p.getField(),
+            p.getMainTags() != null ? new java.util.ArrayList<>(p.getMainTags()) : new java.util.ArrayList<>(),
+            p.getSubTags() != null ? new java.util.ArrayList<>(p.getSubTags()) : new java.util.ArrayList<>(),
+            p.getSdgGoals() != null ? new java.util.ArrayList<>(p.getSdgGoals()) : new java.util.ArrayList<>(),
+            p.getNst2Goals() != null ? new java.util.ArrayList<>(p.getNst2Goals()) : new java.util.ArrayList<>(),
+            p.getAdditionalMediaUrls() != null ? new java.util.ArrayList<>(p.getAdditionalMediaUrls()) : new java.util.ArrayList<>(),
+            p.getCreatedAt(),
+            p.getUpdatedAt(),
+            ownerName,
+            likesCount
+        );
+    }
+
     @GetMapping("/all")
     public ResponseEntity<?> getAllProjects() {
         List<Projects> projects = service.getAllProjects();
@@ -108,32 +154,8 @@ public class ProjectsController {
                     .body("No projects found");
         }
         
-        // Convert to DTOs to avoid Hibernate serialization issues
         List<ProjectResponseDTO> projectDTOs = projects.stream()
-            .map(p -> new ProjectResponseDTO(
-                p.getId(),
-                p.getTitle(),
-                p.getDescription(),
-                p.getProjectStatus(),
-                p.getProjectVisibility(),
-                p.getOwnerId(),
-                p.getTeamId(),
-                p.getSourceIdeaId(),
-                p.getCoverImageUrl(),
-                p.getRepoUrl(),
-                p.getStartDate(),
-                p.getEndDate(),
-                p.getViewCount(),
-                p.getEnterpriseRequests(),
-                p.getField(),
-                p.getMainTags() != null ? new java.util.ArrayList<>(p.getMainTags()) : new java.util.ArrayList<>(),
-                p.getSubTags() != null ? new java.util.ArrayList<>(p.getSubTags()) : new java.util.ArrayList<>(),
-                p.getSdgGoals() != null ? new java.util.ArrayList<>(p.getSdgGoals()) : new java.util.ArrayList<>(),
-                p.getNst2Goals() != null ? new java.util.ArrayList<>(p.getNst2Goals()) : new java.util.ArrayList<>(),
-                p.getAdditionalMediaUrls() != null ? new java.util.ArrayList<>(p.getAdditionalMediaUrls()) : new java.util.ArrayList<>(),
-                p.getCreatedAt(),
-                p.getUpdatedAt()
-            ))
+            .map(this::mapToDTO)
             .collect(java.util.stream.Collectors.toList());
         
         return ResponseEntity.status(HttpStatus.OK).body(projectDTOs);
@@ -183,30 +205,7 @@ public class ProjectsController {
                 
                 // Convert to DTOs to avoid Hibernate serialization issues
                 List<ProjectResponseDTO> projectDTOs = projects.stream()
-                    .map(p -> new ProjectResponseDTO(
-                        p.getId(),
-                        p.getTitle(),
-                        p.getDescription(),
-                        p.getProjectStatus(),
-                        p.getProjectVisibility(),
-                        p.getOwnerId(),
-                        p.getTeamId(),
-                        p.getSourceIdeaId(),
-                        p.getCoverImageUrl(),
-                        p.getRepoUrl(),
-                        p.getStartDate(),
-                        p.getEndDate(),
-                        p.getViewCount(),
-                        p.getEnterpriseRequests(),
-                        p.getField(),
-                        p.getMainTags() != null ? new java.util.ArrayList<>(p.getMainTags()) : new java.util.ArrayList<>(),
-                        p.getSubTags() != null ? new java.util.ArrayList<>(p.getSubTags()) : new java.util.ArrayList<>(),
-                        p.getSdgGoals() != null ? new java.util.ArrayList<>(p.getSdgGoals()) : new java.util.ArrayList<>(),
-                        p.getNst2Goals() != null ? new java.util.ArrayList<>(p.getNst2Goals()) : new java.util.ArrayList<>(),
-                        p.getAdditionalMediaUrls() != null ? new java.util.ArrayList<>(p.getAdditionalMediaUrls()) : new java.util.ArrayList<>(),
-                        p.getCreatedAt(),
-                        p.getUpdatedAt()
-                    ))
+                    .map(this::mapToDTO)
                     .collect(java.util.stream.Collectors.toList());
                 
                 log.info("  Converted to {} DTOs", projectDTOs.size());
@@ -263,30 +262,7 @@ public class ProjectsController {
         
         // Convert to DTOs to avoid Hibernate serialization issues
         List<ProjectResponseDTO> projectDTOs = projects.stream()
-            .map(p -> new ProjectResponseDTO(
-                p.getId(),
-                p.getTitle(),
-                p.getDescription(),
-                p.getProjectStatus(),
-                p.getProjectVisibility(),
-                p.getOwnerId(),
-                p.getTeamId(),
-                p.getSourceIdeaId(),
-                p.getCoverImageUrl(),
-                p.getRepoUrl(),
-                p.getStartDate(),
-                p.getEndDate(),
-                p.getViewCount(),
-                p.getEnterpriseRequests(),
-                p.getField(),
-                p.getMainTags() != null ? new java.util.ArrayList<>(p.getMainTags()) : new java.util.ArrayList<>(),
-                p.getSubTags() != null ? new java.util.ArrayList<>(p.getSubTags()) : new java.util.ArrayList<>(),
-                p.getSdgGoals() != null ? new java.util.ArrayList<>(p.getSdgGoals()) : new java.util.ArrayList<>(),
-                p.getNst2Goals() != null ? new java.util.ArrayList<>(p.getNst2Goals()) : new java.util.ArrayList<>(),
-                p.getAdditionalMediaUrls() != null ? new java.util.ArrayList<>(p.getAdditionalMediaUrls()) : new java.util.ArrayList<>(),
-                p.getCreatedAt(),
-                p.getUpdatedAt()
-            ))
+            .map(this::mapToDTO)
             .collect(java.util.stream.Collectors.toList());
         
         return ResponseEntity.status(HttpStatus.OK).body(projectDTOs);
@@ -300,31 +276,7 @@ public class ProjectsController {
         }
         
         // Convert to DTO to avoid Hibernate serialization issues
-        Projects p = project.get();
-        ProjectResponseDTO projectDTO = new ProjectResponseDTO(
-            p.getId(),
-            p.getTitle(),
-            p.getDescription(),
-            p.getProjectStatus(),
-            p.getProjectVisibility(),
-            p.getOwnerId(),
-            p.getTeamId(),
-            p.getSourceIdeaId(),
-            p.getCoverImageUrl(),
-            p.getRepoUrl(),
-            p.getStartDate(),
-            p.getEndDate(),
-            p.getViewCount(),
-            p.getEnterpriseRequests(),
-            p.getField(),
-            p.getMainTags() != null ? new java.util.ArrayList<>(p.getMainTags()) : new java.util.ArrayList<>(),
-            p.getSubTags() != null ? new java.util.ArrayList<>(p.getSubTags()) : new java.util.ArrayList<>(),
-            p.getSdgGoals() != null ? new java.util.ArrayList<>(p.getSdgGoals()) : new java.util.ArrayList<>(),
-            p.getNst2Goals() != null ? new java.util.ArrayList<>(p.getNst2Goals()) : new java.util.ArrayList<>(),
-            p.getAdditionalMediaUrls() != null ? new java.util.ArrayList<>(p.getAdditionalMediaUrls()) : new java.util.ArrayList<>(),
-            p.getCreatedAt(),
-            p.getUpdatedAt()
-        );
+        ProjectResponseDTO projectDTO = mapToDTO(project.get());
         
         return ResponseEntity.status(HttpStatus.OK).body(projectDTO);
     }
@@ -342,8 +294,30 @@ public class ProjectsController {
     }
 
     @PostMapping("/view/{id}")
-    public ResponseEntity<?> incrementViewCount(@PathVariable("id") Integer id) {
-        service.incrementViewCount(id);
+    public ResponseEntity<?> incrementViewCount(@PathVariable("id") Integer id, Authentication authentication) {
+        Optional<Projects> projectOpt = service.getProjectById(id);
+        if (projectOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        
+        Projects project = projectOpt.get();
+        
+        // Only increment if not the owner viewing their own project
+        boolean shouldIncrement = true;
+        if (authentication != null && authentication.isAuthenticated()) {
+            String principalName = authentication.getName();
+            User user = userRepository.findByEmail(principalName)
+                    .orElseGet(() -> userRepository.findByUsername(principalName).orElse(null));
+            
+            if (user != null && user.getId().equals(Long.valueOf(project.getOwnerId()))) {
+                shouldIncrement = false;
+            }
+        }
+        
+        if (shouldIncrement) {
+            service.incrementViewCount(id);
+        }
+        
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
