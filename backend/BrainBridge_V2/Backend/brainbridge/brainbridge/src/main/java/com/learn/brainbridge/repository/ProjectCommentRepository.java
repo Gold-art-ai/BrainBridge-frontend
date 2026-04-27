@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ProjectCommentRepository extends JpaRepository<ProjectComment, Long> {
     List<ProjectComment> findByProjectIdOrderByCreatedAtDesc(Integer projectId);
+    long countByProjectId(Integer projectId);
 }
