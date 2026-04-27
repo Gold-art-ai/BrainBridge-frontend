@@ -45,19 +45,19 @@ public class FavoritesController {
     @PostMapping("/{projectId}")
     public ResponseEntity<?> addFavorite(@PathVariable Integer projectId, Authentication authentication) {
         Long userId = getUserIdFromAuth(authentication);
-        if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(java.util.Map.of("error", "Unauthorized"));
 
         favoriteService.addFavorite(userId, projectId);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Project added to favorites");
+        return ResponseEntity.status(HttpStatus.CREATED).body(java.util.Map.of("message", "Project added to favorites"));
     }
 
     @DeleteMapping("/{projectId}")
     public ResponseEntity<?> removeFavorite(@PathVariable Integer projectId, Authentication authentication) {
         Long userId = getUserIdFromAuth(authentication);
-        if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(java.util.Map.of("error", "Unauthorized"));
 
         favoriteService.removeFavorite(userId, projectId);
-        return ResponseEntity.ok("Project removed from favorites");
+        return ResponseEntity.ok(java.util.Map.of("message", "Project removed from favorites"));
     }
 
     @GetMapping("/{projectId}/check")

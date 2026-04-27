@@ -73,6 +73,15 @@ public class ProjectResponseDTO {
     @JsonProperty("likesCount")
     private Long likesCount;
 
+    @JsonProperty("commentsCount")
+    private Long commentsCount;
+
+    @JsonProperty("isFavorited")
+    private Boolean isFavorited;
+
+    @JsonProperty("isLiked")
+    private Boolean isLiked;
+
     @JsonProperty("createdAt")
     private LocalDate createdAt;
 
@@ -88,7 +97,7 @@ public class ProjectResponseDTO {
             Integer viewCount, Integer enterpriseRequests, String field, List<String> mainTags,
             List<String> subTags, List<String> sdgGoals, List<String> nst2Goals,
             List<String> additionalMediaUrls, LocalDate createdAt, LocalDate updatedAt,
-            String ownerName, Long likesCount) {
+            String ownerName, Long likesCount, Long commentsCount, Boolean isFavorited, Boolean isLiked) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -113,6 +122,9 @@ public class ProjectResponseDTO {
         this.updatedAt = updatedAt;
         this.ownerName = ownerName;
         this.likesCount = likesCount;
+        this.commentsCount = commentsCount;
+        this.isFavorited = isFavorited;
+        this.isLiked = isLiked;
     }
 
     // Getters and Setters
@@ -187,4 +199,13 @@ public class ProjectResponseDTO {
 
     public Long getLikesCount() { return likesCount; }
     public void setLikesCount(Long likesCount) { this.likesCount = likesCount; }
+
+    public Long getCommentsCount() { return commentsCount; }
+    public void setCommentsCount(Long commentsCount) { this.commentsCount = commentsCount; }
+
+    public Boolean getIsFavorited() { return isFavorited; }
+    public void setIsFavorited(Boolean isFavorited) { this.isFavorited = isFavorited; }
+
+    public Boolean getIsLiked() { return isLiked; }
+    public void setIsLiked(Boolean isLiked) { this.isLiked = isLiked; }
 }
