@@ -30,18 +30,21 @@ public class ProjectsController {
     private final UserRepository userRepository;
     private final com.learn.brainbridge.repository.FavoriteRepository favoriteRepository;
     private final com.learn.brainbridge.repository.ProjectCommentRepository projectCommentRepository;
+    private final com.learn.brainbridge.repository.ProjectLikeRepository projectLikeRepository;
 
     @Autowired
     public ProjectsController(
             ProjectsService service, 
             UserRepository userRepository,
             com.learn.brainbridge.repository.FavoriteRepository favoriteRepository,
-            com.learn.brainbridge.repository.ProjectCommentRepository projectCommentRepository
+            com.learn.brainbridge.repository.ProjectCommentRepository projectCommentRepository,
+            com.learn.brainbridge.repository.ProjectLikeRepository projectLikeRepository
     ) {
         this.service = service;
         this.userRepository = userRepository;
         this.favoriteRepository = favoriteRepository;
         this.projectCommentRepository = projectCommentRepository;
+        this.projectLikeRepository = projectLikeRepository;
     }
 
     @GetMapping("/{id}/comments")
@@ -72,7 +75,7 @@ public class ProjectsController {
             @Valid @RequestBody com.learn.brainbridge.dtos.CommentDTO commentDto
     ) {
         if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(java.util.Map.of("error", "Unauthorized"));
         }
 
         String principalName = authentication.getName();
@@ -80,7 +83,7 @@ public class ProjectsController {
                 .orElseGet(() -> userRepository.findByUsername(principalName).orElse(null));
 
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(java.util.Map.of("error", "User not found"));
         }
 
         com.learn.brainbridge.entity.ProjectComment comment = new com.learn.brainbridge.entity.ProjectComment(id, user.getId(), commentDto.getContent());
@@ -119,7 +122,7 @@ public class ProjectsController {
 
         if (user == null) {
             log.warn("  REJECTED: User not found for principal: {}", principalName);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(java.util.Map.of("error", "User not found"));
         }
 
         log.info("  User found: {} (ID: {})", user.getUsername(), user.getId());
@@ -130,7 +133,7 @@ public class ProjectsController {
         } catch (ArithmeticException ex) {
             log.error("  User ID too large: {}", user.getId());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("User ID is too large to map to project owner id");
+                    .body(java.util.Map.of("error", "User ID is too large to map to project owner id"));
         }
 
         Projects project = new Projects();
@@ -161,7 +164,7 @@ public class ProjectsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
-    private ProjectResponseDTO mapToDTO(Projects p) {
+    private ProjectResponseDTO mapToDTO(Projects p, Authentication auth) {
         String ownerName = "Anonymous";
         User user = userRepository.findById(Long.valueOf(p.getOwnerId())).orElse(null);
         if (user != null) {
@@ -171,7 +174,21 @@ public class ProjectsController {
             }
         }
 
-        long likesCount = favoriteRepository.countByProjectId(p.getId());
+        long likesCount = projectLikeRepository.countByProjectId(p.getId());
+        long commentsCount = projectCommentRepository.countByProjectId(p.getId());
+        
+        boolean isFavorited = false;
+        boolean isLiked = false;
+        
+        if (auth != null && auth.isAuthenticated()) {
+            String principalName = auth.getName();
+            User currentUser = userRepository.findByEmail(principalName)
+                    .orElseGet(() -> userRepository.findByUsername(principalName).orElse(null));
+            if (currentUser != null) {
+                isFavorited = favoriteRepository.existsByUserIdAndProjectId(currentUser.getId(), p.getId());
+                isLiked = projectLikeRepository.existsByUserIdAndProjectId(currentUser.getId(), p.getId());
+            }
+        }
 
         return new ProjectResponseDTO(
             p.getId(),
@@ -197,12 +214,15 @@ public class ProjectsController {
             p.getCreatedAt(),
             p.getUpdatedAt(),
             ownerName,
-            likesCount
+            likesCount,
+            commentsCount,
+            isFavorited,
+            isLiked
         );
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllProjects() {
+    public ResponseEntity<?> getAllProjects(Authentication auth) {
         List<Projects> projects = service.getAllProjects();
         if (projects.isEmpty()) {
             return ResponseEntity
@@ -211,7 +231,7 @@ public class ProjectsController {
         }
         
         List<ProjectResponseDTO> projectDTOs = projects.stream()
-            .map(this::mapToDTO)
+            .map(p -> mapToDTO(p, auth))
             .collect(java.util.stream.Collectors.toList());
         
         return ResponseEntity.status(HttpStatus.OK).body(projectDTOs);
@@ -261,7 +281,7 @@ public class ProjectsController {
                 
                 // Convert to DTOs to avoid Hibernate serialization issues
                 List<ProjectResponseDTO> projectDTOs = projects.stream()
-                    .map(this::mapToDTO)
+                    .map(p -> mapToDTO(p, authentication))
                     .collect(java.util.stream.Collectors.toList());
                 
                 log.info("  Converted to {} DTOs", projectDTOs.size());
@@ -310,7 +330,7 @@ public class ProjectsController {
     }
 
     @GetMapping("/team/{teamName}")
-    public ResponseEntity<?> getProject(@PathVariable("teamName") Integer teamName) {
+    public ResponseEntity<?> getProject(@PathVariable("teamName") Integer teamName, Authentication auth) {
         List<Projects> projects = service.getProjectsByTeam(teamName);
         if (projects.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No projects found for team " + teamName);
@@ -318,21 +338,21 @@ public class ProjectsController {
         
         // Convert to DTOs to avoid Hibernate serialization issues
         List<ProjectResponseDTO> projectDTOs = projects.stream()
-            .map(this::mapToDTO)
+            .map(p -> mapToDTO(p, auth))
             .collect(java.util.stream.Collectors.toList());
         
         return ResponseEntity.status(HttpStatus.OK).body(projectDTOs);
     }
 
     @GetMapping("/fetch/{id}")
-    public ResponseEntity<?> getProjectById(@PathVariable("id") Integer id) {
+    public ResponseEntity<?> getProjectById(@PathVariable("id") Integer id, Authentication auth) {
         Optional<Projects> project = service.getProjectById(id);
         if (project.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No projects found");
         }
         
         // Convert to DTO to avoid Hibernate serialization issues
-        ProjectResponseDTO projectDTO = mapToDTO(project.get());
+        ProjectResponseDTO projectDTO = mapToDTO(project.get(), auth);
         
         return ResponseEntity.status(HttpStatus.OK).body(projectDTO);
     }
@@ -357,24 +377,52 @@ public class ProjectsController {
         }
         
         Projects project = projectOpt.get();
-        
-        // Only increment if not the owner viewing their own project
         boolean shouldIncrement = true;
         if (authentication != null && authentication.isAuthenticated()) {
             String principalName = authentication.getName();
             User user = userRepository.findByEmail(principalName)
                     .orElseGet(() -> userRepository.findByUsername(principalName).orElse(null));
-            
             if (user != null && user.getId().equals(Long.valueOf(project.getOwnerId()))) {
                 shouldIncrement = false;
             }
         }
-        
         if (shouldIncrement) {
             service.incrementViewCount(id);
         }
-        
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @PostMapping("/{id}/likes/toggle")
+    @Transactional
+    public ResponseEntity<?> toggleLike(@PathVariable("id") Integer id, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        String principalName = authentication.getName();
+        User user = userRepository.findByEmail(principalName)
+                .orElseGet(() -> userRepository.findByUsername(principalName).orElse(null));
+
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+
+        Optional<Projects> projectOpt = service.getProjectById(id);
+        if (projectOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project not found");
+        }
+
+        Optional<com.learn.brainbridge.entity.ProjectLike> existing = projectLikeRepository.findByUserIdAndProjectId(user.getId(), id);
+        boolean likedByMe;
+        if (existing.isPresent()) {
+            projectLikeRepository.deleteByUserIdAndProjectId(user.getId(), id);
+            likedByMe = false;
+        } else {
+            projectLikeRepository.save(new com.learn.brainbridge.entity.ProjectLike(user.getId(), id));
+            likedByMe = true;
+        }
+
+        long count = projectLikeRepository.countByProjectId(id);
+        return ResponseEntity.ok(java.util.Map.of("likesCount", count, "isLiked", likedByMe));
+    }
 }

@@ -36,6 +36,7 @@ const apiSlice = (0, __TURBOPACK__imported__module__$5b$project$5d2f$brainbridge
         'Article',
         'ArticleLikes',
         'ArticleComments',
+        'Comments',
         'Favorites',
         'Messages',
         'Notifications'

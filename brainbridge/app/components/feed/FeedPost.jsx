@@ -2,12 +2,18 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Heart, MessageCircle, Share2, Bookmark, Activity } from 'lucide-react';
+import { useToggleProjectLikeMutation } from '../../redux/api/ProjectsApiSlice';
+import { useAddFavoriteMutation, useRemoveFavoriteMutation } from '../../redux/api/FavoritesApiSlice';
 import RecommendationBadge from './RecommendationBadge';
 
 export default function FeedPost({ project, recommendationReason }) {
-  const [isLiked, setIsLiked] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+  const [isLiked, setIsLiked] = useState(project.isLiked || false);
+  const [isSaved, setIsSaved] = useState(project.isFavorited || false);
   const [likesCount, setLikesCount] = useState(project.likesCount || 0);
+
+  const [toggleLike] = useToggleProjectLikeMutation();
+  const [addFavorite] = useAddFavoriteMutation();
+  const [removeFavorite] = useRemoveFavoriteMutation();
 
   const tags =
     (project.mainTags && project.mainTags.length > 0)
@@ -16,13 +22,25 @@ export default function FeedPost({ project, recommendationReason }) {
         ? project.tech
         : (project.field ? [project.field] : []);
 
-  const handleLike = () => {
-    // Note: Actual like/favorite API call should be here, but using local toggle for now
-    setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
-    setIsLiked(!isLiked);
+  const handleLike = async () => {
+    try {
+      const res = await toggleLike(project.id).unwrap();
+      setIsLiked(res.isLiked);
+      setLikesCount(res.likesCount);
+    } catch (err) { console.error("Like toggle failed", err); }
   };
 
-  const handleSave = () => setIsSaved(!isSaved);
+  const handleSave = async () => {
+    try {
+      if (isSaved) {
+        await removeFavorite(project.id).unwrap();
+        setIsSaved(false);
+      } else {
+        await addFavorite(project.id).unwrap();
+        setIsSaved(true);
+      }
+    } catch (err) { console.error("Save toggle failed", err); }
+  };
 
   const authorName = project.ownerName || "Anonymous Developer";
   const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=random&color=fff`;
@@ -74,7 +92,7 @@ export default function FeedPost({ project, recommendationReason }) {
           </button>
           <button className="group flex items-center gap-2 transition-transform active:scale-90 hover:bg-gray-50 p-2 -ml-2 rounded-2xl touch-manipulation">
             <MessageCircle size={26} className="text-gray-500 group-hover:text-[var(--primary)] transition-colors stroke-2" />
-            <span className="text-[13px] font-bold text-gray-500">12</span>
+            <span className="text-[13px] font-bold text-gray-500">{project.commentsCount || 0}</span>
           </button>
           <button className="group relative flex items-center justify-center transition-transform active:scale-90 hover:bg-gray-50 w-10 h-10 rounded-2xl touch-manipulation">
             <Share2 size={22} className="text-gray-500 group-hover:text-[var(--primary)] transition-colors absolute stroke-2" />
