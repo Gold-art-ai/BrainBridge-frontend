@@ -47,6 +47,10 @@ export const projectsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ['Comments']
     }),
+    toggleProjectLike: builder.mutation({
+      query: id => ({ url: `/projects/${id}/likes/toggle`, method: 'POST' }),
+      invalidatesTags: ['Projects']
+    }),
   }),
   overrideExisting: false,
 })
@@ -62,4 +66,5 @@ export const {
   useIncrementViewCountMutation,
   useGetProjectCommentsQuery,
   useAddProjectCommentMutation,
+  useToggleProjectLikeMutation,
 } = projectsApi

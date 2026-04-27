@@ -75,10 +75,10 @@ export default function FavoritesPage() {
               Explore the Discovery Hub to find and save innovative project nodes to your personal archive.
             </p>
             <Link 
-                href="/projects" 
+                href="/dashboard/feed" 
                 className="flex items-center gap-2 bg-[var(--primary)] text-white px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--primary-dark)] transition-all"
             >
-              Go to Discovery <ArrowRight size={14} />
+              Go to Feed <ArrowRight size={14} />
             </Link>
           </div>
         )}

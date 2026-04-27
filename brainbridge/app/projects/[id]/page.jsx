@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useGetProjectByIdQuery, useIncrementViewCountMutation, useGetProjectCommentsQuery, useAddProjectCommentMutation } from '../../redux/api/ProjectsApiSlice';
+import { useGetProjectByIdQuery, useIncrementViewCountMutation, useGetProjectCommentsQuery, useAddProjectCommentMutation, useToggleProjectLikeMutation } from '../../redux/api/ProjectsApiSlice';
 import { useCheckFavoriteQuery, useAddFavoriteMutation, useRemoveFavoriteMutation } from '../../redux/api/FavoritesApiSlice';
 import { useSendMessageMutation } from '../../redux/api/MessagesApiSlice';
-import { ArrowLeft, MessageSquare, Heart, Send, Terminal, Activity, Eye } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Heart, Send, Terminal, Activity, Eye, Bookmark } from 'lucide-react';
 import Link from 'next/link';
 import ProjectView from "../../components/projects/ProjectView"; 
 
@@ -16,13 +16,17 @@ export default function ProjectPage() {
   
   const { data: fetchedProject, refetch: refetchProject } = useGetProjectByIdQuery(id, { skip: !id });
   const { data: comments = [] } = useGetProjectCommentsQuery(id, { skip: !id });
-  const { data: isFavorited } = useCheckFavoriteQuery(id, { skip: !id });
   
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+
   const [incrementViewCount] = useIncrementViewCountMutation();
   const [sendMessage] = useSendMessageMutation();
   const [addComment] = useAddProjectCommentMutation();
   const [addFavorite] = useAddFavoriteMutation();
   const [removeFavorite] = useRemoveFavoriteMutation();
+  const [toggleLike] = useToggleProjectLikeMutation();
 
   const [user, setUser] = useState(null);
   useEffect(() => {
@@ -31,6 +35,14 @@ export default function ProjectPage() {
       try { setUser(JSON.parse(userStr)); } catch (e) {}
     }
   }, []);
+
+  useEffect(() => {
+    if (fetchedProject) {
+      setIsLiked(fetchedProject.isLiked || false);
+      setIsSaved(fetchedProject.isFavorited || false);
+      setLikesCount(fetchedProject.likesCount || 0);
+    }
+  }, [fetchedProject]);
 
   const isOwner = user && project && (
     user.id === project.ownerId || 
@@ -41,14 +53,25 @@ export default function ProjectPage() {
   useEffect(() => {
     const handleInitialLoad = async () => {
       if (fetchedProject && !isNaN(Number(id))) {
-        try {
-          await incrementViewCount(id).unwrap();
-          refetchProject();
-        } catch (e) {}
+        // Unique Session-based View Incrementation
+        const sessionKey = 'viewed_projects';
+        const viewedProjects = JSON.parse(sessionStorage.getItem(sessionKey) || '[]');
+        
+        if (!viewedProjects.includes(id)) {
+          try {
+            await incrementViewCount(id).unwrap();
+            refetchProject();
+            // Register this node as viewed in the current session
+            sessionStorage.setItem(sessionKey, JSON.stringify([...viewedProjects, id]));
+          } catch (e) {
+            console.error("View registration bypass:", e);
+          }
+        }
         setProject(fetchedProject);
         return;
       }
     };
+    
     handleInitialLoad();
 
     if (!fetchedProject) {
@@ -63,11 +86,25 @@ export default function ProjectPage() {
     }
   }, [id, fetchedProject]);
 
-  const handleToggleFavorite = async () => {
+  const handleLike = async () => {
     if (!user) return;
     try {
-      if (isFavorited) await removeFavorite(id).unwrap();
-      else await addFavorite(id).unwrap();
+      const res = await toggleLike(id).unwrap();
+      setIsLiked(res.isLiked);
+      setLikesCount(res.likesCount);
+    } catch (err) { console.error(err); }
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+    try {
+      if (isSaved) {
+        await removeFavorite(id).unwrap();
+        setIsSaved(false);
+      } else {
+        await addFavorite(id).unwrap();
+        setIsSaved(true);
+      }
     } catch (err) { console.error(err); }
   };
 
@@ -107,15 +144,25 @@ export default function ProjectPage() {
           </div>
           System Hub
         </Link>
-        <button 
-          onClick={handleToggleFavorite}
-          className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl border transition-all text-[10px] font-black uppercase tracking-widest shadow-sm ${
-            isFavorited ? 'bg-red-50 border-red-100 text-red-500' : 'bg-white border-gray-100 text-gray-400 hover:text-red-500'
-          }`}
-        >
-          <Heart size={18} className={isFavorited ? 'fill-red-500' : ''} />
-          {project.likesCount || 0} Engagement
-        </button>
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={handleLike}
+            className={`flex items-center gap-3 px-8 py-3.5 rounded-2xl border transition-all text-[10px] font-black uppercase tracking-widest shadow-sm ${
+              isLiked ? 'bg-red-50 border-red-100 text-red-500' : 'bg-white border-gray-100 text-gray-400 hover:text-red-500'
+            }`}
+          >
+            <Heart size={18} className={isLiked ? 'fill-red-500' : ''} />
+            {likesCount} Likes
+          </button>
+          <button 
+            onClick={handleSave}
+            className={`w-12 h-12 rounded-2xl border flex items-center justify-center transition-all ${
+              isSaved ? 'bg-[var(--primary)] border-[var(--primary)] text-white shadow-lg shadow-blue-500/20' : 'bg-white border-gray-100 text-gray-400 hover:text-[var(--primary)]'
+            }`}
+          >
+            <Bookmark size={20} className={isSaved ? 'fill-white' : ''} />
+          </button>
+        </div>
       </header>
 
       <div className="px-6">
